@@ -8,12 +8,12 @@ public class BozbarContextTest {
 
     @Remotable("foo")
     public interface FooService {
-        String greet(String name);
+        String greet(@Default("stranger") String name);
     }
 
     public static class FooServiceImpl implements FooService {
         @Override
-        public String greet(@Default("stranger") String name) {
+        public String greet(String name) {
             return "Hello " + name;
         }
     }
