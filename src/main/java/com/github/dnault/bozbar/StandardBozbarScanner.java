@@ -16,8 +16,8 @@ public class StandardBozbarScanner implements BozbarScanner {
     public Collection<BozbarMethod> scan(Object o) {
         List<BozbarMethod> methods = new ArrayList<>();
 
-        for (Class iface : getAllInterfaces(o)) {
-            Remotable annotation = (Remotable) iface.getAnnotation(Remotable.class);
+        for (Class<?> iface : getAllInterfaces(o)) {
+            Remotable annotation = iface.getAnnotation(Remotable.class);
             if (annotation != null) {
                 methods.addAll(scan(o, iface, annotation.value()));
             }
@@ -27,7 +27,7 @@ public class StandardBozbarScanner implements BozbarScanner {
         return methods;
     }
 
-    protected Collection<BozbarMethod> scan(Object owner, Class iface, String namespace) {
+    protected Collection<BozbarMethod> scan(Object owner, Class<?> iface, String namespace) {
         return stream(iface.getMethods())
                 .map(method -> new BozbarMethod(namespace, owner, method, iface))
                 .collect(Collectors.toList());
