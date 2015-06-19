@@ -13,7 +13,7 @@ import com.github.dnault.bozbar.core.internal.MethodDefinition;
 public class MethodRegistry {
     private final HashMap<String, MethodDefinition> methodsByName = new HashMap<>();
 
-    private Introspector scanner = new StandardIntrospector();
+    private MethodIntrospector scanner = new StandardMethodIntrospector();
     private final ObjectMapper objectMapper;
 
     public MethodRegistry() {
@@ -29,7 +29,7 @@ public class MethodRegistry {
     }
 
     public void scan(Object o) {
-        for (MethodDefinition method : scanner.scan(o)) {
+        for (MethodDefinition method : scanner.findMethods(o)) {
             methodsByName.put(method.getUnqualifiedName(), method);
         }
     }

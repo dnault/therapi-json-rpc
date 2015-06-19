@@ -26,7 +26,7 @@ public class StandardIntrospectorTest {
 
     @Test
     public void testScan() throws Exception {
-        Collection<MethodDefinition> methods = new StandardIntrospector().scan(new FooServiceImpl());
+        Collection<MethodDefinition> methods = new StandardMethodIntrospector().findMethods(new FooServiceImpl());
 
         assertEquals(ImmutableList.of("greet"),
                 methods.stream().map(MethodDefinition::getUnqualifiedName).collect(toList()));
