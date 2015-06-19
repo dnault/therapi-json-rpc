@@ -1,10 +1,10 @@
-package com.github.dnault.bozbar;
+package com.github.dnault.bozbar.core;
 
-import com.github.dnault.bozbar.annotation.Default;
-import com.github.dnault.bozbar.annotation.Remotable;
+import com.github.dnault.bozbar.core.annotation.Default;
+import com.github.dnault.bozbar.core.annotation.Remotable;
 import org.junit.Test;
 
-public class BozbarContextTest {
+public class MethodRegistryTest {
 
     @Remotable("foo")
     public interface FooService {
@@ -19,9 +19,11 @@ public class BozbarContextTest {
     }
 
     @Test
-    public void foo() {
-        BozbarContext context = new BozbarContext();
+    public void foo() throws Exception {
+        MethodRegistry context = new MethodRegistry();
         context.scan(new FooServiceImpl());
+
+        System.out.println(context.invoke("greet", context.getObjectMapper().createObjectNode()));
     }
 
 

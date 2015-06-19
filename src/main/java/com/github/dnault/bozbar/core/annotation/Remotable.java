@@ -1,4 +1,4 @@
-package com.github.dnault.bozbar.annotation;
+package com.github.dnault.bozbar.core.annotation;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
