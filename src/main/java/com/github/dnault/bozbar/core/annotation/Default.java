@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(PARAMETER)
 public @interface Default {
-    public static final String NULL = "_!$NULL$!_";
+    String NULL = "_!$NULL$!_";
     String value() default NULL;
 }

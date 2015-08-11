@@ -35,4 +35,8 @@ public class MethodDefinition {
     public Object getOwner() {
         return owner;
     }
+
+    public ImmutableList<ParameterDefinition> getParameters() {
+        return params;
+    }
 }

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dnault.bozbar.core.annotation.Default;
 import com.github.dnault.bozbar.core.annotation.Remotable;
 import com.github.dnault.bozbar.core.internal.MethodDefinition;
@@ -26,7 +27,7 @@ public class StandardIntrospectorTest {
 
     @Test
     public void testScan() throws Exception {
-        Collection<MethodDefinition> methods = new StandardMethodIntrospector().findMethods(new FooServiceImpl());
+        Collection<MethodDefinition> methods = new StandardMethodIntrospector(new ObjectMapper()).findMethods(new FooServiceImpl());
 
         assertEquals(ImmutableList.of("greet"),
                 methods.stream().map(MethodDefinition::getUnqualifiedName).collect(toList()));

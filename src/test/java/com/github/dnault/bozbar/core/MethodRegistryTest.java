@@ -2,6 +2,7 @@ package com.github.dnault.bozbar.core;
 
 import com.github.dnault.bozbar.core.annotation.Default;
 import com.github.dnault.bozbar.core.annotation.Remotable;
+import com.github.dnault.bozbar.core.internal.JacksonHelper;
 import org.junit.Test;
 
 public class MethodRegistryTest {
@@ -20,11 +21,10 @@ public class MethodRegistryTest {
 
     @Test
     public void foo() throws Exception {
-        MethodRegistry context = new MethodRegistry();
+        MethodRegistry context = new MethodRegistry(JacksonHelper.newLenientObjectMapper());
         context.scan(new FooServiceImpl());
 
-        System.out.println(context.invoke("greet", context.getObjectMapper().createObjectNode()));
+        System.out.println(context.invoke("greet", context.getObjectMapper().readTree("{name:'henry'}")));
+        System.out.println(context.invoke("greet", context.getObjectMapper().readTree("[]")));
     }
-
-
 }

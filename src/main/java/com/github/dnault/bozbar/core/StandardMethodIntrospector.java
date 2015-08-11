@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dnault.bozbar.core.annotation.Remotable;
 import com.github.dnault.bozbar.core.internal.MethodDefinition;
 
@@ -15,8 +16,8 @@ public class StandardMethodIntrospector implements MethodIntrospector {
 
     private final ParameterIntrospector parameterIntrospector;
 
-    public StandardMethodIntrospector() {
-        this(new StandardParameterIntrospector());
+    public StandardMethodIntrospector(ObjectMapper mapper) {
+        this(new StandardParameterIntrospector(mapper));
     }
     public StandardMethodIntrospector(ParameterIntrospector parameterIntrospector) {
         this.parameterIntrospector = requireNonNull(parameterIntrospector);
