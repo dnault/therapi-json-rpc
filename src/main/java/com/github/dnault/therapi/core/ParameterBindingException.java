@@ -1,4 +1,4 @@
-package com.github.dnault.bozbar.core;
+package com.github.dnault.therapi.core;
 
 public class ParameterBindingException extends RuntimeException {
     public ParameterBindingException(String s) {

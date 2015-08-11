@@ -1,8 +1,8 @@
-package com.github.dnault.bozbar.core;
+package com.github.dnault.therapi.core;
 
-import com.github.dnault.bozbar.core.annotation.Default;
-import com.github.dnault.bozbar.core.annotation.Remotable;
-import com.github.dnault.bozbar.core.internal.JacksonHelper;
+import com.github.dnault.therapi.core.annotation.Default;
+import com.github.dnault.therapi.core.annotation.Remotable;
+import com.github.dnault.therapi.core.internal.JacksonHelper;
 import org.junit.Test;
 
 public class MethodRegistryTest {

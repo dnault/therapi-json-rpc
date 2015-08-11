@@ -1,4 +1,4 @@
-package com.github.dnault.bozbar.core.internal;
+package com.github.dnault.therapi.core.internal;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;

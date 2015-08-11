@@ -1,8 +1,8 @@
-package com.github.dnault.bozbar.core;
+package com.github.dnault.therapi.core;
 
 import java.util.Collection;
 
-import com.github.dnault.bozbar.core.internal.MethodDefinition;
+import com.github.dnault.therapi.core.internal.MethodDefinition;
 
 /**
  * Scans an object and returns a list of method definitions provided by the object.

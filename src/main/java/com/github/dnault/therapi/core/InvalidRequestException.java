@@ -1,4 +1,4 @@
-package com.github.dnault.bozbar.core;
+package com.github.dnault.therapi.core;
 
 public class InvalidRequestException extends RuntimeException {
     public InvalidRequestException() {

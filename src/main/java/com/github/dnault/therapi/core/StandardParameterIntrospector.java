@@ -1,8 +1,8 @@
-package com.github.dnault.bozbar.core;
+package com.github.dnault.therapi.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.dnault.bozbar.core.annotation.Default;
-import com.github.dnault.bozbar.core.internal.ParameterDefinition;
+import com.github.dnault.therapi.core.annotation.Default;
+import com.github.dnault.therapi.core.internal.ParameterDefinition;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;

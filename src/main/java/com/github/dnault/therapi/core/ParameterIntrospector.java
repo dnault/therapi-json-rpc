@@ -1,9 +1,9 @@
-package com.github.dnault.bozbar.core;
+package com.github.dnault.therapi.core;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
-import com.github.dnault.bozbar.core.internal.ParameterDefinition;
+import com.github.dnault.therapi.core.internal.ParameterDefinition;
 
 public interface ParameterIntrospector {
     List<ParameterDefinition> findParameters(Method method);

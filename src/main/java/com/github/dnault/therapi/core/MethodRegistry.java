@@ -1,11 +1,11 @@
-package com.github.dnault.bozbar.core;
+package com.github.dnault.therapi.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.dnault.bozbar.core.internal.MethodDefinition;
-import com.github.dnault.bozbar.core.internal.ParameterDefinition;
+import com.github.dnault.therapi.core.internal.MethodDefinition;
+import com.github.dnault.therapi.core.internal.ParameterDefinition;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package com.github.dnault.bozbar.core;
+package com.github.dnault.therapi.core;
 
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
@@ -6,9 +6,9 @@ import static org.junit.Assert.assertEquals;
 import java.util.Collection;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.dnault.bozbar.core.annotation.Default;
-import com.github.dnault.bozbar.core.annotation.Remotable;
-import com.github.dnault.bozbar.core.internal.MethodDefinition;
+import com.github.dnault.therapi.core.annotation.Default;
+import com.github.dnault.therapi.core.annotation.Remotable;
+import com.github.dnault.therapi.core.internal.MethodDefinition;
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 

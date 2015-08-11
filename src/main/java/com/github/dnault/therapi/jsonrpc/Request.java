@@ -1,4 +1,4 @@
-package com.github.dnault.bozbar.jsonrpc;
+package com.github.dnault.therapi.jsonrpc;
 
 public class Request {
     String version;

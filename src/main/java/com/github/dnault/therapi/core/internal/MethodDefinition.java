@@ -1,4 +1,4 @@
-package com.github.dnault.bozbar.core.internal;
+package com.github.dnault.therapi.core.internal;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
