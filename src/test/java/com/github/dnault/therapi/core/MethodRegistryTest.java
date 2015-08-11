@@ -7,7 +7,7 @@ import org.junit.Test;
 
 public class MethodRegistryTest {
 
-    @Remotable("foo")
+    @Remotable("")
     public interface FooService {
         String greet(@Default("stranger") String name);
     }

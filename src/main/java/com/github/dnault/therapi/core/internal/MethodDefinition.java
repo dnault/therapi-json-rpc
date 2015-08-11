@@ -1,5 +1,6 @@
 package com.github.dnault.therapi.core.internal;
 
+import static com.google.common.base.Strings.emptyToNull;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import javax.annotation.Nullable;
@@ -20,12 +21,12 @@ public class MethodDefinition {
         this.method = method;
         this.owner = owner;
         this.params = ImmutableList.copyOf(params);
-        this.namespace = Optional.ofNullable(namespace);
+        this.namespace = Optional.ofNullable(emptyToNull(namespace));
         this.shortName = defaultIfNull(shortName, method.getName());
     }
 
     public String getUnqualifiedName() {
-        return method.getName();
+        return shortName;
     }
 
     public Method getMethod() {
@@ -38,5 +39,13 @@ public class MethodDefinition {
 
     public ImmutableList<ParameterDefinition> getParameters() {
         return params;
+    }
+
+    public String getQualifiedName(String namespaceSeparator) {
+        return namespace.isPresent() ? (namespace.get() + namespaceSeparator + shortName) : shortName;
+    }
+
+    public Optional<String> getNamespace() {
+        return namespace;
     }
 }

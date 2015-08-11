@@ -19,6 +19,7 @@ public class MethodRegistry {
 
     private MethodIntrospector scanner;
     private final ObjectMapper objectMapper;
+    private String namespaceSeparator = ".";
 
     public MethodRegistry() {
         this(new ObjectMapper());
@@ -35,7 +36,7 @@ public class MethodRegistry {
 
     public void scan(Object o) {
         for (MethodDefinition method : scanner.findMethods(o)) {
-            methodsByName.put(method.getUnqualifiedName(), method);
+            methodsByName.put(getName(method), method);
         }
     }
 
@@ -92,8 +93,7 @@ public class MethodRegistry {
     }
 
     private String getName(MethodDefinition method) {
-        // todo use qualified name
-        return method.getUnqualifiedName();
+        return method.getQualifiedName(namespaceSeparator);
     }
 
     private Object[] bindPositionalArguments(MethodDefinition method, ArrayNode args) {
