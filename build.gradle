@@ -18,5 +18,9 @@ dependencies {
     testCompile 'junit:junit:4.11'
 }
 
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-parameters"
+}
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
