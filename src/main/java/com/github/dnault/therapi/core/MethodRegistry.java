@@ -66,8 +66,6 @@ public class MethodRegistry {
         }
 
         return bindNamedArguments(method, (ObjectNode) args);
-
-
     }
 
     private Object[] bindNamedArguments(MethodDefinition method, ObjectNode args) {
@@ -76,15 +74,16 @@ public class MethodRegistry {
 
         int i = 0;
         for (ParameterDefinition p : params) {
-            Object arg = args.get(p.getName());
-
-            if (arg == null && !p.isNullable()) {
-                throw new ParameterBindingException("method '" + getName(method) + "' missing parameter '" + p.getName() + "' of type " + p.getType());
-            }
+            JsonNode arg = args.get(p.getName());
 
             if (!args.has(p.getName()) && p.getDefaultValueSupplier().isPresent()) {
                 boundArgs[i++] = p.getDefaultValueSupplier().get().get();
             } else {
+
+                if (arg.isNull() && !p.isNullable()) {
+                    throw new ParameterBindingException("parameter '" + p.getName() + "' must be non-null");
+                }
+
                 boundArgs[i++] = objectMapper.convertValue(arg, p.getType());
             }
         }
@@ -101,12 +100,27 @@ public class MethodRegistry {
         List<ParameterDefinition> params = method.getParameters();
 
         if (args.size() > params.size()) {
-            throw new ParameterBindingException("method '" + getName(method) + "' only accepts '" + params.size() + "' arguments but " + args.size() + " were provided");
+            throw new ParameterBindingException("method '" + getName(method) + "' only accepts " + params.size() + " arguments but " + args.size() + " were provided");
         }
 
         for (int i = 0; i < params.size(); i++) {
-            // check nullable / default value for args, extra args
-            boundArgs[i] = objectMapper.convertValue(args.get(i), params.get(i).getType());
+            ParameterDefinition param = params.get(i);
+
+            if (!args.has(i)) {
+                if (param.getDefaultValueSupplier().isPresent()) {
+                    boundArgs[i] = param.getDefaultValueSupplier().get().get();
+                    continue;
+                } else {
+                    throw new ParameterBindingException("missing parameter '" + param.getName() + "'");
+                }
+            }
+
+            JsonNode arg = args.get(i);
+            if (arg.isNull() && !param.isNullable()) {
+                throw new ParameterBindingException("parameter '" + param.getName() + "' must be non-null");
+            }
+
+            boundArgs[i] = objectMapper.convertValue(arg, param.getType());
         }
         return boundArgs;
     }

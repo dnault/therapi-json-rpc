@@ -9,13 +9,15 @@ import org.junit.Test;
 
 public class CalculatorServiceTest {
     MethodRegistry context = new MethodRegistry(JacksonHelper.newLenientObjectMapper());
+
     {
         context.scan(new CalculatorServiceImpl());
     }
 
+
     @Test
-    public void foo() throws Exception {
-        check("calculator.add", "[[1,2,3]]", "6");
+    public void multiplyFractions() throws Exception {
+        check("calculator.multiplyFractions", "[[{numerator:2, denominator:3},{numerator:4, denominator:5}]]", "{numerator:8, denominator:15}");
     }
 
     protected void check(String methodName, String args, String expectedResult) throws Exception {

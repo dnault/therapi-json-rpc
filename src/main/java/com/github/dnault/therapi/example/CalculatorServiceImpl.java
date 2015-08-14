@@ -3,8 +3,10 @@ package com.github.dnault.therapi.example;
 import java.util.List;
 
 public class CalculatorServiceImpl implements CalculatorService {
+    private static final Fraction ONE = new Fraction(1, 1);
+
     @Override
-    public int add(List<Integer> addends) {
-        return addends.stream().reduce(0, (x, y) -> x + y);
+    public Fraction multiplyFractions(List<Fraction> multiplicands) {
+        return multiplicands.stream().reduce(ONE, Fraction::multiplyBy);
     }
 }

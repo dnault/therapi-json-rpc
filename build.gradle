@@ -1,3 +1,14 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.2'
+    }
+}
+
+apply plugin: 'org.asciidoctor.convert'
 apply plugin: 'java'
 apply plugin: 'idea'
 
@@ -8,19 +19,37 @@ repositories {
 dependencies {
     compile 'com.google.code.findbugs:jsr305:3.0.0'
     compile 'com.google.guava:guava:18.0'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.5.3'
+
+    def jacksonVersion = '2.6.1'
+    compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    compile "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
 
     def springVersion = '4.1.6.RELEASE'
     compile "org.springframework:spring-beans:${springVersion}"
     compile "org.springframework:spring-context:${springVersion}"
+
     compile 'org.apache.commons:commons-lang3:3.4'
 
     testCompile 'junit:junit:4.11'
 }
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-parameters"
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+
+asciidoctor {
+    attributes 'source-highlighter': 'coderay',
+           // toc: '',
+            idprefix: '',
+            idseparator: '-',
+            'data-uri': '',
+            example: "${projectDir}/src/main/java/com/github/dnault/therapi/example/"
+
+    // icons               : '',
+    // 'data-uri'          : ''
+}
+

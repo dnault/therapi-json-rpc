@@ -3,13 +3,17 @@ package com.github.dnault.therapi.core;
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dnault.therapi.core.annotation.Default;
 import com.github.dnault.therapi.core.internal.ParameterDefinition;
+
+import static com.github.dnault.therapi.core.internal.JacksonHelper.getTypeReference;
 
 public class StandardParameterIntrospector implements ParameterIntrospector {
     private final ObjectMapper objectMapper;
@@ -22,17 +26,22 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
     public List<ParameterDefinition> findParameters(Method method) {
         List<ParameterDefinition> params = new ArrayList<>();
         for (Parameter p : method.getParameters()) {
-            params.add(new ParameterDefinition(getName(p), isNullable(p), getDefaultValueSupplier(p), p.getType()));
+            TypeReference typeReference = getTypeReference(p);
+            params.add(new ParameterDefinition(getName(p), isNullable(p), getDefaultValueSupplier(p, typeReference), typeReference));
         }
         return params;
     }
 
     protected
     @Nullable
-    Supplier<?> getDefaultValueSupplier(Parameter p) {
+    Supplier<?> getDefaultValueSupplier(Parameter p, TypeReference typeReference) {
         Default defaultAnnotation = p.getAnnotation(Default.class);
-        if (defaultAnnotation == null || Default.NULL.equals(defaultAnnotation.value())) {
+        if (defaultAnnotation == null) {
             return null;
+        }
+
+        if (Default.NULL.equals(defaultAnnotation.value())) {
+            return getDefaultValueSupplier(p.getType());
         }
 
         String defaultValueStr = defaultAnnotation.value();
@@ -41,7 +50,35 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
             return () -> defaultValueStr;
         }
 
-        return () -> objectMapper.convertValue(defaultValueStr, p.getType());
+        return () -> objectMapper.convertValue(defaultValueStr, typeReference);
+    }
+
+    private Supplier<?> getDefaultValueSupplier(Class<?> type) {
+        if (type == Boolean.TYPE) {
+            return () -> false;
+        }
+        if (type == Integer.TYPE) {
+            return () -> 0;
+        }
+        if (type == Long.TYPE) {
+            return () -> 0L;
+        }
+        if (type == Character.TYPE) {
+            return () -> '\0';
+        }
+        if (type == Short.TYPE) {
+            return () -> (short) 0;
+        }
+        if (type == Byte.TYPE) {
+            return () -> (byte) 0;
+        }
+        if (type == Double.TYPE) {
+            return () -> (double) 0;
+        }
+        if (type == Float.TYPE) {
+            return () -> (float) 0;
+        }
+        return () -> null;
     }
 
     protected String getName(Parameter p) {

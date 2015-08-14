@@ -1,0 +1,91 @@
+
+# Therapi JSON-RPC Framework
+
+image::therapi.png[]
+
+
+## JSON-RPC in a Nutshell
+
+JSON-RPC is a standard protocol for making remote procedure calls. The client makes a request to the server
+by building a JSON object specifying the method name and arguments. The server returns a JSON object containing
+the method's return value or a message describing an error condition. It's simple, and it works!
+Take a moment to peruse http://www.jsonrpc.org/specification[the brief specification].
+
+
+## Therapi is JSON-RPC for Java
+
+Therapi is a Java library that uses https://github.com/FasterXML/jackson[Jackson] data binding to seamlessly
+expose your Java services over JSON-RPC. Annotated interfaces define the methods you want to expose. Method arguments
+and return values can be any object serializable by Jackson (including complex data types).
+Registering a service POJO with Therapi adds its methods to your JSON-RPC API. If you're using Spring, Therapi can
+scan your application context and automatically register any service beans it discovers.
+
+
+## Bells and Whistles
+
+* Because Therapi knows the method signatures of your API methods, it can automatically generate API documentation
+that incorporates Javadoc from your service methods.
+
+* Because your API is defined by Java interfaces, Therapi can use dynamic proxies to implement
+a Java client library for your API.
+
+* AOP Alliance method interceptors may be selectively applied to methods, making it easy to
+enforce authentication requirements, monitor response times, and apply http://beanvalidation.org[Bean Validation].
+
+
+## A Quick Example
+
+Let's make a web service for multiplying a list of fractions together. It will operate on a model called `Fraction`.
+Here's what the service interface looks like:
+
+[source,java]
+----
+include::{example}/CalculatorService.java[]
+----
+
+Notice that the interface is annotated as `@Remotable`. This is what tells Therapi that the interface methods
+should be included in your JSON-RPC API. It also assigns a namespace prefix to the methods, in this case `calculator`.
+Consequently, the method will be exported as `calculator.multiplyFractions`.
+
+The `@ExampleModel` annotation tells Therapi that when it generates the documentation for the `Fraction` model
+it should include the serialized JSON form of the object returned by this method.
+
+Now let's implement the `CalculatorService` interface:
+
+[source,java]
+----
+include::{example}/CalculatorServiceImpl.java[]
+----
+
+No surprises there -- just standard Java.
+
+
+### Invoking the method via JSON-RPC
+
+Here's the JSON-RPC2 request the client sends to invoke the method:
+
+[source,json]
+----
+{
+  "jsonrpc": "2.0",
+  "method": "calculator.multiplyFractions",
+  "params": {
+    "multiplicands": [
+      {"numerator": 2, "denominator": 5},
+      {"numerator": 3, "denominator": 7}
+    ]
+  },
+  "id": 1
+}
+----
+
+And the server response:
+
+[source,json]
+----
+{
+  "jsonrpc": "2.0",
+  "result": {"numerator": 6, "denominator": 35},
+  "id": 1
+}
+----
