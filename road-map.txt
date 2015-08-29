@@ -1,0 +1,19 @@
+
+
+Invoke methods over http
+
+parameterized superclass collection handling
+
+automatic documentation
+\- schemas
+
+json views
+
+method interception?
+
+automatic client
+
+metrics
+
+polymorphic type handling
+

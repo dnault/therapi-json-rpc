@@ -1,16 +1,17 @@
 package com.github.dnault.therapi.core;
 
-import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
-import static org.springframework.util.ClassUtils.getAllInterfaces;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.dnault.therapi.core.annotation.Remotable;
+import com.github.dnault.therapi.core.internal.MethodDefinition;
 
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.dnault.therapi.core.annotation.Remotable;
-import com.github.dnault.therapi.core.internal.MethodDefinition;
+import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
+import static org.springframework.util.ClassUtils.getAllInterfaces;
 
 public class StandardMethodIntrospector implements MethodIntrospector {
 
@@ -19,6 +20,7 @@ public class StandardMethodIntrospector implements MethodIntrospector {
     public StandardMethodIntrospector(ObjectMapper mapper) {
         this(new StandardParameterIntrospector(mapper));
     }
+
     public StandardMethodIntrospector(ParameterIntrospector parameterIntrospector) {
         this.parameterIntrospector = requireNonNull(parameterIntrospector);
     }
@@ -33,6 +35,7 @@ public class StandardMethodIntrospector implements MethodIntrospector {
 
     protected Stream<MethodDefinition> findMethodsOnInterface(Object owner, Class<?> iface, String namespace) {
         return Arrays.stream(iface.getMethods())
+                .filter(method -> !Modifier.isStatic(method.getModifiers()))
                 .map(method -> new MethodDefinition(namespace, null, method, owner, parameterIntrospector.findParameters(method)));
     }
 }

@@ -3,6 +3,7 @@ package com.github.dnault.therapi.core.internal;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
@@ -31,5 +32,9 @@ public class JacksonHelper {
                 return parameterizedType;
             }
         };
+    }
+
+    public static boolean isLikeNull(JsonNode node) {
+        return node == null || node.isNull();
     }
 }

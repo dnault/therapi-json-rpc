@@ -6,20 +6,38 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.dnault.therapi.core.internal.MethodDefinition;
 import com.github.dnault.therapi.core.internal.ParameterDefinition;
+import com.google.common.collect.TreeMultimap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.google.common.base.Throwables.propagate;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
 
 public class MethodRegistry {
+    private static final Logger log = LoggerFactory.getLogger(MethodRegistry.class);
+
     private final HashMap<String, MethodDefinition> methodsByName = new HashMap<>();
 
     private MethodIntrospector scanner;
     private final ObjectMapper objectMapper;
     private String namespaceSeparator = ".";
+
+    private boolean suggestMethods = true;
+
+    public boolean isSuggestMethods() {
+        return suggestMethods;
+    }
+
+    public void setSuggestMethods(boolean suggestMethods) {
+        this.suggestMethods = suggestMethods;
+    }
 
     public MethodRegistry() {
         this(new ObjectMapper());
@@ -40,6 +58,18 @@ public class MethodRegistry {
         }
     }
 
+    public List<String> suggestMethods(String methodName) {
+        TreeMultimap<Integer, String> suggestionsByDistance = TreeMultimap.create();
+        for (String name : methodsByName.keySet()) {
+            int distance = getLevenshteinDistance(name, methodName, 25);
+            if (distance != -1) {
+                suggestionsByDistance.put(distance, name);
+            }
+        }
+
+        return suggestionsByDistance.entries().stream().limit(5).map(Map.Entry::getValue).collect(toList());
+    }
+
     public JsonNode invoke(String methodName, JsonNode args) throws NoSuchMethodException {
         if (!args.isArray() && !args.isObject()) {
             throw new IllegalArgumentException("arguments must be ARRAY or OBJECT but encountered " + args.getNodeType());
@@ -47,7 +77,7 @@ public class MethodRegistry {
 
         MethodDefinition method = methodsByName.get(methodName);
         if (method == null) {
-            throw new NoSuchMethodException(methodName);
+            throw MethodNotFoundException.forMethod(methodName, suggestMethods ? suggestMethods(methodName) : null);
         }
 
         System.out.println(method.getParameters());
@@ -100,7 +130,7 @@ public class MethodRegistry {
         List<ParameterDefinition> params = method.getParameters();
 
         if (args.size() > params.size()) {
-            throw new ParameterBindingException("method '" + getName(method) + "' only accepts " + params.size() + " arguments but " + args.size() + " were provided");
+            throw new ParameterBindingException("method '" + getName(method) + "' was passed " + args.size() + " argument(s) but only accepts " + params.size());
         }
 
         for (int i = 0; i < params.size(); i++) {
