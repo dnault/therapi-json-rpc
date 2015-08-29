@@ -73,7 +73,7 @@ public class JsonRpcDispatcher {
             return invoke(requestNode);
 
         } catch (Throwable t) {
-            log.error("exception raised during json-rpc invocation", t);
+            log.warn("exception raised during json-rpc invocation", t);
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
             return buildErrorResponse(jsonRpcError, null);
         }
@@ -91,7 +91,7 @@ public class JsonRpcDispatcher {
             throw new InvalidRequestException("expected json-rpc request node to be ARRAY or OBJECT but found " + requestNode.getNodeType());
 
         } catch (Throwable t) {
-            log.error("exception raised during json-rpc invocation", t);
+            log.warn("exception raised during json-rpc invocation", t);
 
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
             return buildErrorResponse(jsonRpcError, null);
@@ -104,64 +104,99 @@ public class JsonRpcDispatcher {
             return invoke(requestNode);
 
         } catch (Throwable t) {
-            log.error("exception raised during json-rpc invocation", t);
+            log.warn("exception raised during json-rpc invocation", t);
 
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
             return buildErrorResponse(jsonRpcError, null);
         }
     }
 
-    public ObjectNode invokeSolo(JsonNode soloRequest) {
+    public boolean isValidSoloRequest(JsonNode soloRequest) {
         try {
-            if (!soloRequest.isObject()) {
-                throw new InvalidRequestException("expected request node to be OBJECT but found " + soloRequest.getNodeType());
+            validateSoloRequest(soloRequest);
+            return true;
+        }
+        catch (InvalidRequestException e) {
+            return false;
+        }
+    }
+
+    public Request validateSoloRequest(JsonNode soloRequest) throws InvalidRequestException {
+        if (!soloRequest.isObject()) {
+            throw new InvalidRequestException("expected request node to be OBJECT but found " + soloRequest.getNodeType());
+        }
+
+        JsonNode methodName = soloRequest.get("method");
+        if (isLikeNull(methodName)) {
+            throw new InvalidRequestException("missing non-null 'method' field");
+        }
+        if (!methodName.isTextual()) {
+            throw new InvalidRequestException("expected 'method' to be a STRING but found " + methodName.getNodeType());
+        }
+
+        JsonNode idNode = soloRequest.get("id");
+        if (!isValidId(idNode)) {
+            throw new InvalidRequestException("expected 'id' to be NULL or STRING or NUMBER but found " + idNode.getNodeType());
+        }
+
+        JsonNode versionNode = soloRequest.get("jsonrpc");
+        if (versionNode != null) {
+            if (!versionNode.isTextual()) {
+                throw new InvalidRequestException("expected 'jsonrpc' to be a STRING but found " + versionNode.getNodeType());
             }
 
-            JsonNode methodName = soloRequest.get("method");
-            if (isLikeNull(methodName)) {
-                throw new InvalidRequestException("missing non-null 'method' field");
+            if (!versionNode.asText().equals("2.0")) {
+                throw new InvalidRequestException("expected 'jsonrpc' to be '2.0' but found '" + versionNode.asText() + "'");
             }
-            if (!methodName.isTextual()) {
-                throw new InvalidRequestException("expected 'method' to be a STRING but found " + methodName.getNodeType());
+        }
+
+        JsonNode params = soloRequest.get("params");
+        if (isLikeNull(params)) {
+            params = getObjectMapper().createObjectNode();
+        } else {
+            if (!params.isArray() && !params.isObject()) {
+                throw new IllegalArgumentException("expected 'params' to be ARRAY or OBJECT but found " + params.getNodeType());
             }
+        }
 
-            JsonNode idNode = soloRequest.get("id");
-            if (!isValidId(idNode)) {
-                throw new InvalidRequestException("expected 'id' to be NULL or STRING or NUMBER but found " + idNode.getNodeType());
-            }
+        return new Request(methodName.asText(), idNode, params);
+    }
+    private static class Request {
+        private final String methodName;
+        private final JsonNode id;
+        private final JsonNode params;
 
-            JsonNode versionNode = soloRequest.get("jsonrpc");
-            if (versionNode != null) {
-                if (!versionNode.isTextual()) {
-                    throw new InvalidRequestException("expected 'jsonrpc' to be a STRING but found " + versionNode.getNodeType());
-                }
+        public Request(String methodName, JsonNode id, JsonNode params) {
+            this.methodName = methodName;
+            this.id = id;
+            this.params = params;
+        }
+    }
 
-                if (!versionNode.asText().equals("2.0")) {
-                    throw new InvalidRequestException("expected 'jsonrpc' to be '2.0' but found '" + versionNode.asText() + "'");
-                }
-            }
 
-            JsonNode params = soloRequest.get("params");
-            if (isLikeNull(params)) {
-                params = getObjectMapper().createObjectNode();
-            } else {
-                if (!params.isArray() && !params.isObject()) {
-                    throw new IllegalArgumentException("expected 'params' to be ARRAY or OBJECT but found " + params.getNodeType());
-                }
-            }
-
-            JsonNode result = methodRegistry.invoke(methodName.asText(), params);
+    public ObjectNode invokeSolo(Request validRequest) {
+        try {
+            JsonNode result = methodRegistry.invoke(validRequest.methodName, validRequest.params);
 
             Map<String, Object> resultMap = new LinkedHashMap<>();
-            if (versionNode != null) {
-                resultMap.put("jsonrpc", "2.0");
-                resultMap.put("id", idNode);
-                resultMap.put("result", result);
-            }
+            resultMap.put("jsonrpc", "2.0");
+            resultMap.put("id", validRequest.id);
+            resultMap.put("result", result);
 
             return getObjectMapper().convertValue(resultMap, ObjectNode.class);
         } catch (Throwable t) {
-            log.error("exception raised during json-rpc invocation", t);
+            log.warn("exception raised during json-rpc invocation", t);
+
+            JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
+            return buildErrorResponse(jsonRpcError, validRequest.id);
+        }
+    }
+
+    public ObjectNode invokeSolo(JsonNode soloRequest) {
+        try {
+            return invokeSolo(validateSoloRequest(soloRequest));
+        } catch (Throwable t) {
+            log.warn("exception raised during json-rpc invocation", t);
 
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
             return buildErrorResponse(jsonRpcError, soloRequest.get("id"));
@@ -191,7 +226,8 @@ public class JsonRpcDispatcher {
 
         List<Future<JsonNode>> futureResults = new ArrayList<>();
         for (JsonNode soloRequest : batchRequest) {
-            boolean isNotification = isLikeNull(soloRequest.get("id"));
+
+            boolean isNotification = isLikeNull(soloRequest.get("id")) && isValidSoloRequest(soloRequest);
             Future<JsonNode> future = executorService.submit(() -> invokeSolo(soloRequest));
 
             if (!isNotification) {

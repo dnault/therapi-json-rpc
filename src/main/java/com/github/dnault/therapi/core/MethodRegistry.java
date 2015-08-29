@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.dnault.therapi.core.internal.JacksonHelper.isLikeNull;
 import static com.google.common.base.Throwables.propagate;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
@@ -85,7 +86,18 @@ public class MethodRegistry {
         Object[] boundArgs = bindArgs(method, args);//new String[] {"Frank"};
         try {
             return objectMapper.convertValue(method.getMethod().invoke(method.getOwner(), boundArgs), JsonNode.class);
-        } catch (InvocationTargetException | IllegalAccessException e) {
+        }
+        catch (IllegalAccessException e) {
+            method.getMethod().setAccessible(true);
+
+            try {
+                return objectMapper.convertValue(method.getMethod().invoke(method.getOwner(), boundArgs), JsonNode.class);
+
+            } catch (InvocationTargetException | IllegalAccessException e2) {
+                throw propagate(e2);
+            }
+
+        } catch (InvocationTargetException e) {
             throw propagate(e);
         }
     }
@@ -110,7 +122,7 @@ public class MethodRegistry {
                 boundArgs[i++] = p.getDefaultValueSupplier().get().get();
             } else {
 
-                if (arg.isNull() && !p.isNullable()) {
+                if (isLikeNull(arg) && !p.isNullable()) {
                     throw new ParameterBindingException("parameter '" + p.getName() + "' must be non-null");
                 }
 
@@ -146,7 +158,7 @@ public class MethodRegistry {
             }
 
             JsonNode arg = args.get(i);
-            if (arg.isNull() && !param.isNullable()) {
+            if (isLikeNull(arg) && !param.isNullable()) {
                 throw new ParameterBindingException("parameter '" + param.getName() + "' must be non-null");
             }
 
