@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,15 +55,32 @@ public class JsonRpcDispatcher {
         }
     }
 
+    protected JsonNode parseNode(InputStream is) {
+        try {
+            return getObjectMapper().readTree(is);
+        } catch (IOException e) {
+            throw new ParseException(e);
+        }
+    }
+
     protected ArrayNode newArray() {
         return getObjectMapper().createArrayNode();
     }
 
-    public JsonNode invoke(String jsonRpcRequest) {
+    public JsonNode invoke(InputStream jsonRpcRequest) {
         try {
-
             JsonNode requestNode = parseNode(jsonRpcRequest);
+            return invoke(requestNode);
 
+        } catch (Throwable t) {
+            log.error("exception raised during json-rpc invocation", t);
+            JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
+            return buildErrorResponse(jsonRpcError, null);
+        }
+    }
+
+    public JsonNode invoke(JsonNode requestNode) {
+        try {
             if (requestNode.isArray()) {
                 return invokeBatch((ArrayNode) requestNode);
             }
@@ -71,6 +89,19 @@ public class JsonRpcDispatcher {
             }
 
             throw new InvalidRequestException("expected json-rpc request node to be ARRAY or OBJECT but found " + requestNode.getNodeType());
+
+        } catch (Throwable t) {
+            log.error("exception raised during json-rpc invocation", t);
+
+            JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
+            return buildErrorResponse(jsonRpcError, null);
+        }
+    }
+
+    public JsonNode invoke(String jsonRpcRequest) {
+        try {
+            JsonNode requestNode = parseNode(jsonRpcRequest);
+            return invoke(requestNode);
 
         } catch (Throwable t) {
             log.error("exception raised during json-rpc invocation", t);
