@@ -13,14 +13,14 @@ import java.util.List;
 import static com.github.dnault.therapi.core.internal.JacksonHelper.newLenientObjectMapper;
 import static org.junit.Assert.assertEquals;
 
-public class JsonRpcDispatcherTest {
-    private JsonRpcDispatcher dispatcher;
+public class JsonRpcDispatcherImplTest {
+    private JsonRpcDispatcherImpl dispatcher;
 
     @Before
     public void setup() {
         MethodRegistry registry = new MethodRegistry(newLenientObjectMapper());
         registry.scan(new ExampleServiceImpl());
-        dispatcher = new JsonRpcDispatcher(registry);
+        dispatcher = new JsonRpcDispatcherImpl(registry);
         dispatcher.setExceptionTranslator(new ExceptionTranslatorImpl().excludeDetails());
     }
 

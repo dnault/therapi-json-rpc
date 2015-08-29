@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.dnault.therapi.core.MethodRegistry;
 import com.github.dnault.therapi.example.CalculatorServiceImpl;
 import com.github.dnault.therapi.jsonrpc.JsonRpcDispatcher;
+import com.github.dnault.therapi.jsonrpc.JsonRpcDispatcherImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,7 +22,7 @@ public class JsonRpcServlet extends HttpServlet {
         MethodRegistry registry = new MethodRegistry(newLenientObjectMapper());
         registry.scan(new CalculatorServiceImpl());
 
-        JsonRpcDispatcher dispatcher = new JsonRpcDispatcher(registry, Executors.newCachedThreadPool());
+        JsonRpcDispatcher dispatcher = new JsonRpcDispatcherImpl(registry, Executors.newCachedThreadPool());
         JsonNode response = dispatcher.invoke(req.getInputStream());
 
         ObjectWriter prettyWriter = registry.getObjectMapper().writerWithDefaultPrettyPrinter();
@@ -33,7 +34,7 @@ public class JsonRpcServlet extends HttpServlet {
         MethodRegistry registry = new MethodRegistry(newLenientObjectMapper());
         registry.scan(new CalculatorServiceImpl());
 
-        JsonRpcDispatcher dispatcher = new JsonRpcDispatcher(registry, Executors.newCachedThreadPool());
+        JsonRpcDispatcher dispatcher = new JsonRpcDispatcherImpl(registry, Executors.newCachedThreadPool());
         JsonNode response = dispatcher.invoke(req.getParameter("r"));
 
         ObjectWriter prettyWriter = registry.getObjectMapper().writerWithDefaultPrettyPrinter();
