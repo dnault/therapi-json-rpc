@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static com.github.dnault.therapi.core.internal.JacksonHelper.newLenientObjectMapper;
 import static org.junit.Assert.assertEquals;
@@ -159,9 +160,13 @@ public class JsonRpcDispatcherImplTest {
                 "");
     }
 
-    private void check(String jsonRpcRequest, String exepctedResponse) throws IOException {
-        String actualResponse = dispatcher.invoke(jsonRpcRequest).toString();
-        assertJsonEquals(exepctedResponse, actualResponse);
+    private void check(String jsonRpcRequest, String expectedResponse) throws IOException {
+        Optional<JsonNode> actualResponse = dispatcher.invoke(jsonRpcRequest);
+        if (expectedResponse.isEmpty()) {
+            assertEquals(Optional.empty(), actualResponse);
+        } else {
+            assertJsonEquals(expectedResponse, actualResponse.get().toString());
+        }
     }
 
     private void assertJsonEquals(String expected, String actual) throws IOException {

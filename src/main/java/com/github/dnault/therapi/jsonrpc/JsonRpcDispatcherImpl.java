@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -68,7 +69,7 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
     }
 
     @Override
-    public JsonNode invoke(InputStream jsonRpcRequest) {
+    public Optional<JsonNode> invoke(InputStream jsonRpcRequest) {
         try {
             JsonNode requestNode = parseNode(jsonRpcRequest);
             return invoke(requestNode);
@@ -76,17 +77,23 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
         } catch (Throwable t) {
             log.warn("exception raised during json-rpc invocation", t);
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
-            return buildErrorResponse(jsonRpcError, null);
+            return Optional.of(buildErrorResponse(jsonRpcError, null));
         }
     }
 
-    protected JsonNode invoke(JsonNode requestNode) {
+    protected Optional<JsonNode> invoke(JsonNode requestNode) {
         try {
             if (requestNode.isArray()) {
-                return invokeBatch((ArrayNode) requestNode);
+                ArrayNode batchResult = invokeBatch((ArrayNode) requestNode);
+                return batchResult.size() == 0 ? Optional.empty() : Optional.of(batchResult);
             }
             if (requestNode.isObject()) {
-                return invokeSolo(requestNode);
+                JsonNode soloResponse = invokeSolo(requestNode);
+                if (isLikeNull(requestNode.get("id")) && isValidSoloRequest(requestNode)) {
+                    log.debug("suppressing notification response because request had null 'id': {}", soloResponse);
+                    return Optional.empty();
+                }
+                return Optional.of(soloResponse);
             }
 
             throw new InvalidRequestException("expected json-rpc request node to be ARRAY or OBJECT but found " + requestNode.getNodeType());
@@ -95,12 +102,12 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
             log.warn("exception raised during json-rpc invocation", t);
 
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
-            return buildErrorResponse(jsonRpcError, null);
+            return Optional.of(buildErrorResponse(jsonRpcError, null));
         }
     }
 
     @Override
-    public JsonNode invoke(String jsonRpcRequest) {
+    public Optional<JsonNode> invoke(String jsonRpcRequest) {
         try {
             JsonNode requestNode = parseNode(jsonRpcRequest);
             return invoke(requestNode);
@@ -109,7 +116,7 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
             log.warn("exception raised during json-rpc invocation", t);
 
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
-            return buildErrorResponse(jsonRpcError, null);
+            return Optional.of(buildErrorResponse(jsonRpcError, null));
         }
     }
 
@@ -186,7 +193,6 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
             return params;
         }
     }
-
 
     protected ObjectNode invokeSolo(Request validRequest) {
         try {

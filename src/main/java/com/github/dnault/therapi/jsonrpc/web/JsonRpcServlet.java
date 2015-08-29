@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 
 import static com.github.dnault.therapi.core.internal.JacksonHelper.newLenientObjectMapper;
@@ -23,11 +24,13 @@ public class JsonRpcServlet extends HttpServlet {
         registry.scan(new CalculatorServiceImpl());
 
         JsonRpcDispatcher dispatcher = new JsonRpcDispatcherImpl(registry, Executors.newCachedThreadPool());
-        JsonNode response = dispatcher.invoke(req.getInputStream());
+        Optional<JsonNode> response = dispatcher.invoke(req.getInputStream());
 
-        ObjectWriter prettyWriter = registry.getObjectMapper().writerWithDefaultPrettyPrinter();
-        resp.setContentType("application/json");
-        prettyWriter.writeValue(resp.getOutputStream(), response);
+        if (response.isPresent()) {
+            ObjectWriter prettyWriter = registry.getObjectMapper().writerWithDefaultPrettyPrinter();
+            resp.setContentType("application/json");
+            prettyWriter.writeValue(resp.getOutputStream(), response.get());
+        }
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -35,11 +38,13 @@ public class JsonRpcServlet extends HttpServlet {
         registry.scan(new CalculatorServiceImpl());
 
         JsonRpcDispatcher dispatcher = new JsonRpcDispatcherImpl(registry, Executors.newCachedThreadPool());
-        JsonNode response = dispatcher.invoke(req.getParameter("r"));
+        Optional<JsonNode> response = dispatcher.invoke(req.getParameter("r"));
 
-        ObjectWriter prettyWriter = registry.getObjectMapper().writerWithDefaultPrettyPrinter();
-        resp.setContentType("application/json");
-        prettyWriter.writeValue(resp.getOutputStream(), response);
+        if (response.isPresent()) {
+            ObjectWriter prettyWriter = registry.getObjectMapper().writerWithDefaultPrettyPrinter();
+            resp.setContentType("application/json");
+            prettyWriter.writeValue(resp.getOutputStream(), response.get());
+        }
 
         /*
         String request = req.getParameter("r");

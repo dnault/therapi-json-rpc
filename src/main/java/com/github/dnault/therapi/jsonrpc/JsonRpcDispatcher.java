@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.util.Optional;
 
 public interface JsonRpcDispatcher {
-    JsonNode invoke(InputStream jsonRpcRequest);
+    Optional<JsonNode> invoke(InputStream jsonRpcRequest);
 
-    JsonNode invoke(String jsonRpcRequest);
+    Optional<JsonNode> invoke(String jsonRpcRequest);
 }
