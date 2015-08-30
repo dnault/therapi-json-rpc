@@ -33,9 +33,9 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     compile "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
 
-    def springVersion = '4.1.6.RELEASE'
-    compile "org.springframework:spring-beans:${springVersion}"
-    compile "org.springframework:spring-context:${springVersion}"
+    //def springVersion = '4.1.6.RELEASE'
+    //compile "org.springframework:spring-beans:${springVersion}"
+    //compile "org.springframework:spring-context:${springVersion}"
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.slf4j:slf4j-simple:1.7.12'

@@ -3,6 +3,7 @@ package com.github.dnault.therapi.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dnault.therapi.core.annotation.Remotable;
 import com.github.dnault.therapi.core.internal.MethodDefinition;
+import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -11,7 +12,6 @@ import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.util.ClassUtils.getAllInterfaces;
 
 public class StandardMethodIntrospector implements MethodIntrospector {
 
@@ -27,7 +27,7 @@ public class StandardMethodIntrospector implements MethodIntrospector {
 
     @Override
     public Collection<MethodDefinition> findMethods(Object o) {
-        return Arrays.stream(getAllInterfaces(o))
+        return ClassUtils.getAllInterfaces(o.getClass()).stream()
                 .filter(iface -> iface.isAnnotationPresent(Remotable.class))
                 .flatMap(iface -> findMethodsOnInterface(o, iface, iface.getAnnotation(Remotable.class).value()))
                 .collect(toList());
