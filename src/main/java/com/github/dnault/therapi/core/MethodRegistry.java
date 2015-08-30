@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.TokenBuffer;
 import com.github.dnault.therapi.core.internal.MethodDefinition;
 import com.github.dnault.therapi.core.internal.ParameterDefinition;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,11 +18,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.github.dnault.therapi.core.internal.JacksonHelper.isLikeNull;
 import static com.google.common.base.Throwables.propagate;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
 
 public class MethodRegistry {
@@ -127,19 +131,34 @@ public class MethodRegistry {
         Object[] boundArgs = new Object[method.getParameters().size()];
         List<ParameterDefinition> params = method.getParameters();
 
+        int consumedArgCount = 0;
         int i = 0;
         for (ParameterDefinition p : params) {
             JsonNode arg = args.get(p.getName());
 
-            if (!args.has(p.getName()) && p.getDefaultValueSupplier().isPresent()) {
-                boundArgs[i++] = p.getDefaultValueSupplier().get().get();
-            } else {
-
-                if (isLikeNull(arg) && !p.isNullable()) {
-                    throw new NullArgumentException(p.getName());
+            if (!args.has(p.getName())) {
+                if (p.getDefaultValueSupplier().isPresent()) {
+                    boundArgs[i++] = p.getDefaultValueSupplier().get().get();
+                    continue;
+                } else {
+                    throw new MissingArgumentException(p.getName());
                 }
+            }
 
-                boundArgs[i++] = objectMapper.convertValue(arg, p.getType());
+            if (isLikeNull(arg) && !p.isNullable()) {
+                throw new NullArgumentException(p.getName());
+            }
+
+            boundArgs[i++] = objectMapper.convertValue(arg, p.getType());
+            consumedArgCount++;
+        }
+
+        if (consumedArgCount != args.size()) {
+            Set<String> parameterNames = params.stream().map(ParameterDefinition::getName).collect(toSet());
+            Set<String> argumentNames = ImmutableSet.copyOf(args.fieldNames());
+            Set<String> extraArguments = Sets.difference(argumentNames, parameterNames);
+            if (!extraArguments.isEmpty()) {
+                throw new ParameterBindingException(null, "unrecognized argument names: " + extraArguments);
             }
         }
 

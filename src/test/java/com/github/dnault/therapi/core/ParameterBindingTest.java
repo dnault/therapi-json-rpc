@@ -56,6 +56,6 @@ public class ParameterBindingTest extends AbstractMethodRegistryTest {
     @Test
     public void tooManyNamedArguments() throws Exception {
         ParameterBindingException e = check("echo", "{a:1,b:'xyzzy',c:['one','two','three'],foo:1}", ParameterBindingException.class);
-        assertEquals(Optional.of("foo"), e.getParameterName());
+        assertEquals(Optional.empty(), e.getParameterName());
     }
 }
