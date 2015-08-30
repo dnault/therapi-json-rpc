@@ -12,6 +12,7 @@ public class ReturnValueNotSlicedTest extends AbstractMethodRegistryTest {
     @Before
     public void setup() {
         registry.scan(new SlicingServiceImpl());
+        registry.scan(new ParameterizedSlicingServiceImpl());
     }
 
     @Remotable("")
@@ -23,6 +24,26 @@ public class ReturnValueNotSlicedTest extends AbstractMethodRegistryTest {
     }
 
     private static class SlicingServiceImpl implements SlicingService {
+        @Override
+        public Base get() {
+            return new Subclass("foo", "bar");
+        }
+
+        @Override
+        public List<Base> list() {
+            return Arrays.asList(new Subclass("foo", "bar"), new Subclass("baz", "zot"));
+        }
+    }
+
+    @Remotable("param")
+    @SuppressWarnings("unused")
+    private interface ParameterizedSlicingService<T> {
+        T get();
+
+        List<T> list();
+    }
+
+    private static class ParameterizedSlicingServiceImpl implements ParameterizedSlicingService<Base> {
         @Override
         public Base get() {
             return new Subclass("foo", "bar");
@@ -67,5 +88,15 @@ public class ReturnValueNotSlicedTest extends AbstractMethodRegistryTest {
     @Test
     public void subclassPropertiesAreIncludedInListEvenThoughDeclaredReturnTypeIsBase() throws Exception {
         check("list", "[]", "[{base:'foo',subclass:'bar'},{base:'baz',subclass:'zot'}]");
+    }
+
+    @Test
+    public void subclassPropertiesAreIncludedEvenThoughDeclaredReturnTypeIsBaseVariable() throws Exception {
+        check("param.get", "[]", "{base:'foo',subclass:'bar'}");
+    }
+
+    @Test
+    public void subclassPropertiesAreIncludedInListEvenThoughDeclaredReturnTypeIsBaseVariable() throws Exception {
+        check("param.list", "[]", "[{base:'foo',subclass:'bar'},{base:'baz',subclass:'zot'}]");
     }
 }

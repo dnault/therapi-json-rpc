@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
 
 public class MethodDefinition {
@@ -16,6 +17,7 @@ public class MethodDefinition {
     private final Object owner;
     private final ImmutableList<ParameterDefinition> params;
     private final Optional<String> namespace;
+    private final TypeReference returnTypeRef;
 
     public MethodDefinition(@Nullable String namespace, @Nullable String shortName, Method method, Object owner, List<ParameterDefinition> params) {
         this.method = method;
@@ -23,6 +25,7 @@ public class MethodDefinition {
         this.params = ImmutableList.copyOf(params);
         this.namespace = Optional.ofNullable(emptyToNull(namespace));
         this.shortName = defaultIfNull(shortName, method.getName());
+        returnTypeRef = JacksonHelper.getReturnTypeReference(method, owner.getClass());
     }
 
     public String getUnqualifiedName() {
@@ -43,6 +46,10 @@ public class MethodDefinition {
 
     public String getQualifiedName(String namespaceSeparator) {
         return namespace.isPresent() ? (namespace.get() + namespaceSeparator + shortName) : shortName;
+    }
+
+    public TypeReference getReturnTypeRef() {
+        return returnTypeRef;
     }
 
     public Optional<String> getNamespace() {

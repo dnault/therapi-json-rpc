@@ -1,20 +1,16 @@
 package com.github.dnault.therapi.core;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dnault.therapi.core.annotation.Remotable;
-import com.github.dnault.therapi.core.internal.JacksonHelper;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -45,6 +41,7 @@ public class PolymorphicGenericsTest extends AbstractMethodRegistryTest {
     }
 
     private static class Dog extends Pet {
+        @JsonCreator
         public Dog(String name) {
             super(name);
         }
@@ -56,6 +53,7 @@ public class PolymorphicGenericsTest extends AbstractMethodRegistryTest {
     }
 
     private static class Cat extends Pet {
+        @JsonCreator
         public Cat(String name) {
             super(name);
         }
@@ -135,23 +133,5 @@ public class PolymorphicGenericsTest extends AbstractMethodRegistryTest {
     @Test
     public void speakAll() throws Exception {
         check("pet.speakAll", "[[{'@type':'Dog','name':'Hachiko'},{'@type':'Cat','name':'Macak'}]]", "['arf','meow']");
-    }
-
-    @Test
-    public void boogers() throws Exception {
-        ObjectMapper mapper = JacksonHelper.newLenientObjectMapper();
-
-        //mapper.registerSubtypes(new NamedType(Pet.class, "pet"));
-        Pet hachi = new Dog("Hachiko");
-        Pet leon = new Cat("Macak");
-        List<Pet> pets = new ArrayList<>();
-        pets.add(hachi);
-        pets.add(leon);
-        System.out.println(mapper.writeValueAsString(hachi));
-        System.out.println(mapper.writeValueAsString(leon));
-        System.out.println(mapper.writeValueAsString(pets));
-        System.out.println(mapper.writerFor(new TypeReference<List<Pet>>() {
-        }).writeValueAsString(pets));
-
     }
 }

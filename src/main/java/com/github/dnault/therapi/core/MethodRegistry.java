@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.TokenBuffer;
 import com.github.dnault.therapi.core.internal.MethodDefinition;
 import com.github.dnault.therapi.core.internal.ParameterDefinition;
 import com.google.common.collect.TreeMultimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
@@ -83,20 +85,33 @@ public class MethodRegistry {
 
         Object[] boundArgs = bindArgs(method, args);
         try {
-            return objectMapper.convertValue(method.getMethod().invoke(method.getOwner(), boundArgs), JsonNode.class);
+            return invoke(method, boundArgs);
 
         } catch (IllegalAccessException e) {
             method.getMethod().setAccessible(true);
 
             try {
-                return objectMapper.convertValue(method.getMethod().invoke(method.getOwner(), boundArgs), JsonNode.class);
+                return invoke(method, boundArgs);
 
-            } catch (InvocationTargetException | IllegalAccessException e2) {
+            } catch (IOException | IllegalAccessException e2) {
                 throw propagate(e2);
             }
 
-        } catch (InvocationTargetException e) {
+        } catch (IOException e) {
             throw propagate(e);
+        }
+    }
+
+    protected JsonNode invoke(MethodDefinition method, Object[] boundArgs) throws IOException, IllegalAccessException {
+        try {
+            Object result = method.getMethod().invoke(method.getOwner(), boundArgs);
+
+            TokenBuffer buffer = new TokenBuffer(objectMapper, false);
+            objectMapper.writerFor(method.getReturnTypeRef()).writeValue(buffer, result);
+            return objectMapper.readTree(buffer.asParser());
+
+        } catch (InvocationTargetException e) {
+            throw propagate(e.getCause());
         }
     }
 
