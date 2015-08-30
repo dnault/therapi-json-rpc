@@ -1,8 +1,10 @@
 
+[COMPLETE] parameterized superclass collection handling
+[COMPLETE] polymorphic type handling
 
 Invoke methods over http
 
-parameterized superclass collection handling
+lowercase enum module
 
 automatic documentation
 \- schemas
@@ -14,6 +16,3 @@ method interception?
 automatic client
 
 metrics
-
-polymorphic type handling
-
