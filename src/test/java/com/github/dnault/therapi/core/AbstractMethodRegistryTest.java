@@ -3,7 +3,6 @@ package com.github.dnault.therapi.core;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.reflect.AbstractInvocationHandler;
 import net.javacrumbs.jsonunit.JsonAssert;
-import org.junit.Assert;
 import org.junit.Before;
 
 import javax.annotation.ParametersAreNonnullByDefault;
