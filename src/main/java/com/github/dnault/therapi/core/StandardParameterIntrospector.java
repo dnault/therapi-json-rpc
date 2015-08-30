@@ -23,10 +23,10 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
     }
 
     @Override
-    public List<ParameterDefinition> findParameters(Method method) {
+    public List<ParameterDefinition> findParameters(Method method, Object owner) {
         List<ParameterDefinition> params = new ArrayList<>();
         for (Parameter p : method.getParameters()) {
-            TypeReference typeReference = getTypeReference(p);
+            TypeReference typeReference = getTypeReference(p, owner.getClass());
             params.add(new ParameterDefinition(getName(p), isNullable(p, method), getDefaultValueSupplier(p, typeReference), typeReference));
         }
         return params;

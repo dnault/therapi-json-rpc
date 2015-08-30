@@ -36,6 +36,6 @@ public class StandardMethodIntrospector implements MethodIntrospector {
     protected Stream<MethodDefinition> findMethodsOnInterface(Object owner, Class<?> iface, String namespace) {
         return Arrays.stream(iface.getMethods())
                 .filter(method -> !Modifier.isStatic(method.getModifiers()))
-                .map(method -> new MethodDefinition(namespace, null, method, owner, parameterIntrospector.findParameters(method)));
+                .map(method -> new MethodDefinition(namespace, null, method, owner, parameterIntrospector.findParameters(method, owner)));
     }
 }

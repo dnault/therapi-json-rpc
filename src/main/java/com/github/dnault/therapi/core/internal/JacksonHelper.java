@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import com.google.common.reflect.TypeToken;
 
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
@@ -24,12 +25,18 @@ public class JacksonHelper {
         return mapper;
     }
 
-    public static TypeReference getTypeReference(Parameter parameter) {
+    public static TypeReference getTypeReference(Parameter parameter, Class<?> contextForTypeVariableResolution) {
         Type parameterizedType = parameter.getParameterizedType();
+        TypeToken token = TypeToken.of(contextForTypeVariableResolution);
+        Type resolvedType = token.resolveType(parameterizedType).getType();
+        return newTypeReference(resolvedType);
+    }
+
+    public static TypeReference newTypeReference(Type type) {
         return new TypeReference<Object>() {
             @Override
             public Type getType() {
-                return parameterizedType;
+                return type;
             }
         };
     }
