@@ -71,7 +71,7 @@ public class MethodRegistry {
         return suggestionsByDistance.entries().stream().limit(5).map(Map.Entry::getValue).collect(toList());
     }
 
-    public JsonNode invoke(String methodName, JsonNode args) throws NoSuchMethodException {
+    public JsonNode invoke(String methodName, JsonNode args) throws MethodNotFoundException {
         if (!args.isArray() && !args.isObject()) {
             throw new IllegalArgumentException("arguments must be ARRAY or OBJECT but encountered " + args.getNodeType());
         }
@@ -81,13 +81,11 @@ public class MethodRegistry {
             throw MethodNotFoundException.forMethod(methodName, suggestMethods ? suggestMethods(methodName) : null);
         }
 
-        System.out.println(method.getParameters());
-
-        Object[] boundArgs = bindArgs(method, args);//new String[] {"Frank"};
+        Object[] boundArgs = bindArgs(method, args);
         try {
             return objectMapper.convertValue(method.getMethod().invoke(method.getOwner(), boundArgs), JsonNode.class);
-        }
-        catch (IllegalAccessException e) {
+
+        } catch (IllegalAccessException e) {
             method.getMethod().setAccessible(true);
 
             try {
@@ -123,7 +121,7 @@ public class MethodRegistry {
             } else {
 
                 if (isLikeNull(arg) && !p.isNullable()) {
-                    throw new ParameterBindingException("parameter '" + p.getName() + "' must be non-null");
+                    throw new NullParameterException("parameter '" + p.getName() + "' must be non-null");
                 }
 
                 boundArgs[i++] = objectMapper.convertValue(arg, p.getType());
@@ -159,7 +157,7 @@ public class MethodRegistry {
 
             JsonNode arg = args.get(i);
             if (isLikeNull(arg) && !param.isNullable()) {
-                throw new ParameterBindingException("parameter '" + param.getName() + "' must be non-null");
+                throw new NullParameterException("parameter '" + param.getName() + "' must be non-null");
             }
 
             boundArgs[i] = objectMapper.convertValue(arg, param.getType());

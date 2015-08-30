@@ -27,7 +27,7 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
         List<ParameterDefinition> params = new ArrayList<>();
         for (Parameter p : method.getParameters()) {
             TypeReference typeReference = getTypeReference(p);
-            params.add(new ParameterDefinition(getName(p), isNullable(p), getDefaultValueSupplier(p, typeReference), typeReference));
+            params.add(new ParameterDefinition(getName(p), isNullable(p, method), getDefaultValueSupplier(p, typeReference), typeReference));
         }
         return params;
     }
@@ -85,8 +85,12 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
         return p.getName();
     }
 
-    protected boolean isNullable(Parameter p) {
+    protected boolean isNullable(Parameter p, Method method) {
         if (p.getAnnotation(Nullable.class) != null) {
+            if (p.getType().isPrimitive()) {
+                throw new InvalidAnnotationException("Annotation " + Nullable.class.getName() + " may not be applied to primitive " + p.getType() + " parameter '" + p.getName() + "' of method: " + method);
+            }
+
             return true;
         }
 

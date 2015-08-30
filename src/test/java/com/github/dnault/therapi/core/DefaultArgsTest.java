@@ -2,23 +2,23 @@ package com.github.dnault.therapi.core;
 
 import com.github.dnault.therapi.core.annotation.Default;
 import com.github.dnault.therapi.core.annotation.Remotable;
-import com.github.dnault.therapi.core.internal.JacksonHelper;
+import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import javax.annotation.Nullable;
 
-public class DefaultArgsTest {
+public class DefaultArgsTest extends AbstractMethodRegistryTest {
 
-    MethodRegistry context = new MethodRegistry(JacksonHelper.newLenientObjectMapper());
-
-    {
-        context.scan(new EchoServiceImpl());
+    @Before
+    public void setup() {
+        registry.scan(new EchoServiceImpl());
     }
 
     @Remotable("")
-    public interface EchoService {
+    private interface EchoService {
         Boolean echoBooleanObjectDefaultNull(@Default Boolean value);
+
+        Boolean echoBooleanObjectDefaultTrueNullable(@Nullable @Default("true") Boolean value);
 
         Boolean echoBooleanObjectDefaultTrue(@Default("true") Boolean value);
 
@@ -37,50 +37,54 @@ public class DefaultArgsTest {
         String echoStringDefaultNonEmpty(@Default("xyzzy") String value);
     }
 
-    public static class EchoServiceImpl implements EchoService {
-
+    private static class EchoServiceImpl implements EchoService {
         @Override
-        public Boolean echoBooleanObjectDefaultNull(@Default Boolean value) {
+        public Boolean echoBooleanObjectDefaultNull(Boolean value) {
             return value;
         }
 
         @Override
-        public Boolean echoBooleanObjectDefaultTrue(@Default("true") Boolean value) {
+        public Boolean echoBooleanObjectDefaultTrueNullable(Boolean value) {
             return value;
         }
 
         @Override
-        public Boolean echoBooleanObjectDefaultFalse(@Default("false") Boolean value) {
+        public Boolean echoBooleanObjectDefaultTrue(Boolean value) {
             return value;
         }
 
         @Override
-        public boolean echoBooleanPrimitiveDefaultNull(@Default boolean value) {
+        public Boolean echoBooleanObjectDefaultFalse(Boolean value) {
             return value;
         }
 
         @Override
-        public boolean echoBooleanPrimitiveDefaultTrue(@Default("true") boolean value) {
+        public boolean echoBooleanPrimitiveDefaultNull(boolean value) {
             return value;
         }
 
         @Override
-        public boolean echoBooleanPrimitiveDefaultFalse(@Default("false") boolean value) {
+        public boolean echoBooleanPrimitiveDefaultTrue(boolean value) {
             return value;
         }
 
         @Override
-        public String echoStringDefaultNull(@Default String value) {
+        public boolean echoBooleanPrimitiveDefaultFalse(boolean value) {
             return value;
         }
 
         @Override
-        public String echoStringDefaultEmpty(@Default("") String value) {
+        public String echoStringDefaultNull(String value) {
             return value;
         }
 
         @Override
-        public String echoStringDefaultNonEmpty(@Default("xyzzy") String value) {
+        public String echoStringDefaultEmpty(String value) {
+            return value;
+        }
+
+        @Override
+        public String echoStringDefaultNonEmpty(String value) {
             return value;
         }
     }
@@ -90,6 +94,9 @@ public class DefaultArgsTest {
         check("echoBooleanObjectDefaultNull", "[]", "null");
         check("echoBooleanObjectDefaultTrue", "[]", "true");
         check("echoBooleanObjectDefaultFalse", "[]", "false");
+
+        check("echoBooleanObjectDefaultTrueNullable", "[null]", "null");
+        check("echoBooleanObjectDefaultTrueNullable", "{value:null}", "null");
 
         check("echoBooleanObjectDefaultNull", "{}", "null");
         check("echoBooleanObjectDefaultTrue", "{}", "true");
@@ -113,23 +120,13 @@ public class DefaultArgsTest {
         check("echoBooleanObjectDefaultFalse", "{value:false}", "false");
     }
 
-    @Test(expected = ParameterBindingException.class)
+    @Test(expected = NullParameterException.class)
     public void echoBooleanObjectDefaultTrueRequiresNonNullPositional() throws Exception {
         check("echoBooleanObjectDefaultTrue", "[null]", "null");
     }
 
-    @Test(expected = ParameterBindingException.class)
+    @Test(expected = NullParameterException.class)
     public void echoBooleanObjectDefaultTrueRequiresNonNullNamed() throws Exception {
         check("echoBooleanObjectDefaultTrue", "{value:null}", "null");
-    }
-
-    protected void check(String methodName, String args, String expectedResult) throws Exception {
-        Object result = context.invoke(methodName, context.getObjectMapper().readTree(args));
-
-        if (expectedResult.equals("null")) {
-            assertNull(result);
-        } else {
-            assertEquals(context.getObjectMapper().readTree(expectedResult), result);
-        }
     }
 }
