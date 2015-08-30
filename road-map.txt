@@ -16,3 +16,5 @@ method interception?
 automatic client
 
 metrics
+
+unit test support?
