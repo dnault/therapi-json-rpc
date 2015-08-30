@@ -1,13 +1,13 @@
 
-# Therapi JSON-RPC Framework
+# Therapi JSON-RPC 2.0 Framework for Java
 
 image::therapi.png[]
 
 
 ## JSON-RPC in a Nutshell
 
-JSON-RPC is a standard protocol for making remote procedure calls. The client makes a request to the server
-by building a JSON object specifying the method name and arguments. The server returns a JSON object containing
+JSON-RPC 2.0 is a standard protocol for making remote procedure calls. The client makes a request to the server
+by passing a JSON object specifying the method name and arguments. The server returns a JSON object containing
 the method's return value or a message describing an error condition. It's simple, and it works!
 Take a moment to peruse http://www.jsonrpc.org/specification[the brief specification].
 
