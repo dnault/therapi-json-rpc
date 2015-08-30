@@ -8,8 +8,14 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-@Ignore("These tests assert return value slicing is *not* performed... is this really the desired behavior?")
-public class ReturnValueNotSlicedTest extends AbstractMethodRegistryTest {
+/**
+ * Checks that when a method returns a subclass of its declared return type,
+ * the fields from the subclass are not serialized.
+ *
+ * If this is not the desired behavior, the type should be registered with Jackson
+ * as a polymorphic type, as tested by {@link PolymorphicGenericsTest}.
+ */
+public class ReturnValueSlicingTest extends AbstractMethodRegistryTest {
 
     @Before
     public void setup() {
@@ -83,22 +89,22 @@ public class ReturnValueNotSlicedTest extends AbstractMethodRegistryTest {
     }
 
     @Test
-    public void subclassPropertiesAreIncludedEvenThoughDeclaredReturnTypeIsBase() throws Exception {
-        check("get", "[]", "{base:'foo',subclass:'bar'}");
+    public void subclassPropertiesAreIgnored() throws Exception {
+        check("get", "[]", "{base:'foo'}");
     }
 
     @Test
-    public void subclassPropertiesAreIncludedInListEvenThoughDeclaredReturnTypeIsBase() throws Exception {
-        check("list", "[]", "[{base:'foo',subclass:'bar'},{base:'baz',subclass:'zot'}]");
+    public void subclassPropertiesAreIgnoredInList() throws Exception {
+        check("list", "[]", "[{base:'foo'},{base:'baz'}]");
     }
 
     @Test
-    public void subclassPropertiesAreIncludedEvenThoughDeclaredReturnTypeIsBaseVariable() throws Exception {
-        check("param.get", "[]", "{base:'foo',subclass:'bar'}");
+    public void subclassPropertiesAreIgnoredWhenReturnTypeIsVariable() throws Exception {
+        check("param.get", "[]", "{base:'foo'}");
     }
 
     @Test
-    public void subclassPropertiesAreIncludedInListEvenThoughDeclaredReturnTypeIsBaseVariable() throws Exception {
-        check("param.list", "[]", "[{base:'foo',subclass:'bar'},{base:'baz',subclass:'zot'}]");
+    public void subclassPropertiesAreIgnoredInListWhenReturnTypeIsVariable() throws Exception {
+        check("param.list", "[]", "[{base:'foo'},{base:'baz'}]");
     }
 }
