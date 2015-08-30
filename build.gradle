@@ -38,6 +38,7 @@ dependencies {
     //compile "org.springframework:spring-context:${springVersion}"
 
     testCompile 'junit:junit:4.11'
+    testCompile 'net.javacrumbs.json-unit:json-unit:1.6.0'
     testCompile 'org.slf4j:slf4j-simple:1.7.12'
 }
 

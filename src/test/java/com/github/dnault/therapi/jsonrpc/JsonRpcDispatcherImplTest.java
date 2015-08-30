@@ -3,6 +3,7 @@ package com.github.dnault.therapi.jsonrpc;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.dnault.therapi.core.MethodRegistry;
 import com.github.dnault.therapi.core.annotation.Remotable;
+import net.javacrumbs.jsonunit.JsonAssert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -173,6 +174,6 @@ public class JsonRpcDispatcherImplTest {
     private void assertJsonEquals(String expected, String actual) throws IOException {
         JsonNode expectedNode = dispatcher.getObjectMapper().readTree(expected);
         JsonNode actualNode = dispatcher.getObjectMapper().readTree(actual);
-        assertEquals(expectedNode, actualNode);
+        JsonAssert.assertJsonEquals(expectedNode, actualNode);
     }
 }

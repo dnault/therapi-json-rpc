@@ -2,6 +2,7 @@ package com.github.dnault.therapi.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.reflect.AbstractInvocationHandler;
+import net.javacrumbs.jsonunit.JsonAssert;
 import org.junit.Before;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -11,7 +12,6 @@ import java.lang.reflect.Method;
 import static com.github.dnault.therapi.core.internal.JacksonHelper.isLikeNull;
 import static com.github.dnault.therapi.core.internal.JacksonHelper.newLenientObjectMapper;
 import static java.lang.reflect.Proxy.newProxyInstance;
-import static org.junit.Assert.assertEquals;
 
 public class AbstractMethodRegistryTest {
     protected MethodRegistry registry;
@@ -29,7 +29,7 @@ public class AbstractMethodRegistryTest {
             expected = null;
         }
 
-        assertEquals(expected, result);
+        JsonAssert.assertJsonEquals(expected, result);
     }
 
     protected JsonNode readTree(String json) throws IOException {
