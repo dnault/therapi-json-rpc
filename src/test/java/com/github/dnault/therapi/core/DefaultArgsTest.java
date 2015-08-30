@@ -11,10 +11,11 @@ public class DefaultArgsTest extends AbstractMethodRegistryTest {
 
     @Before
     public void setup() {
-        registry.scan(new EchoServiceImpl());
+        registry.scan(newEchoProxyInstance(EchoService.class));
     }
 
     @Remotable("")
+    @SuppressWarnings("unused")
     private interface EchoService {
         Boolean echoBooleanObjectDefaultNull(@Default Boolean value);
 
@@ -35,58 +36,6 @@ public class DefaultArgsTest extends AbstractMethodRegistryTest {
         String echoStringDefaultEmpty(@Default("") String value);
 
         String echoStringDefaultNonEmpty(@Default("xyzzy") String value);
-    }
-
-    private static class EchoServiceImpl implements EchoService {
-        @Override
-        public Boolean echoBooleanObjectDefaultNull(Boolean value) {
-            return value;
-        }
-
-        @Override
-        public Boolean echoBooleanObjectDefaultTrueNullable(Boolean value) {
-            return value;
-        }
-
-        @Override
-        public Boolean echoBooleanObjectDefaultTrue(Boolean value) {
-            return value;
-        }
-
-        @Override
-        public Boolean echoBooleanObjectDefaultFalse(Boolean value) {
-            return value;
-        }
-
-        @Override
-        public boolean echoBooleanPrimitiveDefaultNull(boolean value) {
-            return value;
-        }
-
-        @Override
-        public boolean echoBooleanPrimitiveDefaultTrue(boolean value) {
-            return value;
-        }
-
-        @Override
-        public boolean echoBooleanPrimitiveDefaultFalse(boolean value) {
-            return value;
-        }
-
-        @Override
-        public String echoStringDefaultNull(String value) {
-            return value;
-        }
-
-        @Override
-        public String echoStringDefaultEmpty(String value) {
-            return value;
-        }
-
-        @Override
-        public String echoStringDefaultNonEmpty(String value) {
-            return value;
-        }
     }
 
     @Test

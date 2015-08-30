@@ -26,6 +26,7 @@ public class JsonRpcDispatcherImplTest {
     }
 
     @Remotable("")
+    @SuppressWarnings("unused")
     private interface ExampleService {
         int subtract(int minuend, int subtrahend);
 
