@@ -11,7 +11,7 @@
 
     <servlet>
         <servlet-name>JsonRpcServlet</servlet-name>
-        <servlet-class>com.github.dnault.therapi.jsonrpc.web.JsonRpcServlet</servlet-class>
+        <servlet-class>com.github.dnault.therapi.example.ExampleJsonRpcServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

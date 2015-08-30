@@ -1,7 +1,6 @@
-package com.github.dnault.therapi.core.example;
+package com.github.dnault.therapi.example;
 
 import com.github.dnault.therapi.core.AbstractMethodRegistryTest;
-import com.github.dnault.therapi.example.CalculatorServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 

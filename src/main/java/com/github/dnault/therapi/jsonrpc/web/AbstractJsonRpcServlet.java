@@ -1,11 +1,9 @@
 package com.github.dnault.therapi.jsonrpc.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.github.dnault.therapi.core.MethodRegistry;
-import com.github.dnault.therapi.example.CalculatorServiceImpl;
 import com.github.dnault.therapi.jsonrpc.JsonRpcDispatcher;
-import com.github.dnault.therapi.jsonrpc.JsonRpcDispatcherImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -13,37 +11,28 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.concurrent.Executors;
 
-import static com.github.dnault.therapi.core.internal.JacksonHelper.newLenientObjectMapper;
+public abstract class AbstractJsonRpcServlet extends HttpServlet {
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-public class JsonRpcServlet extends HttpServlet {
+    protected abstract JsonRpcDispatcher getJsonRpcDispatcher();
+    protected abstract ObjectWriter getObjectWriter();
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        MethodRegistry registry = new MethodRegistry(newLenientObjectMapper());
-        registry.scan(new CalculatorServiceImpl());
-
-        JsonRpcDispatcher dispatcher = new JsonRpcDispatcherImpl(registry, Executors.newCachedThreadPool());
-        Optional<JsonNode> response = dispatcher.invoke(req.getInputStream());
+        Optional<JsonNode> response = getJsonRpcDispatcher().invoke(req.getInputStream());
 
         if (response.isPresent()) {
-            ObjectWriter prettyWriter = registry.getObjectMapper().writerWithDefaultPrettyPrinter();
             resp.setContentType("application/json");
-            prettyWriter.writeValue(resp.getOutputStream(), response.get());
+            getObjectWriter().writeValue(resp.getOutputStream(), response.get());
         }
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        MethodRegistry registry = new MethodRegistry(newLenientObjectMapper());
-        registry.scan(new CalculatorServiceImpl());
-
-        JsonRpcDispatcher dispatcher = new JsonRpcDispatcherImpl(registry, Executors.newCachedThreadPool());
-        Optional<JsonNode> response = dispatcher.invoke(req.getParameter("r"));
+        Optional<JsonNode> response = getJsonRpcDispatcher().invoke(req.getParameter("r"));
 
         if (response.isPresent()) {
-            ObjectWriter prettyWriter = registry.getObjectMapper().writerWithDefaultPrettyPrinter();
             resp.setContentType("application/json");
-            prettyWriter.writeValue(resp.getOutputStream(), response.get());
+            getObjectWriter().writeValue(resp.getOutputStream(), response.get());
         }
 
         /*
