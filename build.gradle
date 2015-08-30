@@ -56,7 +56,7 @@ asciidoctor {
             idprefix: '',
             idseparator: '-',
             'data-uri': '',
-            example: "${projectDir}/src/main/java/com/github/dnault/therapi/example/"
+            example: "${projectDir}/examples/src/main/java/com/github/dnault/therapi/example/"
 
     // icons               : '',
     // 'data-uri'          : ''
