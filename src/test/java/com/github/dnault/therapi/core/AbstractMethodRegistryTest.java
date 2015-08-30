@@ -64,7 +64,7 @@ public class AbstractMethodRegistryTest {
             @Override
             @ParametersAreNonnullByDefault
             protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable {
-                return args.length == 1 ? args[0] : Arrays.asList(args);
+                return args.length == 0 ? null : args.length == 1 ? args[0] : Arrays.asList(args);
             }
         }));
     }
