@@ -69,12 +69,12 @@ public class DefaultArgsTest extends AbstractMethodRegistryTest {
         check("echoBooleanObjectDefaultFalse", "{value:false}", "false");
     }
 
-    @Test(expected = NullParameterException.class)
+    @Test(expected = NullArgumentException.class)
     public void echoBooleanObjectDefaultTrueRequiresNonNullPositional() throws Exception {
         check("echoBooleanObjectDefaultTrue", "[null]", "null");
     }
 
-    @Test(expected = NullParameterException.class)
+    @Test(expected = NullArgumentException.class)
     public void echoBooleanObjectDefaultTrueRequiresNonNullNamed() throws Exception {
         check("echoBooleanObjectDefaultTrue", "{value:null}", "null");
     }

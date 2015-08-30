@@ -136,7 +136,7 @@ public class MethodRegistry {
             } else {
 
                 if (isLikeNull(arg) && !p.isNullable()) {
-                    throw new NullParameterException("parameter '" + p.getName() + "' must be non-null");
+                    throw new NullArgumentException(p.getName());
                 }
 
                 boundArgs[i++] = objectMapper.convertValue(arg, p.getType());
@@ -155,7 +155,7 @@ public class MethodRegistry {
         List<ParameterDefinition> params = method.getParameters();
 
         if (args.size() > params.size()) {
-            throw new ParameterBindingException("method '" + getName(method) + "' was passed " + args.size() + " argument(s) but only accepts " + params.size());
+            throw new TooManyPositionalArguments(params.size(), args.size());
         }
 
         for (int i = 0; i < params.size(); i++) {
@@ -166,13 +166,13 @@ public class MethodRegistry {
                     boundArgs[i] = param.getDefaultValueSupplier().get().get();
                     continue;
                 } else {
-                    throw new ParameterBindingException("missing parameter '" + param.getName() + "'");
+                    throw new MissingArgumentException(param.getName());
                 }
             }
 
             JsonNode arg = args.get(i);
             if (isLikeNull(arg) && !param.isNullable()) {
-                throw new NullParameterException("parameter '" + param.getName() + "' must be non-null");
+                throw new NullArgumentException(param.getName());
             }
 
             boundArgs[i] = objectMapper.convertValue(arg, param.getType());
