@@ -21,11 +21,6 @@ dependencies {
     compile project(':') // core project
     compile 'org.slf4j:slf4j-simple:1.7.12'
 
-
-    def jacksonVersion = '2.6.1'
-    compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-    compile "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
-
     testCompile 'junit:junit:4.11'
 }
 
