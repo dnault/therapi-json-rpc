@@ -16,7 +16,7 @@
 
     <servlet-mapping>
         <servlet-name>JsonRpcServlet</servlet-name>
-        <url-pattern>/jsonrpc</url-pattern>
+        <url-pattern>/jsonrpc/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

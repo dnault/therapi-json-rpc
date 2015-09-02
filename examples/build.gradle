@@ -21,6 +21,8 @@ dependencies {
     compile project(':') // core project
     compile 'org.slf4j:slf4j-simple:1.7.12'
 
+    compile 'commons-io:commons-io:2.4'
+
     testCompile 'junit:junit:4.11'
 }
 

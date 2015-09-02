@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import java.util.Set;
 
 import static com.github.dnault.therapi.core.internal.JacksonHelper.isLikeNull;
 import static com.google.common.base.Throwables.propagate;
+import static java.util.Collections.unmodifiableCollection;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -197,5 +199,9 @@ public class MethodRegistry {
             boundArgs[i] = objectMapper.convertValue(arg, param.getType());
         }
         return boundArgs;
+    }
+
+    public Collection<MethodDefinition> getMethods() {
+        return unmodifiableCollection(methodsByName.values());
     }
 }

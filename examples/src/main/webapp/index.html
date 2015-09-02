@@ -13,6 +13,15 @@
     <script type="text/javascript"
             src="script/datagraph/jquery-jsonrpc/0.1.1/jquery.jsonrpc.js"></script>
 
+<!--
+    <script type="text/javascript"
+            src="script/jakearchibald/es6-promise-3.0.2/es6-promise.min.js"></script>
+-->
+
+    <script type="text/javascript"
+            src="jsonrpc/client.js"></script>
+
+
     <script type="text/javascript">
         $.jsonRPC.setup({
             endPoint: 'jsonrpc',
@@ -21,18 +30,24 @@
     </script>
 </head>
 <body>
-Try this:
+Open the Javascript console and try this:
 
 <pre>
-$.jsonRPC.request('calculator.multiplyFractions', {
-  params: [[{numerator: 3, denominator: 5},{numerator: 7, denominator: 15}]],
-  success: function(result) {
-    console.debug(JSON.stringify(result))
-  },
-  error: function(result) {
-    console.warn(JSON.stringify(result))
-  }
-});
+// Print dictionary entries starting with "a"
+Therapi.dictionary.list("a").then(logit).catch(logit);
+</pre>
+
+Or chain Promises together, like this:
+
+<pre>
+Therapi.dictionary.list()
+    .then(function(words) {
+        var randomWord = words[Math.floor(Math.random()*words.length)];
+        console.debug(randomWord);
+        return Therapi.dictionary.lookUp(randomWord);
+    })
+    .then(logit)
+    .catch(logit);
 </pre>
 </body>
 </html>
