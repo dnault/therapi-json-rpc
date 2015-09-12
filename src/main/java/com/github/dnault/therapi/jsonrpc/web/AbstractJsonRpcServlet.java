@@ -3,6 +3,8 @@ package com.github.dnault.therapi.jsonrpc.web;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.github.dnault.therapi.apidoc.ApiDocProvider;
+import com.github.dnault.therapi.apidoc.TherapiMethodDoc;
 import com.github.dnault.therapi.core.MethodRegistry;
 import com.github.dnault.therapi.core.internal.MethodDefinition;
 import com.github.dnault.therapi.core.internal.ParameterDefinition;
@@ -44,6 +46,11 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
             return;
         }
 
+        if ("/apidoc".equals(req.getPathInfo())) {
+            sendApiDoc(req, resp);
+            return;
+        }
+
         if (response.isPresent()) {
             resp.setContentType("application/json");
             getObjectWriter().writeValue(resp.getOutputStream(), response.get());
@@ -73,6 +80,20 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
         }
 
 */
+    }
+
+    protected void sendApiDoc(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/plain;charset=UTF-8");
+        PrintWriter out = resp.getWriter();
+
+        ApiDocProvider provider = new ApiDocProvider();
+
+        for (MethodDefinition mdef : getMethodRegistry().getMethods()) {
+            TherapiMethodDoc mdoc = provider.getMethodDoc(mdef).orElse(null);
+            if (mdoc != null) {
+                out.println(mdoc.getName() + " - " + mdoc.getDescription());
+            }
+        }
     }
 
     private void sendJavascriptClient(HttpServletRequest req, HttpServletResponse resp) throws IOException {

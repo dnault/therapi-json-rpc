@@ -17,6 +17,7 @@ apply plugin: 'findbugs'
 
 
 repositories {
+    mavenLocal()
     jcenter()
 }
 
@@ -32,6 +33,8 @@ dependencies {
     def jacksonVersion = '2.6.1'
     compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     compile "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
+
+    compile "com.github.dnault.therapi:therapi-runtime-javadoc:0.1.0-SNAPSHOT"
 
     //def springVersion = '4.1.6.RELEASE'
     //compile "org.springframework:spring-beans:${springVersion}"
@@ -61,4 +64,3 @@ asciidoctor {
     // icons               : '',
     // 'data-uri'          : ''
 }
-
