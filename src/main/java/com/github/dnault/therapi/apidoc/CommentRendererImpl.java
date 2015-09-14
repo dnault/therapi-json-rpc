@@ -6,9 +6,15 @@ import com.github.dnault.therapi.runtimejavadoc.CommentText;
 import com.github.dnault.therapi.runtimejavadoc.InlineLink;
 import com.github.dnault.therapi.runtimejavadoc.InlineTag;
 
+import javax.annotation.Nullable;
+
 public class CommentRendererImpl implements CommentRenderer {
 
-    public String render(Comment comment) {
+    public String render(@Nullable Comment comment) {
+        if (comment == null) {
+            return "";
+        }
+
         StringBuilder sb = new StringBuilder();
 
         for (CommentElement e : comment) {
