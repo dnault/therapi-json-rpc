@@ -6,13 +6,13 @@ buildscript {
 
     dependencies {
         classpath "org.akhikhl.gretty:gretty:1.2.4"
-        classpath 'com.github.dnault.therapi:therapi-runtime-javadoc:0.1.0-SNAPSHOT'
+        classpath 'com.github.therapi:therapi-runtime-javadoc:0.1.0-SNAPSHOT'
     }
 }
 
 apply plugin: 'war'
 apply plugin: 'org.akhikhl.gretty'
-apply plugin: 'com.github.dnault.therapi.runtime-javadoc'
+apply plugin: 'com.github.therapi.runtime-javadoc'
 
 
 repositories {

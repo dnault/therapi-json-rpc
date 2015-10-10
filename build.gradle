@@ -34,7 +34,7 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     compile "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
 
-    compile "com.github.dnault.therapi:therapi-runtime-javadoc:0.1.0-SNAPSHOT"
+    compile "com.github.therapi:therapi-runtime-javadoc:0.1.0-SNAPSHOT"
 
     //def springVersion = '4.1.6.RELEASE'
     //compile "org.springframework:spring-beans:${springVersion}"
