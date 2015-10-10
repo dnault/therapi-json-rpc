@@ -2,6 +2,7 @@
 <%@ page import="com.github.therapi.apidoc.TherapiNamespaceDoc" %>
 <%@ page import="com.github.therapi.apidoc.TherapiParamDoc" %>
 <%@ page import="java.util.List" %>
+<%@ page import="static com.google.common.base.Strings.nullToEmpty" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -82,9 +83,11 @@
         <% for (TherapiNamespaceDoc nsDoc : (List<TherapiNamespaceDoc>) request.getAttribute("therapiNamespaces")) { %>
         <a name="<%=nsDoc.getName()%>"></a>
 
+        <%--
         <h1>
             <%=nsDoc.getName()%>
         </h1>
+        --%>
 
         <% for (TherapiMethodDoc methodDoc : nsDoc.getMethods()) { %>
         <a name="<%=nsDoc.getName() + "." + methodDoc.getName()%>"></a>
@@ -111,10 +114,10 @@
                     <%= paramDoc.getName() %>
                 </td>
                 <td>
-                    <%= paramDoc.getDescription() %>
+                    <%= nullToEmpty(paramDoc.getDescription()) %>
                 </td>
                 <td>
-                    <%= paramDoc.getDefaultValue() %>
+                    <%= nullToEmpty(paramDoc.getDefaultValue()) %>
                 </td>
             </tr>
             <% } %>
@@ -122,7 +125,7 @@
         </table>
         <% } %>
         <% } %>
-        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        <br>
     </div>
 
     <div id="footer"></div>
