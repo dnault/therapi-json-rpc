@@ -22,7 +22,9 @@ repositories {
 dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
 
-    compile project(':') // core project
+    compile project(':') // Core library; a real project would use the following line instead:
+    // compile "com.github.therapi:therapi-json-rpc:<version>"
+
     compile 'org.slf4j:slf4j-simple:1.7.12'
 
     compile 'commons-io:commons-io:2.4'
@@ -34,5 +36,18 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 tasks.withType(JavaCompile) {
+    // retain parameter names in class files
     options.compilerArgs << "-parameters"
+}
+
+project.afterEvaluate {
+    appRun.doFirst {
+        println """
+            *
+            * WARNING: Please use the 'appRunWar' task instead, otherwise you won't
+            * be able to view the API documentation. A real project using a pre-built
+            * therapi-json-rpc.jar does not have this limitation.
+            *
+            """.stripIndent()
+    }
 }
