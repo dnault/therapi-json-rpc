@@ -107,7 +107,8 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
 
         writer.println();
 
-        writer.println("logit = function(x) { console.debug(x); };");
+        writer.println("logit = function(x) { if (x instanceof JsonRpcError) { logerr(x);} else {console.debug(x);} };");
+        writer.println("logerr = function(x) { console.warn(x); if (x.data && x.data.detail) {console.warn(x.data.detail);}};");
         writer.println("rethrow = function(e) { throw e; };");
 
         writer.println();

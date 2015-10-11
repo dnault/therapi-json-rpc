@@ -151,8 +151,12 @@ public class MethodRegistry {
                 throw new NullArgumentException(p.getName());
             }
 
-            boundArgs[i++] = objectMapper.convertValue(arg, p.getType());
-            consumedArgCount++;
+            try {
+                boundArgs[i++] = objectMapper.convertValue(arg, p.getType());
+                consumedArgCount++;
+            } catch (Exception e) {
+                throw new ParameterBindingException(p.getName(), buildParamBindingErrorMessage(p, arg, e));
+            }
         }
 
         if (consumedArgCount != args.size()) {
@@ -196,9 +200,21 @@ public class MethodRegistry {
                 throw new NullArgumentException(param.getName());
             }
 
-            boundArgs[i] = objectMapper.convertValue(arg, param.getType());
+            try {
+                boundArgs[i] = objectMapper.convertValue(arg, param.getType());
+            } catch (Exception e) {
+                throw new ParameterBindingException(param.getName(), buildParamBindingErrorMessage(param, arg, e));
+            }
         }
         return boundArgs;
+    }
+
+    private String buildParamBindingErrorMessage(ParameterDefinition param, JsonNode arg, Exception e) {
+        String jacksonErrorMessage = e.getMessage().replace("\n at [Source: N/A; line: -1, column: -1]", "");
+
+        String typeName = param.getType().getType().toString();
+        return "Can't bind parameter '" + param.getName() + "' of type " + typeName + " to " +
+                arg.getNodeType() + " value " + arg.toString() + " : " + jacksonErrorMessage;
     }
 
     public Collection<MethodDefinition> getMethods() {
