@@ -23,7 +23,6 @@ apply plugin: 'maven-publish'
 
 repositories {
     jcenter()
-    maven { url "https://dl.bintray.com/dnault/maven/" }
 }
 
 group = "com.github.therapi"
@@ -94,7 +93,7 @@ asciidoctor {
             idprefix: '',
             idseparator: '-',
             'data-uri': '',
-            example: "${projectDir}/examples/src/main/java/com/github/dnault/therapi/example/"
+            example: "${projectDir}/examples/src/main/java/com/github/therapi/example/"
 
     // icons               : '',
     // 'data-uri'          : ''

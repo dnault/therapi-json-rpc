@@ -1,7 +1,6 @@
 buildscript {
     repositories {
         jcenter()
-        maven { url "https://dl.bintray.com/dnault/maven/" }
     }
 
     dependencies {
@@ -15,7 +14,6 @@ apply plugin: 'org.akhikhl.gretty'
 apply plugin: 'com.github.therapi.runtime-javadoc'
 
 repositories {
-    maven { url "https://dl.bintray.com/dnault/maven/" }
     jcenter()
 }
 
