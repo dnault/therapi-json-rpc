@@ -1,12 +1,11 @@
 
 [COMPLETE] parameterized superclass collection handling
 [COMPLETE] polymorphic type handling
-
-Invoke methods over http
+[COMPLETE] Invoke methods over http
 
 lowercase enum module
 
-automatic documentation
+automatic documentation [IN PROGRESS]
 \- schemas
 
 json views
