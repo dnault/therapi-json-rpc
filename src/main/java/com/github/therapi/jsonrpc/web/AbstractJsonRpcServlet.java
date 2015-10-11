@@ -83,11 +83,8 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
 
     protected void sendApiDoc(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         ApiDocProvider provider = new ApiDocProvider();
-
         req.setAttribute("therapiNamespaces", provider.getDocumentation(getMethodRegistry()));
         req.getRequestDispatcher("/WEB-INF/therapi/apidoc.jsp").include(req, resp);
-        return;
-
     }
 
     private void sendJavascriptClient(HttpServletRequest req, HttpServletResponse resp) throws IOException {
