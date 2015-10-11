@@ -5,6 +5,7 @@ import com.github.therapi.core.internal.MethodDefinition;
 import com.github.therapi.core.internal.ParameterDefinition;
 import com.github.therapi.runtimejavadoc.ClassJavadoc;
 import com.github.therapi.runtimejavadoc.Comment;
+import com.github.therapi.runtimejavadoc.CommentFormatter;
 import com.github.therapi.runtimejavadoc.MethodJavadoc;
 import com.github.therapi.runtimejavadoc.ParamJavadoc;
 import com.github.therapi.runtimejavadoc.RuntimeJavadocReader;
@@ -22,7 +23,7 @@ import java.util.Optional;
 import static com.github.therapi.core.internal.LangHelper.index;
 
 public class ApiDocProvider {
-    private CommentRenderer commentRenderer = new CommentRendererImpl();
+    private CommentFormatter commentFormatter = new CommentFormatter();
     private RuntimeJavadocReader javadocReader = new RuntimeJavadocReader();
 
     public List<TherapiNamespaceDoc> getDocumentation(MethodRegistry registry) throws IOException {
@@ -121,6 +122,6 @@ public class ApiDocProvider {
     }
 
     protected String render(Comment comment) {
-        return commentRenderer.render(comment);
+        return commentFormatter.format(comment);
     }
 }
