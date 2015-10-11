@@ -15,10 +15,9 @@ apply plugin: 'idea'
 apply plugin: 'provided-base'
 apply plugin: 'findbugs'
 
-
 repositories {
-    mavenLocal()
     jcenter()
+    maven { url "https://dl.bintray.com/dnault/maven/" }
 }
 
 dependencies {
@@ -34,7 +33,7 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     compile "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
 
-    compile "com.github.therapi:therapi-runtime-javadoc:0.1.0-SNAPSHOT"
+    compile "com.github.therapi:therapi-runtime-javadoc:0.1.0"
 
     //def springVersion = '4.1.6.RELEASE'
     //compile "org.springframework:spring-beans:${springVersion}"

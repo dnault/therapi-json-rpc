@@ -1,12 +1,12 @@
 buildscript {
     repositories {
-        mavenLocal()
         jcenter()
+        maven { url "https://dl.bintray.com/dnault/maven/" }
     }
 
     dependencies {
         classpath "org.akhikhl.gretty:gretty:1.2.4"
-        classpath 'com.github.therapi:therapi-runtime-javadoc:0.1.0-SNAPSHOT'
+        classpath 'com.github.therapi:therapi-runtime-javadoc:0.1.0'
     }
 }
 
@@ -14,9 +14,8 @@ apply plugin: 'war'
 apply plugin: 'org.akhikhl.gretty'
 apply plugin: 'com.github.therapi.runtime-javadoc'
 
-
 repositories {
-    mavenLocal() // must list repo containing therapi-runtime-javadoc, otherwise gretty complains
+    maven { url "https://dl.bintray.com/dnault/maven/" }
     jcenter()
 }
 
