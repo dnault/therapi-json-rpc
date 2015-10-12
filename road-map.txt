@@ -2,8 +2,7 @@
 [COMPLETE] parameterized superclass collection handling
 [COMPLETE] polymorphic type handling
 [COMPLETE] Invoke methods over http
-
-lowercase enum module
+[COMPLETE] lowercase enum module
 
 automatic documentation [IN PROGRESS]
 \- schemas

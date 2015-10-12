@@ -1,8 +1,10 @@
 package com.github.therapi.example;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.example.devilsdictionary.DictionaryServiceImpl;
+import com.github.therapi.jackson.enums.LowerCamelCaseEnumModule;
 import com.github.therapi.jsonrpc.JsonRpcDispatcher;
 import com.github.therapi.jsonrpc.JsonRpcDispatcherImpl;
 import com.github.therapi.jsonrpc.web.AbstractJsonRpcServlet;
@@ -23,7 +25,10 @@ public class ExampleJsonRpcServlet extends AbstractJsonRpcServlet {
         super.init();
 
         try {
-            registry = new MethodRegistry(newLenientObjectMapper());
+            ObjectMapper objectMapper = newLenientObjectMapper();
+            objectMapper.registerModule(new LowerCamelCaseEnumModule());
+
+            registry = new MethodRegistry(objectMapper);
             registry.scan(new CalculatorServiceImpl());
             registry.scan(new DictionaryServiceImpl());
 
