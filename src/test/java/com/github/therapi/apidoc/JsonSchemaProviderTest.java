@@ -37,6 +37,7 @@ public class JsonSchemaProviderTest {
                 "    \"animals\" : {\n" +
                 "      \"type\" : \"array\",\n" +
                 "      \"items\" : {\n" +
+                "        \"type\" : \"object\",\n" +
                 "        \"$ref\" : \"urn:jsonschema:com:github:therapi:apidoc:JsonSchemaProviderTest:Animal\"\n" +
                 "      }\n" +
                 "    }\n" +
