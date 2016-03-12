@@ -6,4 +6,5 @@
 
 
 Because sometimes you just want to make a remote procedure call without all that tedious mucking about in REST.
+
 [Learn more](http://dnault.github.io/therapi-json-rpc/).
