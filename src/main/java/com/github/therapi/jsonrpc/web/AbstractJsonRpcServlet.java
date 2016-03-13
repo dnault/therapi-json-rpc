@@ -58,7 +58,23 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
             }
         }
 
-        Optional<JsonNode> response = getJsonRpcDispatcher().invoke(req.getParameter("r"));
+        String jsonRequest = req.getParameter("r");
+        if (jsonRequest == null) {
+            resp.setStatus(400);
+            resp.setContentType("text/html");
+            resp.setCharacterEncoding("UTF-8");
+            PrintWriter out = resp.getWriter();
+            out.println("Hi. This URI is a <a href=\"http://www.jsonrpc.org/specification\">JSON-RPC 2.0</a> endpoint.");
+            out.println("<p>");
+            out.println("Clients should submit request objects in the body of a POST to this URI.");
+            out.println("If you just want to poke around, you can manually submit a request object as the 'r' query parameter of a GET request.");
+            out.println("Don't forget the 'id' property of your request object, otherwise it will be treated as a notification and you won't see the response.");
+            out.println("<p>");
+            out.println("API documentation is <a href=\"" + req.getContextPath() + req.getServletPath() + "/apidoc\">over here</a>.");
+            return;
+        }
+
+        Optional<JsonNode> response = getJsonRpcDispatcher().invoke(jsonRequest);
 
         if (response.isPresent()) {
             resp.setContentType("application/json");
