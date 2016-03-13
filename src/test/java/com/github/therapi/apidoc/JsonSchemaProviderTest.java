@@ -11,13 +11,13 @@ import org.junit.Test;
 
 public class JsonSchemaProviderTest {
 
-    private static class Zoo {
-        public String name;
-        public List<Animal> animals;
+    private interface Zoo {
+        String getName();
+        List<Animal> getAnimals();
     }
 
-    private static class Animal {
-        public String species;
+    private interface Animal {
+        String getSpecies();
     }
 
     private static class NoPublicFields {
