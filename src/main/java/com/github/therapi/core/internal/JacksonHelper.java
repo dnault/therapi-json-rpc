@@ -46,6 +46,11 @@ public class JacksonHelper {
             public Type getType() {
                 return type;
             }
+
+            @Override
+            public String toString() {
+                return type.toString();
+            }
         };
     }
 

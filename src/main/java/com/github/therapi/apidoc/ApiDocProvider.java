@@ -1,5 +1,20 @@
 package com.github.therapi.apidoc;
 
+import static com.github.therapi.core.internal.LangHelper.index;
+import static org.apache.commons.lang3.StringUtils.removeStart;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
+
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.internal.MethodDefinition;
 import com.github.therapi.core.internal.ParameterDefinition;
@@ -12,15 +27,6 @@ import com.github.therapi.runtimejavadoc.RuntimeJavadocReader;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static com.github.therapi.core.internal.LangHelper.index;
 
 public class ApiDocProvider {
     private CommentFormatter commentFormatter = new CommentFormatter();
@@ -66,6 +72,7 @@ public class ApiDocProvider {
                 for (ParameterDefinition pdef : mdef.getParameters()) {
                     TherapiParamDoc pdoc = new TherapiParamDoc();
                     pdoc.setName(pdef.getName());
+                    pdoc.setType(toJsonType(pdef.getType()));
 
                     ParamJavadoc paramJavadoc = javadocsByParamName.get(pdef.getName());
                     if (paramJavadoc != null) {
@@ -85,6 +92,48 @@ public class ApiDocProvider {
         return namespaces;
     }
 
+    protected String toJsonType(TypeReference typeRef) {
+        String typeName = typeRef.getType().toString();
+
+        typeName = removeStart(typeName, "class ");
+        typeName = removeStart(typeName, "interface ");
+
+        if (typeName.equals("int") || typeName.equals("long")) {
+            return "integer";
+        }
+
+        if (typeName.equals("float") || typeName.equals("double")) {
+            return "number";
+        }
+
+        typeName = typeName.replace("java.lang.Object", "any");
+
+        typeName = typeName.replace("java.lang.String", "string");
+
+        typeName = typeName.replace("java.lang.Integer", "integer");
+        typeName = typeName.replace("java.lang.Long", "integer");
+
+        typeName = typeName.replace("java.lang.Float", "number");
+        typeName = typeName.replace("java.lang.Double", "number");
+
+        typeName = typeName.replace("java.util.Set", "array");
+        typeName = typeName.replace("java.util.List", "array");
+        typeName = typeName.replace("java.util.Collection", "array");
+
+        typeName = typeName.replace("java.util.Map", "map");
+
+        typeName = typeName.replace("java.util.Optional", "optional");
+        typeName = typeName.replace("com.google.common.base.Optional", "optional");
+
+        if (typeName.startsWith("com.google.common.collect.Multimap")) {
+            String params = substringBetween(typeName, "<", ">");
+            String keyType = substringBefore(params, ",").trim();
+            String valueType = substringAfter(params, ",").trim();
+            typeName = "map<" + keyType + ", array<" + valueType + ">>";
+        }
+
+        return typeName;
+    }
 
     public Optional<MethodJavadoc> getJavadoc(MethodDefinition m) throws IOException {
         ClassJavadoc classJavadoc = javadocReader.getDocumentation(m.getMethod().getDeclaringClass().getName());
