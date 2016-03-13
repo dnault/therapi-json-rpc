@@ -7,14 +7,15 @@ import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.internal.MethodDefinition;
 import com.github.therapi.core.internal.ParameterDefinition;
@@ -29,13 +30,15 @@ import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 
 public class ApiDocProvider {
-    private CommentFormatter commentFormatter = new CommentFormatter();
-    private RuntimeJavadocReader javadocReader = new RuntimeJavadocReader();
+    private final CommentFormatter commentFormatter = new CommentFormatter();
+    private final RuntimeJavadocReader javadocReader = new RuntimeJavadocReader();
 
     public List<TherapiNamespaceDoc> getDocumentation(MethodRegistry registry) throws IOException {
-        List<TherapiNamespaceDoc> namespaces = new ArrayList<>();
+        final ObjectWriter prettyWriter = registry.getObjectMapper().writerWithDefaultPrettyPrinter();
 
-        SortedSetMultimap<String, MethodDefinition> methodDefinitionsByNamespace = TreeMultimap.create(
+        final List<TherapiNamespaceDoc> namespaces = new ArrayList<>();
+
+        final SortedSetMultimap<String, MethodDefinition> methodDefinitionsByNamespace = TreeMultimap.create(
                 Comparator.<String>naturalOrder(), new Comparator<MethodDefinition>() {
                     @Override
                     public int compare(MethodDefinition o1, MethodDefinition o2) {
@@ -49,17 +52,17 @@ public class ApiDocProvider {
         }
 
         for (String namespaceName : methodDefinitionsByNamespace.keySet()) {
-            TherapiNamespaceDoc nsDoc = new TherapiNamespaceDoc();
+            final TherapiNamespaceDoc nsDoc = new TherapiNamespaceDoc();
             nsDoc.setName(namespaceName);
 
-            List<TherapiMethodDoc> methods = new ArrayList<>();
+            final List<TherapiMethodDoc> methods = new ArrayList<>();
             for (MethodDefinition mdef : methodDefinitionsByNamespace.get(namespaceName)) {
 
-                TherapiMethodDoc mdoc = new TherapiMethodDoc();
+                final TherapiMethodDoc mdoc = new TherapiMethodDoc();
                 mdoc.setName(mdef.getUnqualifiedName());
 
-                Optional<MethodJavadoc> methodJavadocOptional = getJavadoc(mdef);
-                Map<String, ParamJavadoc> javadocsByParamName = methodJavadocOptional.isPresent()
+                final Optional<MethodJavadoc> methodJavadocOptional = getJavadoc(mdef);
+                final Map<String, ParamJavadoc> javadocsByParamName = methodJavadocOptional.isPresent()
                         ? index(methodJavadocOptional.get().getParams(), ParamJavadoc::getName)
                         : ImmutableMap.<String, ParamJavadoc>of();
 
@@ -68,11 +71,16 @@ public class ApiDocProvider {
                     mdoc.setReturns(render(methodJavadocOptional.get().getReturns()));
                 }
 
-                List<TherapiParamDoc> paramDocs = new ArrayList<>();
+                final List<TherapiParamDoc> paramDocs = new ArrayList<>();
                 for (ParameterDefinition pdef : mdef.getParameters()) {
-                    TherapiParamDoc pdoc = new TherapiParamDoc();
+                    final TherapiParamDoc pdoc = new TherapiParamDoc();
                     pdoc.setName(pdef.getName());
                     pdoc.setType(toJsonType(pdef.getType()));
+
+                    Optional<Supplier<?>> defaultSupplier = pdef.getDefaultValueSupplier();
+                    if (defaultSupplier.isPresent()) {
+                        pdoc.setDefaultValue(prettyWriter.writeValueAsString(defaultSupplier.get().get()));
+                    }
 
                     ParamJavadoc paramJavadoc = javadocsByParamName.get(pdef.getName());
                     if (paramJavadoc != null) {
