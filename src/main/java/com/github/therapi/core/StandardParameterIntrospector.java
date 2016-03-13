@@ -52,30 +52,30 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
         return () -> objectMapper.convertValue(defaultValueStr, typeReference);
     }
 
-    private Supplier<?> getDefaultValueSupplier(Class<?> type) {
-        if (type == Boolean.TYPE) {
+    protected static Supplier<?> getDefaultValueSupplier(Class<?> type) {
+        if (type == boolean.class) {
             return () -> false;
         }
-        if (type == Integer.TYPE) {
+        if (type == int.class) {
             return () -> 0;
         }
-        if (type == Long.TYPE) {
+        if (type == long.class) {
             return () -> 0L;
         }
-        if (type == Character.TYPE) {
+        if (type == char.class) {
             return () -> '\0';
         }
-        if (type == Short.TYPE) {
+        if (type == short.class) {
             return () -> (short) 0;
         }
-        if (type == Byte.TYPE) {
+        if (type == byte.class) {
             return () -> (byte) 0;
         }
-        if (type == Double.TYPE) {
-            return () -> (double) 0;
+        if (type == double.class) {
+            return () -> 0d;
         }
-        if (type == Float.TYPE) {
-            return () -> (float) 0;
+        if (type == float.class) {
+            return () -> 0f;
         }
         return () -> null;
     }
