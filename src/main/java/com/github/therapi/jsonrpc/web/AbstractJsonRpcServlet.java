@@ -16,9 +16,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.therapi.apidoc.ApiDocProvider;
+import com.github.therapi.apidoc.JsonSchemaProvider;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.internal.MethodDefinition;
 import com.github.therapi.core.internal.ParameterDefinition;
+import com.github.therapi.core.internal.TypesHelper;
 import com.github.therapi.jsonrpc.JsonRpcDispatcher;
 
 public abstract class AbstractJsonRpcServlet extends HttpServlet {
@@ -114,7 +116,17 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
     }
 
     protected void sendModelDoc(HttpServletRequest req, HttpServletResponse resp, String modelClassName) throws IOException, ServletException {
+        Class modelClass = TypesHelper.findClass(modelClassName).orElse(null);
+
+        if (modelClass == null) {
+            resp.sendError(404, "Model class not found: " + modelClassName);
+            return;
+        }
+
+        String schema = new JsonSchemaProvider().getSchema(getMethodRegistry().getObjectMapper(), modelClass).orElse(null);
+
         req.setAttribute("modelClassName", modelClassName);
+        req.setAttribute("schema", schema);
         req.getRequestDispatcher("/WEB-INF/therapi/modeldoc.jsp").include(req, resp);
     }
 

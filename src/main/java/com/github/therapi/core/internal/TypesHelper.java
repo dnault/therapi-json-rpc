@@ -9,6 +9,7 @@ import static org.apache.commons.lang3.StringUtils.substringBetween;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -119,5 +120,13 @@ public class TypesHelper {
         }
 
         return typeName;
+    }
+
+    public static Optional<Class> findClass(String className) {
+        try {
+            return Optional.of(Class.forName(className));
+        } catch (ClassNotFoundException e) {
+            return Optional.empty();
+        }
     }
 }
