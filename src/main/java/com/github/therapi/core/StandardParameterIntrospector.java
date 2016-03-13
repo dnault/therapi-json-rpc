@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.therapi.core.internal.TypesHelper;
 import com.github.therapi.core.annotation.Default;
 import com.github.therapi.core.internal.ParameterDefinition;
 
@@ -40,7 +41,7 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
         }
 
         if (Default.NULL.equals(defaultAnnotation.value())) {
-            return getDefaultValueSupplier(p.getType());
+            return TypesHelper.getDefaultValueSupplier(p.getType());
         }
 
         String defaultValueStr = defaultAnnotation.value();
@@ -50,34 +51,6 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
         }
 
         return () -> objectMapper.convertValue(defaultValueStr, typeReference);
-    }
-
-    protected static Supplier<?> getDefaultValueSupplier(Class<?> type) {
-        if (type == boolean.class) {
-            return () -> false;
-        }
-        if (type == int.class) {
-            return () -> 0;
-        }
-        if (type == long.class) {
-            return () -> 0L;
-        }
-        if (type == char.class) {
-            return () -> '\0';
-        }
-        if (type == short.class) {
-            return () -> (short) 0;
-        }
-        if (type == byte.class) {
-            return () -> (byte) 0;
-        }
-        if (type == double.class) {
-            return () -> 0d;
-        }
-        if (type == float.class) {
-            return () -> 0f;
-        }
-        return () -> null;
     }
 
     protected String getName(Parameter p) {

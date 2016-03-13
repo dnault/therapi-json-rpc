@@ -1,13 +1,6 @@
 package com.github.therapi.jsonrpc.web;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.github.therapi.apidoc.ApiDocProvider;
-import com.github.therapi.core.MethodRegistry;
-import com.github.therapi.core.internal.MethodDefinition;
-import com.github.therapi.core.internal.ParameterDefinition;
-import com.github.therapi.jsonrpc.JsonRpcDispatcher;
+import static org.apache.commons.lang3.StringUtils.removeStart;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,6 +11,15 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.github.therapi.apidoc.ApiDocProvider;
+import com.github.therapi.core.MethodRegistry;
+import com.github.therapi.core.internal.MethodDefinition;
+import com.github.therapi.core.internal.ParameterDefinition;
+import com.github.therapi.jsonrpc.JsonRpcDispatcher;
 
 public abstract class AbstractJsonRpcServlet extends HttpServlet {
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -38,14 +40,22 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if ("/apidoc".equals(req.getPathInfo())) {
-            sendApiDoc(req, resp);
-            return;
-        }
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null) {
+            if ("/apidoc".equals(req.getPathInfo())) {
+                sendApiDoc(req, resp);
+                return;
+            }
 
-        if ("/client.js".equals(req.getPathInfo())) {
-            sendJavascriptClient(req, resp);
-            return;
+            if (pathInfo.startsWith("/modeldoc/")) {
+                sendModelDoc(req, resp, removeStart(pathInfo, "/modeldoc/"));
+                return;
+            }
+
+            if ("/client.js".equals(req.getPathInfo())) {
+                sendJavascriptClient(req, resp);
+                return;
+            }
         }
 
         Optional<JsonNode> response = getJsonRpcDispatcher().invoke(req.getParameter("r"));
@@ -85,6 +95,11 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
         ApiDocProvider provider = new ApiDocProvider();
         req.setAttribute("therapiNamespaces", provider.getDocumentation(getMethodRegistry()));
         req.getRequestDispatcher("/WEB-INF/therapi/apidoc.jsp").include(req, resp);
+    }
+
+    protected void sendModelDoc(HttpServletRequest req, HttpServletResponse resp, String modelClassName) throws IOException, ServletException {
+        req.setAttribute("modelClassName", modelClassName);
+        req.getRequestDispatcher("/WEB-INF/therapi/modeldoc.jsp").include(req, resp);
     }
 
     private void sendJavascriptClient(HttpServletRequest req, HttpServletResponse resp) throws IOException {

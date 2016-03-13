@@ -1,6 +1,7 @@
 <%@ page import="com.github.therapi.apidoc.TherapiMethodDoc" %>
 <%@ page import="com.github.therapi.apidoc.TherapiNamespaceDoc" %>
 <%@ page import="com.github.therapi.apidoc.TherapiParamDoc" %>
+<%@ page import="com.github.therapi.apidoc.ApiDocProvider" %>
 <%@ page import="static org.apache.commons.lang3.StringEscapeUtils.escapeHtml3" %>
 <%@ page import="java.util.List" %>
 <%@ page import="static com.google.common.base.Strings.nullToEmpty" %>
@@ -116,7 +117,7 @@
                     <%= escapeHtml3(paramDoc.getName()) %>
                 </td>
                 <td>
-                    <%= escapeHtml3(paramDoc.getType()) %>
+                    <%= ApiDocProvider.activateModelLinks(paramDoc.getType()) %>
                 </td>
                 <td>
                     <%= escapeHtml3(nullToEmpty(paramDoc.getDescription())) %>

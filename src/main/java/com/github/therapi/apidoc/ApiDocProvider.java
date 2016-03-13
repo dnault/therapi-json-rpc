@@ -1,10 +1,9 @@
 package com.github.therapi.apidoc;
 
 import static com.github.therapi.core.internal.LangHelper.index;
-import static org.apache.commons.lang3.StringUtils.removeStart;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static com.github.therapi.core.internal.TypesHelper.getClassNames;
+import static com.github.therapi.core.internal.TypesHelper.getSimpleName;
+import static com.google.common.html.HtmlEscapers.htmlEscaper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.internal.MethodDefinition;
 import com.github.therapi.core.internal.ParameterDefinition;
+import com.github.therapi.core.internal.TypesHelper;
 import com.github.therapi.runtimejavadoc.ClassJavadoc;
 import com.github.therapi.runtimejavadoc.Comment;
 import com.github.therapi.runtimejavadoc.CommentFormatter;
@@ -101,46 +101,7 @@ public class ApiDocProvider {
     }
 
     protected String toJsonType(TypeReference typeRef) {
-        String typeName = typeRef.getType().toString();
-
-        typeName = removeStart(typeName, "class ");
-        typeName = removeStart(typeName, "interface ");
-
-        if (typeName.equals("int") || typeName.equals("long")) {
-            return "integer";
-        }
-
-        if (typeName.equals("float") || typeName.equals("double")) {
-            return "number";
-        }
-
-        typeName = typeName.replace("java.lang.Object", "any");
-
-        typeName = typeName.replace("java.lang.String", "string");
-
-        typeName = typeName.replace("java.lang.Integer", "integer");
-        typeName = typeName.replace("java.lang.Long", "integer");
-
-        typeName = typeName.replace("java.lang.Float", "number");
-        typeName = typeName.replace("java.lang.Double", "number");
-
-        typeName = typeName.replace("java.util.Set", "array");
-        typeName = typeName.replace("java.util.List", "array");
-        typeName = typeName.replace("java.util.Collection", "array");
-
-        typeName = typeName.replace("java.util.Map", "map");
-
-        typeName = typeName.replace("java.util.Optional", "optional");
-        typeName = typeName.replace("com.google.common.base.Optional", "optional");
-
-        if (typeName.startsWith("com.google.common.collect.Multimap")) {
-            String params = substringBetween(typeName, "<", ">");
-            String keyType = substringBefore(params, ",").trim();
-            String valueType = substringAfter(params, ",").trim();
-            typeName = "map<" + keyType + ", array<" + valueType + ">>";
-        }
-
-        return typeName;
+        return TypesHelper.toJsonType(typeRef.getType());
     }
 
     public Optional<MethodJavadoc> getJavadoc(MethodDefinition m) throws IOException {
@@ -180,5 +141,15 @@ public class ApiDocProvider {
 
     protected String render(Comment comment) {
         return commentFormatter.format(comment);
+    }
+
+    public static String activateModelLinks(String typeName) {
+        String result = htmlEscaper().escape(typeName);
+        for (String className : getClassNames(typeName)) {
+            String link = "<a href=\"modeldoc/" + className + "\">" + getSimpleName(className) + "</a>";
+            result = result.replace(className, link);
+        }
+
+        return result;
     }
 }

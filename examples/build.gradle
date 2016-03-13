@@ -5,7 +5,7 @@ buildscript {
 
     dependencies {
         classpath "org.akhikhl.gretty:gretty:1.2.4"
-        classpath 'com.github.therapi:therapi-runtime-javadoc:0.1.1'
+        classpath 'com.github.therapi:therapi-runtime-javadoc:0.1.2'
     }
 }
 
