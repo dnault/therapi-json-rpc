@@ -8,6 +8,8 @@ public class TherapiMethodDoc {
     private String name;
     private String description;
     private String returns;
+    private String returnType;
+
     private List<TherapiParamDoc> params = ImmutableList.of();
 
     public String getName() {
@@ -32,6 +34,14 @@ public class TherapiMethodDoc {
 
     public void setReturns(String returns) {
         this.returns = returns;
+    }
+
+    public String getReturnType() {
+        return returnType;
+    }
+
+    public void setReturnType(String returnType) {
+        this.returnType = returnType;
     }
 
     public List<TherapiParamDoc> getParams() {

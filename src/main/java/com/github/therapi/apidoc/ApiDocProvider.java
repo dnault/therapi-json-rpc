@@ -69,6 +69,7 @@ public class ApiDocProvider {
                 if (methodJavadocOptional.isPresent()) {
                     mdoc.setDescription(render(methodJavadocOptional.get().getComment()));
                     mdoc.setReturns(render(methodJavadocOptional.get().getReturns()));
+                    mdoc.setReturnType(toJsonType(mdef.getReturnTypeRef()));
                 }
 
                 final List<TherapiParamDoc> paramDocs = new ArrayList<>();

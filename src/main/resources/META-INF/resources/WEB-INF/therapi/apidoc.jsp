@@ -39,6 +39,13 @@
         margin: 0 0 20px 0;
     }
 
+    caption {
+        text-align: left;
+        font-family: "Source Sans Pro", sans-serif;
+        font-weight: 700;
+        padding: 2px 0px;
+    }
+
     th {
         background-color: #f5f5f5;
         text-align: left;
@@ -46,6 +53,7 @@
         font-weight: 700;
         padding: 4px 8px;
         border: #e0e0e0 1px solid;
+        font-size: 90%;
     }
 
     td {
@@ -104,6 +112,7 @@
 
         <p>
         <table>
+            <caption>Parameters<caption>
             <tr>
                 <th>Name</th>
                 <th>Type</th>
@@ -123,12 +132,26 @@
                     <%= escapeHtml3(nullToEmpty(paramDoc.getDescription())) %>
                 </td>
                 <td>
-                    <%= escapeHtml3(nullToEmpty(paramDoc.getDefaultValue())) %>
+                    <code><%= escapeHtml3(nullToEmpty(paramDoc.getDefaultValue())) %><code>
                 </td>
             </tr>
             <% } %>
 
         </table>
+        <p>
+        <table>
+            <caption>Returns<caption>
+            <tr>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><%= ApiDocProvider.activateModelLinks(methodDoc.getReturnType()) %></td>
+                <td><%= escapeHtml3(nullToEmpty(methodDoc.getReturns())) %></td>
+            </tr>
+        </table>
+        <br>
+        <br>
         <% } %>
         <% } %>
         <br>
