@@ -20,7 +20,6 @@
 <style>
     .container {
         position: relative;
-        padding: 0 0 0 55px;
     }
 
     #sidebar {
@@ -30,7 +29,8 @@
     }
 
     #content {
-        margin-left: 250px;
+        margin-left: 275px;
+        margin-right: 10px;
     }
 
     table {
@@ -60,6 +60,24 @@
         vertical-align: top;
         padding: 2px 8px;
         border: #e0e0e0 1px solid;
+    }
+
+    h2 {
+        border-top-left-radius: 9px;
+        border-top-right-radius: 9px;
+
+        padding: 5px;
+        padding-left: 10px;
+
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+
+        /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#3b679e+0,2b88d9+8,207cca+15,7db9e8+100 */
+        background: rgb(59,103,158); /* Old browsers */
+        background: -moz-linear-gradient(top,  rgba(59,103,158,1) 0%, rgba(43,136,217,1) 8%, rgba(32,124,202,1) 15%, rgba(125,185,232,1) 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(top,  rgba(59,103,158,1) 0%,rgba(43,136,217,1) 8%,rgba(32,124,202,1) 15%,rgba(125,185,232,1) 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to bottom,  rgba(59,103,158,1) 0%,rgba(43,136,217,1) 8%,rgba(32,124,202,1) 15%,rgba(125,185,232,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3b679e', endColorstr='#7db9e8',GradientType=0 ); /* IE6-9 */
     }
 
 
@@ -105,7 +123,7 @@
         <h2>
             <span><%= nsDoc.getName() + "." + methodDoc.getName() %></span>
         </h2>
-
+        <div style="padding-left: 10px; padding-right: 10px;">
         <span>
             <%= methodDoc.getDescription() %>
         </span>
@@ -150,6 +168,7 @@
                 <td><%= escapeHtml3(nullToEmpty(methodDoc.getReturns())) %></td>
             </tr>
         </table>
+        </div>
         <br>
         <br>
         <% } %>
