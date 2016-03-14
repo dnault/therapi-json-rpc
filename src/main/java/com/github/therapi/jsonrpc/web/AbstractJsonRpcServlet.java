@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.therapi.apidoc.ApiDocProvider;
 import com.github.therapi.apidoc.JsonSchemaProvider;
@@ -24,7 +23,6 @@ import com.github.therapi.core.internal.TypesHelper;
 import com.github.therapi.jsonrpc.JsonRpcDispatcher;
 
 public abstract class AbstractJsonRpcServlet extends HttpServlet {
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     protected abstract JsonRpcDispatcher getJsonRpcDispatcher();
 
