@@ -65,7 +65,7 @@ public class Parser {
         }
 
         // special cases
-        if (line.startsWith("X in our alphabet") || line.startsWith("W (double U)")) {
+        if (line.startsWith("X in our alphabet") || line.startsWith("W (double U)") || line.startsWith("R.I.P.")) {
             return true;
         }
         if (!line.contains(",")) {
