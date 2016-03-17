@@ -27,14 +27,14 @@ public class JacksonHelper {
     }
 
     public static TypeReference getTypeReference(Parameter parameter, Class<?> contextForTypeVariableResolution) {
-        Type parameterizedType = parameter.getParameterizedType();
-        TypeToken token = TypeToken.of(contextForTypeVariableResolution);
-        Type resolvedType = token.resolveType(parameterizedType).getType();
-        return newTypeReference(resolvedType);
+        return getResolvedTypeReference(parameter.getParameterizedType(), contextForTypeVariableResolution);
     }
 
     public static TypeReference getReturnTypeReference(Method method, Class<?> contextForTypeVariableResolution) {
-        Type parameterizedType = method.getGenericReturnType();
+        return getResolvedTypeReference(method.getGenericReturnType(), contextForTypeVariableResolution);
+    }
+
+    public static TypeReference getResolvedTypeReference(Type parameterizedType, Class<?> contextForTypeVariableResolution) {
         TypeToken token = TypeToken.of(contextForTypeVariableResolution);
         Type resolvedType = token.resolveType(parameterizedType).getType();
         return newTypeReference(resolvedType);
