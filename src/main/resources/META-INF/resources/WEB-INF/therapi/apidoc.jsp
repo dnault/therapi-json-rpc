@@ -168,6 +168,8 @@
                 <td><%= escapeHtml3(nullToEmpty(methodDoc.getReturns())) %></td>
             </tr>
         </table>
+
+        <a href="ui/<%=nsDoc.getName() + "." + methodDoc.getName()%>">Try it!</a>
         </div>
         <br>
         <br>

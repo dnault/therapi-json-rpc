@@ -52,6 +52,11 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
                 return;
             }
 
+            if (pathInfo.startsWith("/ui/")) {
+                sendUi(req, resp, removeStart(pathInfo, "/ui/"));
+                return;
+            }
+
             if ("/client.js".equals(req.getPathInfo())) {
                 sendJavascriptClient(req, resp);
                 return;
@@ -110,7 +115,7 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
     protected void sendApiDoc(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         ApiDocProvider provider = new ApiDocProvider();
         req.setAttribute("therapiNamespaces", provider.getDocumentation(getMethodRegistry()));
-        req.getRequestDispatcher("/WEB-INF/therapi/apidoc.jsp").include(req, resp);
+        req.getRequestDispatcher("/WEB-INF/therapi/apidoc.jsp").forward(req, resp);
     }
 
     protected void sendModelDoc(HttpServletRequest req, HttpServletResponse resp, String modelClassName) throws IOException, ServletException {
@@ -128,6 +133,22 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/therapi/modeldoc.jsp").include(req, resp);
     }
 
+    protected void sendUi(HttpServletRequest req, HttpServletResponse resp, String methodName) throws IOException, ServletException {
+
+        MethodDefinition methodDef = getMethodRegistry().getMethod(methodName).orElse(null);
+        if (methodDef == null) {
+            resp.sendError(404, "Method not found: " + methodName);
+            return;
+        }
+
+        String schema = new JsonSchemaProvider().getSchema(getMethodRegistry().getObjectMapper(), methodDef);
+
+        req.setAttribute("schema", schema);
+        req.setAttribute("methodName", methodName);
+
+        req.getRequestDispatcher("/WEB-INF/therapi/ui.jsp").forward(req, resp);
+    }
+    
     private void sendJavascriptClient(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // "application/javascript" is more correct, but might alienate IE8
         resp.setContentType("text/javascript; charset=UTF-8");

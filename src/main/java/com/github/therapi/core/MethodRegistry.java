@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.github.therapi.core.internal.JacksonHelper.isLikeNull;
@@ -219,5 +220,9 @@ public class MethodRegistry {
 
     public Collection<MethodDefinition> getMethods() {
         return unmodifiableCollection(methodsByName.values());
+    }
+
+    public Optional<MethodDefinition> getMethod(String methodName) {
+        return Optional.ofNullable(methodsByName.get(methodName));
     }
 }
