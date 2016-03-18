@@ -68,9 +68,8 @@
             });
         }
 
-        logit = function(x) { if (x instanceof JsonRpcError) { logerr(x);} else {alert(JSON.stringify(x, null, 2));} };
+        logit = function(x) { if (x instanceof JsonRpcError) { logerr(x);} else { $("#result").text(JSON.stringify(x, null, 2))} };
         logerr = function(x) { alert("error:" + JSON.stringify(x, null, 2)); if (x.data && x.data.detail) {console.warn(x.data.detail);}};
-        //logit = function(x) { if (x instanceof JsonRpcError) { logerr(x);} else {console.debug(x);} };
         //logerr = function(x) { console.warn(x); if (x.data && x.data.detail) {console.warn(x.data.detail);}};
         rethrow = function(e) { throw e; };
 
@@ -88,4 +87,7 @@
         &nbsp;
         <button class="btn btn-primary" onclick="invokeJsonRpc('<%= escapeEcmaScript(methodName) %>', bf.getData()).then(logit).catch(logit)">invoke()</button>
     </div>
+    <pre>
+        <div id="result"></div>
+    </pre>
 </body>
