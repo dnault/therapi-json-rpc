@@ -88,6 +88,6 @@
         <button class="btn btn-primary" onclick="invokeJsonRpc('<%= escapeEcmaScript(methodName) %>', bf.getData()).then(logit).catch(logit)">invoke()</button>
     </div>
     <pre>
-        <div id="result"></div>
+        <div id="result" style="word-wrap: break-word;"></div>
     </pre>
 </body>
