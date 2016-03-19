@@ -11,6 +11,8 @@ json views
 
 method interception?
 
+spring integration
+
 automatic client
 
 metrics
