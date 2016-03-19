@@ -215,14 +215,14 @@
             <button class="btn btn-primary" onclick="$('#<%= tryItButtonId %>').show(); $('#<%= explorerId %>').hide(150, function(){$('#<%= formContainerId %>').empty();});">Close</button>
 
 
-            <h3>Request</h3>
+            <h4>Request</h4>
             <pre>
-                <div id="<%= requestContainerId %>"></div>
+                <div id="<%= requestContainerId %>" style="max-height: 500px; overflow: auto;"></div>
             </pre>
 
-            <h3>Response</h3>
+            <h4>Response</h4>
             <pre>
-                <div id="<%= responseContainerId %>"></div>
+                <div id="<%= responseContainerId %>" style="max-height: 500px; overflow: auto;"></div>
             </pre>
         </div>
 
@@ -282,8 +282,17 @@ $(document).ready(function(){
 
 
         function submitForm(methodName, formName) {
-            var form = TherapiForms[formName]
-            invokeJsonRpc(methodName, form.getData()).then(logit).catch(logit);
+            var form = TherapiForms[formName];
+
+           // alert('<%= responseContainerId %>');
+            //alert(JSON.stringify(form.getData(), null, 2));
+
+            invokeJsonRpc(methodName, form.getData()).then(function(result) {
+                var json = JSON.stringify(result, null, 2);
+                //alert(json);
+                //alert('<%= responseContainerId %>');
+                $("#response_" + methodName.replace(/\./g,'_')).text(json);
+            }).catch(logerr);
             var copy = JSON.parse(JSON.stringify(form.getData()));
             var req = {
                 jsonrpc: "2.0",
@@ -292,7 +301,7 @@ $(document).ready(function(){
                 params: copy,
             };
             console.debug(JSON.stringify(req))
-            $("#request_" + formName ).text(JSON.stringify(req, null, 2))
+            $("#request_" + methodName.replace(/\./g,'_')).text(JSON.stringify(req, null, 2))
         }
 
 </script>
