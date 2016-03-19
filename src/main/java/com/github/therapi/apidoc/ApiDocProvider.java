@@ -32,6 +32,7 @@ import com.google.common.collect.TreeMultimap;
 public class ApiDocProvider {
     private final CommentFormatter commentFormatter = new CommentFormatter();
     private final RuntimeJavadocReader javadocReader = new RuntimeJavadocReader();
+    private final JsonSchemaProvider schemaProvider = new JsonSchemaProvider();
 
     public List<TherapiNamespaceDoc> getDocumentation(MethodRegistry registry) throws IOException {
         final ObjectWriter prettyWriter = registry.getObjectMapper().writerWithDefaultPrettyPrinter();
@@ -60,6 +61,7 @@ public class ApiDocProvider {
 
                 final TherapiMethodDoc mdoc = new TherapiMethodDoc();
                 mdoc.setName(mdef.getUnqualifiedName());
+                mdoc.setRequestSchema(schemaProvider.getSchema(registry.getObjectMapper(), mdef));
 
                 final Optional<MethodJavadoc> methodJavadocOptional = getJavadoc(mdef);
                 final Map<String, ParamJavadoc> javadocsByParamName = methodJavadocOptional.isPresent()

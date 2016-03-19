@@ -3,6 +3,7 @@
 <%@ page import="com.github.therapi.apidoc.TherapiParamDoc" %>
 <%@ page import="com.github.therapi.apidoc.ApiDocProvider" %>
 <%@ page import="static org.apache.commons.lang3.StringEscapeUtils.escapeHtml3" %>
+<%@ page import="static org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript" %>
 <%@ page import="java.util.List" %>
 <%@ page import="static com.google.common.base.Strings.nullToEmpty" %>
 <!DOCTYPE html>
@@ -14,6 +15,26 @@
     <link rel="stylesheet" href="../therapi/cssmenu/styles.css">
     <script src="https://code.jquery.com/jquery-1.11.3.min.js" type="text/javascript"></script>
     <script src="../therapi/cssmenu/script.js"></script>
+
+    <link rel="stylesheet" href='../therapi/json-forms/css/brutusin-json-forms.min.css'/>
+    <script src="../therapi/json-forms/js/brutusin-json-forms.min.js"></script>
+
+
+    <script type="text/javascript"
+            src="../script/datagraph/jquery-jsonrpc/0.1.1/jquery.jsonrpc.js"></script>
+
+<!--
+    <script type="text/javascript"
+            src="../script/jakearchibald/es6-promise-3.0.2/es6-promise.min.js"></script>
+-->
+
+
+    <script type="text/javascript">
+        $.jsonRPC.setup({
+            endPoint: '../jsonrpc',
+        });
+    </script>
+
     <title>API Documentation</title>
 </head>
 <body>
@@ -117,8 +138,16 @@
         </h1>
         --%>
 
-        <% for (TherapiMethodDoc methodDoc : nsDoc.getMethods()) { %>
-        <a name="<%=nsDoc.getName() + "." + methodDoc.getName()%>"></a>
+        <% for (TherapiMethodDoc methodDoc : nsDoc.getMethods()) {
+               String methodName = nsDoc.getName() + "." + methodDoc.getName();
+               String formContainerId = ("formContainer." + methodName).replace(".","_");
+               String tryItButtonId = ("tryIt." + methodName).replace(".","_");
+               String explorerId = ("explorer." + methodName).replace(".","_");
+               String formVar = ("form." + methodName).replace(".","_");
+               String requestContainerId = ("request." + methodName).replace(".","_");
+               String responseContainerId = ("response." + methodName).replace(".","_");
+        %>
+        <a name="<%= methodName %>"></a>
 
         <h2>
             <span><%= nsDoc.getName() + "." + methodDoc.getName() %></span>
@@ -169,9 +198,108 @@
             </tr>
         </table>
 
-        <a href="ui/<%=nsDoc.getName() + "." + methodDoc.getName()%>">Try it!</a>
+        <!-- <a href="ui/<%= methodName %>">Try it!</a> -->
+
+
+        <button id="<%= tryItButtonId %>" class="btn btn-primary">Try it!</button>
+
+
+        <p>
+
+        <div style="display: none;" id="<%= explorerId %>">
+            <div id="<%= formContainerId %>"></div>
+            <p>
+
+            <button class="btn btn-primary" onclick="submitForm('<%= escapeEcmaScript(methodName) %>', '<%= formVar %>')">Invoke</button>
+            &nbsp;
+            <button class="btn btn-primary" onclick="$('#<%= tryItButtonId %>').show(); $('#<%= explorerId %>').hide(150, function(){$('#<%= formContainerId %>').empty();});">Close</button>
+
+
+            <h3>Request</h3>
+            <pre>
+                <div id="<%= requestContainerId %>"></div>
+            </pre>
+
+            <h3>Response</h3>
+            <pre>
+                <div id="<%= responseContainerId %>"></div>
+            </pre>
         </div>
-        <br>
+
+<script>
+
+TherapiForms = {}
+
+$(document).ready(function(){
+    $("#<%= tryItButtonId %>").click(function(){
+
+        $("#<%= tryItButtonId %>").hide();
+
+        var schema = "<%= escapeEcmaScript(methodDoc.getRequestSchema()) %>"
+        var BrutusinForms = brutusin["json-forms"];
+        var form = BrutusinForms.create(JSON.parse(schema));
+
+        var container = document.getElementById('<%= formContainerId %>');
+        form.render(container);
+
+        TherapiForms['<%= formVar %>'] = form;
+
+
+
+        $("#<%= explorerId %>").show(150);
+    });
+});
+
+        function JsonRpcError(jsonRpcErrorResponse) {
+            this.name = "JsonRpcError";
+            this.code = jsonRpcErrorResponse.code;
+            this.message = jsonRpcErrorResponse.message;
+            this.data = jsonRpcErrorResponse.data;
+            this.stack = (new Error()).stack;
+        }
+        JsonRpcError.prototype = Object.create(Error.prototype);
+        JsonRpcError.prototype.constructor = JsonRpcError;
+
+        function invokeJsonRpc(name, params) {
+            return new Promise(function (resolve, reject) {
+                $.jsonRPC.request(name, {
+                    params: params,
+                    success: function (result) {
+                        resolve(result.result);
+                    },
+                    error: function (result) {
+                        reject(new JsonRpcError(result.error));
+                    }
+                });
+            });
+        }
+
+        logit = function(x) { if (x instanceof JsonRpcError) { logerr(x);} else { alert(JSON.stringify(x, null, 2))} };
+//        logit = function(x) { if (x instanceof JsonRpcError) { logerr(x);} else { $("#result").text(JSON.stringify(x, null, 2))} };
+        logerr = function(x) { alert("error:" + JSON.stringify(x, null, 2)); if (x.data && x.data.detail) {console.warn(x.data.detail);}};
+        //logerr = function(x) { console.warn(x); if (x.data && x.data.detail) {console.warn(x.data.detail);}};
+        rethrow = function(e) { throw e; };
+
+
+        function submitForm(methodName, formName) {
+            var form = TherapiForms[formName]
+            invokeJsonRpc(methodName, form.getData()).then(logit).catch(logit);
+            var copy = JSON.parse(JSON.stringify(form.getData()));
+            var req = {
+                jsonrpc: "2.0",
+                id: "",
+                method: methodName,
+                params: copy,
+            };
+            console.debug(JSON.stringify(req))
+            $("#request_" + formName ).text(JSON.stringify(req, null, 2))
+        }
+
+</script>
+
+
+
+        </div>
         <br>
         <% } %>
         <% } %>

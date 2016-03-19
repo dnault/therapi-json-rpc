@@ -9,8 +9,17 @@ public class TherapiMethodDoc {
     private String description;
     private String returns;
     private String returnType;
-
     private List<TherapiParamDoc> params = ImmutableList.of();
+
+    private String requestSchema;
+
+    public String getRequestSchema() {
+        return requestSchema;
+    }
+
+    public void setRequestSchema(String requestSchema) {
+        this.requestSchema = requestSchema;
+    }
 
     public String getName() {
         return name;
