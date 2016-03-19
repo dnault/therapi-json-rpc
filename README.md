@@ -6,3 +6,12 @@
 
 
 Join the RESTless Revolution. [Learn more](http://dnault.github.io/therapi-json-rpc/).
+
+To build and deploy the sample webapp:
+
+    ./gradlew appRunWar
+
+Then visit:
+
+    http://localhost:8080/examples
+
