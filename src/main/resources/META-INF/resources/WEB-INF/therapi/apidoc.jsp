@@ -19,6 +19,8 @@
     <link rel="stylesheet" href='../therapi/json-forms/css/brutusin-json-forms.min.css'/>
     <script src="../therapi/json-forms/js/brutusin-json-forms.min.js"></script>
 
+    <link rel="stylesheet" href="../therapi/highlight/styles/github-gist.css">
+    <script src="../therapi/highlight/highlight.pack.js"></script>
 
     <script type="text/javascript"
             src="../script/datagraph/jquery-jsonrpc/0.1.1/jquery.jsonrpc.js"></script>
@@ -217,12 +219,12 @@
 
             <h4>Request</h4>
             <pre>
-                <div id="<%= requestContainerId %>" style="max-height: 500px; overflow: auto;"></div>
+                <div class="json" id="<%= requestContainerId %>" style="max-height: 500px; overflow: auto;"></div>
             </pre>
 
-            <h4>Response</h4>
+            <h4>Result</h4>
             <pre>
-                <div id="<%= responseContainerId %>" style="max-height: 500px; overflow: auto;"></div>
+                <div class="json" id="<%= responseContainerId %>" style="max-height: 500px; overflow: auto;"></div>
             </pre>
         </div>
 
@@ -292,6 +294,13 @@ $(document).ready(function(){
                 //alert(json);
                 //alert('<%= responseContainerId %>');
                 $("#response_" + methodName.replace(/\./g,'_')).text(json);
+
+
+//              $('pre code div').each(function(i, block) { hljs.highlightBlock(block); });
+              $("#response_" + methodName.replace(/\./g,'_')).each(function(i, block) { hljs.highlightBlock(block); });
+
+
+
             }).catch(logerr);
             var copy = JSON.parse(JSON.stringify(form.getData()));
             var req = {
@@ -302,7 +311,15 @@ $(document).ready(function(){
             };
             console.debug(JSON.stringify(req))
             $("#request_" + methodName.replace(/\./g,'_')).text(JSON.stringify(req, null, 2))
+
+              //$('pre code div').each(function(i, block) {
+                //hljs.highlightBlock(block);
+              //});
+
+             $("#request_" + methodName.replace(/\./g,'_')).each(function(i, block) { hljs.highlightBlock(block); });;
+
         }
+
 
 </script>
 
