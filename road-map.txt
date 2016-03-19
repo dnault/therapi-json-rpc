@@ -9,6 +9,10 @@ automatic documentation [IN PROGRESS]
 
 json views
 
+binary responses
+
+upload requests
+
 method interception?
 
 spring integration
