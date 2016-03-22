@@ -196,11 +196,11 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
 
     protected ObjectNode invokeSolo(Request validRequest) {
         try {
-            JsonNode result = methodRegistry.invoke(validRequest.methodName, validRequest.params);
+            JsonNode result = methodRegistry.invoke(validRequest.getMethodName(), validRequest.getParams());
 
             Map<String, Object> resultMap = new LinkedHashMap<>();
             resultMap.put("jsonrpc", "2.0");
-            resultMap.put("id", validRequest.id);
+            resultMap.put("id", validRequest.getId());
             resultMap.put("result", result);
 
             return getObjectMapper().convertValue(resultMap, ObjectNode.class);

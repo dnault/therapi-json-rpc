@@ -63,9 +63,13 @@ public class MethodRegistry {
     }
 
     public void scan(Object o) {
-        for (MethodDefinition method : scanner.findMethods(o)) {
-            methodsByName.put(getName(method), method);
+        for (MethodDefinition methodDef : scanner.findMethods(o)) {
+            add(methodDef);
         }
+    }
+
+    private void add(MethodDefinition methodDef) {
+        methodsByName.put(getName(methodDef), methodDef);
     }
 
     public List<String> suggestMethods(String methodName) {
@@ -77,7 +81,10 @@ public class MethodRegistry {
             }
         }
 
-        return suggestionsByDistance.entries().stream().limit(5).map(Map.Entry::getValue).collect(toList());
+        return suggestionsByDistance.entries().stream()
+                .limit(5)
+                .map(Map.Entry::getValue)
+                .collect(toList());
     }
 
     public JsonNode invoke(String methodName, JsonNode args) throws MethodNotFoundException {
@@ -109,7 +116,7 @@ public class MethodRegistry {
         }
     }
 
-    protected JsonNode invoke(MethodDefinition method, Object[] boundArgs) throws IOException, IllegalAccessException {
+    private JsonNode invoke(MethodDefinition method, Object[] boundArgs) throws IOException, IllegalAccessException {
         try {
             Object result = method.getMethod().invoke(method.getOwner(), boundArgs);
 
