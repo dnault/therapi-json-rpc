@@ -23,13 +23,10 @@
     <script src="../therapi/highlight/highlight.pack.js"></script>
 
     <script type="text/javascript"
-            src="../script/datagraph/jquery-jsonrpc/0.1.1/jquery.jsonrpc.js"></script>
+            src="../therapi/datagraph/jquery-jsonrpc/0.1.1/jquery.jsonrpc.js"></script>
 
-<!--
     <script type="text/javascript"
-            src="../script/jakearchibald/es6-promise-3.0.2/es6-promise.min.js"></script>
--->
-
+            src="../therapi/jakearchibald/es6-promise-3.0.2/es6-promise.min.js"></script>
 
     <script type="text/javascript">
         $.jsonRPC.setup({
