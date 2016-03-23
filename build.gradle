@@ -19,6 +19,7 @@ apply plugin: 'idea'
 apply plugin: 'provided-base'
 apply plugin: 'findbugs'
 apply plugin: 'maven-publish'
+apply plugin: 'checkstyle'
 
 
 repositories {
@@ -86,6 +87,10 @@ task install {
 tasks.withType(JavaCompile) {
     // retain parameter names in class files
     options.compilerArgs << "-parameters"
+}
+
+checkstyle {
+    toolVersion = "6.16.1"
 }
 
 asciidoctor {
