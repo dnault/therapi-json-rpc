@@ -1,6 +1,6 @@
 package com.github.therapi.jsonrpc;
 
-import static com.github.therapi.core.internal.JacksonHelper.newLenientObjectMapper;
+import static com.github.therapi.jackson.ObjectMappers.newLenientObjectMapper;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;

@@ -1,6 +1,6 @@
 package com.github.therapi.apidoc;
 
-import static com.github.therapi.core.internal.JacksonHelper.newLenientObjectMapper;
+import static com.github.therapi.jackson.ObjectMappers.newLenientObjectMapper;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static org.junit.Assert.assertFalse;
 

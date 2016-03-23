@@ -1,6 +1,6 @@
 package com.github.therapi.apidoc;
 
-public class TherapiParamDoc {
+public class ApiParamDoc {
     private String name;
     private String type;
     private String description;

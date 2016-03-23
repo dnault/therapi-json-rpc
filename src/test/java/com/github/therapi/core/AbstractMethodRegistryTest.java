@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import static com.github.therapi.core.internal.JacksonHelper.isLikeNull;
-import static com.github.therapi.core.internal.JacksonHelper.newLenientObjectMapper;
+import static com.github.therapi.jackson.ObjectMappers.newLenientObjectMapper;
 import static com.google.common.base.Throwables.propagate;
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static org.junit.Assert.fail;

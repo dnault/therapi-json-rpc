@@ -3,10 +3,10 @@ package com.github.therapi.apidoc;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TherapiNamespaceDoc {
+public class ApiNamespaceDoc {
     private String name;
     private String description;
-    private List<TherapiMethodDoc> methods = new ArrayList<>();
+    private List<ApiMethodDoc> methods = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -24,11 +24,11 @@ public class TherapiNamespaceDoc {
         this.description = description;
     }
 
-    public List<TherapiMethodDoc> getMethods() {
+    public List<ApiMethodDoc> getMethods() {
         return methods;
     }
 
-    public void setMethods(List<TherapiMethodDoc> methods) {
+    public void setMethods(List<ApiMethodDoc> methods) {
         this.methods = methods;
     }
 }

@@ -34,10 +34,10 @@ public class ApiDocProvider {
     private final RuntimeJavadocReader javadocReader = new RuntimeJavadocReader();
     private final JsonSchemaProvider schemaProvider = new JsonSchemaProvider();
 
-    public List<TherapiNamespaceDoc> getDocumentation(MethodRegistry registry) throws IOException {
+    public List<ApiNamespaceDoc> getDocumentation(MethodRegistry registry) throws IOException {
         final ObjectWriter prettyWriter = registry.getObjectMapper().writerWithDefaultPrettyPrinter();
 
-        final List<TherapiNamespaceDoc> namespaces = new ArrayList<>();
+        final List<ApiNamespaceDoc> namespaces = new ArrayList<>();
 
         final SortedSetMultimap<String, MethodDefinition> methodDefinitionsByNamespace = TreeMultimap.create(
                 Comparator.<String>naturalOrder(), new Comparator<MethodDefinition>() {
@@ -53,13 +53,13 @@ public class ApiDocProvider {
         }
 
         for (String namespaceName : methodDefinitionsByNamespace.keySet()) {
-            final TherapiNamespaceDoc nsDoc = new TherapiNamespaceDoc();
+            final ApiNamespaceDoc nsDoc = new ApiNamespaceDoc();
             nsDoc.setName(namespaceName);
 
-            final List<TherapiMethodDoc> methods = new ArrayList<>();
+            final List<ApiMethodDoc> methods = new ArrayList<>();
             for (MethodDefinition mdef : methodDefinitionsByNamespace.get(namespaceName)) {
 
-                final TherapiMethodDoc mdoc = new TherapiMethodDoc();
+                final ApiMethodDoc mdoc = new ApiMethodDoc();
                 mdoc.setName(mdef.getUnqualifiedName());
                 mdoc.setRequestSchema(schemaProvider.getSchema(registry.getObjectMapper(), mdef));
 
@@ -74,9 +74,9 @@ public class ApiDocProvider {
                     mdoc.setReturnType(toJsonType(mdef.getReturnTypeRef()));
                 }
 
-                final List<TherapiParamDoc> paramDocs = new ArrayList<>();
+                final List<ApiParamDoc> paramDocs = new ArrayList<>();
                 for (ParameterDefinition pdef : mdef.getParameters()) {
-                    final TherapiParamDoc pdoc = new TherapiParamDoc();
+                    final ApiParamDoc pdoc = new ApiParamDoc();
                     pdoc.setName(pdef.getName());
                     pdoc.setType(toJsonType(pdef.getType()));
 
@@ -123,7 +123,7 @@ public class ApiDocProvider {
         return Optional.empty();
     }
 
-    public Optional<TherapiMethodDoc> getMethodDoc(MethodDefinition m) throws IOException {
+    public Optional<ApiMethodDoc> getMethodDoc(MethodDefinition m) throws IOException {
         ClassJavadoc classJavadoc = javadocReader.getDocumentation(m.getMethod().getDeclaringClass().getName());
         if (classJavadoc == null) {
             return Optional.empty();
@@ -131,7 +131,7 @@ public class ApiDocProvider {
 
         for (MethodJavadoc methodJavadoc : classJavadoc.getMethods()) {
             if (methodJavadoc.getName().equals(m.getMethod().getName())) {
-                TherapiMethodDoc doc = new TherapiMethodDoc();
+                ApiMethodDoc doc = new ApiMethodDoc();
                 doc.setName(m.getQualifiedName("."));
                 doc.setDescription(render(methodJavadoc.getComment()));
 

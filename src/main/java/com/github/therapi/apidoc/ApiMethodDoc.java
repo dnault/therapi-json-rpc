@@ -4,12 +4,12 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
-public class TherapiMethodDoc {
+public class ApiMethodDoc {
     private String name;
     private String description;
     private String returns;
     private String returnType;
-    private List<TherapiParamDoc> params = ImmutableList.of();
+    private List<ApiParamDoc> params = ImmutableList.of();
 
     private String requestSchema;
 
@@ -53,11 +53,11 @@ public class TherapiMethodDoc {
         this.returnType = returnType;
     }
 
-    public List<TherapiParamDoc> getParams() {
+    public List<ApiParamDoc> getParams() {
         return params;
     }
 
-    public void setParams(List<TherapiParamDoc> params) {
+    public void setParams(List<ApiParamDoc> params) {
         this.params = params;
     }
 }

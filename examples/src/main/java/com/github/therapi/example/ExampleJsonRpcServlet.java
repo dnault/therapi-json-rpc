@@ -1,6 +1,6 @@
 package com.github.therapi.example;
 
-import static com.github.therapi.core.internal.JacksonHelper.newLenientObjectMapper;
+import static com.github.therapi.jackson.ObjectMappers.newLenientObjectMapper;
 
 import javax.servlet.ServletException;
 
