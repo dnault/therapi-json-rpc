@@ -1,19 +1,25 @@
 package com.github.therapi.jsonrpc;
 
+import static java.util.Collections.singletonMap;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.github.therapi.core.MethodNotFoundException;
 import com.github.therapi.core.ParameterBindingException;
 
-import static java.util.Collections.singletonMap;
-
-public class ExceptionTranslatorImpl implements ExceptionTranslator {
+/**
+ * Basic implementation that treats all application layer exceptions as internal errors.
+ * Developers are encouraged to create subclasses that override the
+ * {@link #translateCustom} method and provide more detailed error responses
+ * for application layer exceptions.
+ */
+public class DefaultExceptionTranslator implements ExceptionTranslator {
     private boolean includeDetailsForStandardErrors = true;
 
     public void setIncludeDetailsForStandardErrors(boolean includeDetailsForStandardErrors) {
         this.includeDetailsForStandardErrors = includeDetailsForStandardErrors;
     }
 
-    public ExceptionTranslatorImpl excludeDetails() {
+    public DefaultExceptionTranslator excludeDetails() {
         setIncludeDetailsForStandardErrors(false);
         return this;
     }
@@ -70,7 +76,7 @@ public class ExceptionTranslatorImpl implements ExceptionTranslator {
     }
 
     /**
-     * Subclasses may override to implement custom translation schemes.
+     * Override this method to provide more details for application layer exceptions.
      */
     protected JsonRpcError translateCustom(Throwable t) {
         return new JsonRpcError(ErrorCodes.INTERNAL_ERROR, "Internal error");

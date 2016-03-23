@@ -1,13 +1,9 @@
 package com.github.therapi.jsonrpc;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.therapi.core.MethodRegistry;
-import com.google.common.util.concurrent.MoreExecutors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.github.therapi.core.internal.JacksonHelper.isLikeNull;
+import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorService;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.indexOfAny;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -21,27 +17,31 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import static com.github.therapi.core.internal.JacksonHelper.isLikeNull;
-import static java.util.Objects.requireNonNull;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.therapi.core.MethodRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
     private static final Logger log = LoggerFactory.getLogger(JsonRpcDispatcherImpl.class);
 
     protected final MethodRegistry methodRegistry;
     protected final ExecutorService executorService;
-    protected ExceptionTranslator exceptionTranslator = new ExceptionTranslatorImpl();
+    protected final ExceptionTranslator exceptionTranslator;
 
-    public JsonRpcDispatcherImpl(MethodRegistry methodRegistry) {
-        this(methodRegistry, MoreExecutors.newDirectExecutorService());
+    public JsonRpcDispatcherImpl(MethodRegistry registry, ExceptionTranslator translator) {
+        this(registry, translator, newDirectExecutorService());
     }
 
-    public void setExceptionTranslator(ExceptionTranslator exceptionTranslator) {
-        this.exceptionTranslator = requireNonNull(exceptionTranslator);
-    }
-
-    public JsonRpcDispatcherImpl(MethodRegistry methodRegistry, ExecutorService executorService) {
-        this.methodRegistry = requireNonNull(methodRegistry);
+    public JsonRpcDispatcherImpl(MethodRegistry registry,
+                                 ExceptionTranslator translator,
+                                 ExecutorService executorService) {
+        this.methodRegistry = requireNonNull(registry);
         this.executorService = requireNonNull(executorService);
+        this.exceptionTranslator = requireNonNull(translator);
     }
 
     protected ObjectMapper getObjectMapper() {
@@ -108,6 +108,8 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
 
     @Override
     public Optional<JsonNode> invoke(String jsonRpcRequest) {
+        jsonRpcRequest = expandShorthand(jsonRpcRequest);
+
         try {
             JsonNode requestNode = parseNode(jsonRpcRequest);
             return invoke(requestNode);
@@ -118,6 +120,35 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
             return Optional.of(buildErrorResponse(jsonRpcError, null));
         }
+    }
+
+    /**
+     * @param request a valid JSON RPC 2.0 request, or a string of the form
+     *                {@code method[arg1, arg2, ...]} or {@code method{arg1Name:arg1, arg2Name,arg2, ...}}
+     */
+    protected String expandShorthand(String request) {
+        if (request.startsWith("{") || request.startsWith("[")) {
+            return request;
+        }
+
+        int paramStartIndex = indexOfAny(request, '{', '[');
+        final String method;
+        final String params;
+
+        if (paramStartIndex == -1) {
+            method = request.trim();
+            params = "{}";
+        } else {
+            method = request.substring(0, paramStartIndex).trim();
+            params = request.substring(paramStartIndex);
+        }
+
+        return "{" +
+                "\"jsonrpc\":\"2.0\"," +
+                "\"id\":\"\"," +
+                "\"method\":\"" + method + "\"," +
+                "\"params\":" + params +
+                "}";
     }
 
     protected boolean isValidSoloRequest(JsonNode soloRequest) {

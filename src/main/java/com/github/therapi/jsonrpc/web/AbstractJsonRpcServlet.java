@@ -1,5 +1,7 @@
 package com.github.therapi.jsonrpc.web;
 
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.removeStart;
 
 import javax.servlet.ServletException;
@@ -9,34 +11,37 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.therapi.apidoc.ApiDocProvider;
 import com.github.therapi.apidoc.JsonSchemaProvider;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.internal.MethodDefinition;
 import com.github.therapi.core.internal.ParameterDefinition;
 import com.github.therapi.core.internal.TypesHelper;
-import com.github.therapi.jsonrpc.JsonRpcDispatcher;
 
 public abstract class AbstractJsonRpcServlet extends HttpServlet {
 
-    protected abstract JsonRpcDispatcher getJsonRpcDispatcher();
+    private JsonRpcServletHandler handler;
 
-    protected abstract ObjectWriter getObjectWriter();
+    protected void setHandler(JsonRpcServletHandler handler) {
+        this.handler = requireNonNull(handler);
+    }
 
-    protected abstract MethodRegistry getMethodRegistry();
+    /**
+     * @throws IllegalStateException if the handler has not been set
+     */
+    protected JsonRpcServletHandler getHandler() {
+        checkState(handler != null, "handler not initialized; must call setHandler first");
+        return handler;
+    }
+
+    protected MethodRegistry getMethodRegistry() {
+        return getHandler().getRegistry();
+    }
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Optional<JsonNode> response = getJsonRpcDispatcher().invoke(req.getInputStream());
-
-        if (response.isPresent()) {
-            resp.setContentType("application/json");
-            getObjectWriter().writeValue(resp.getOutputStream(), response.get());
-        }
+        getHandler().handlePost(req, resp);
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -63,53 +68,7 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
             }
         }
 
-        String jsonRequest = req.getParameter("r");
-        if (jsonRequest == null) {
-            resp.setStatus(400);
-            resp.setContentType("text/html");
-            resp.setCharacterEncoding("UTF-8");
-            PrintWriter out = resp.getWriter();
-            out.println("Hi. This URI is a <a href=\"http://www.jsonrpc.org/specification\">JSON-RPC 2.0</a> endpoint.");
-            out.println("<p>");
-            out.println("Clients should submit request objects in the body of a POST to this URI.");
-            out.println("If you just want to poke around, you can manually submit a request object as the 'r' query parameter of a GET request.");
-            out.println("Don't forget the 'id' property of your request object, otherwise it will be treated as a notification and you won't see the response.");
-            out.println("<p>");
-            out.println("API documentation is <a href=\"" + req.getContextPath() + req.getServletPath() + "/apidoc\">over here</a>.");
-            return;
-        }
-
-        Optional<JsonNode> response = getJsonRpcDispatcher().invoke(jsonRequest);
-
-        if (response.isPresent()) {
-            resp.setContentType("application/json");
-            getObjectWriter().writeValue(resp.getOutputStream(), response.get());
-        }
-
-        /*
-        String request = req.getParameter("r");
-        if (request != null) {
-            Request r = new Request();
-            r.setVersion("2.0");
-            r.setId(new TextNode(""));
-
-            int paramStartIndex = getParamStartIndex(request);
-            final String params;
-            final String method;
-
-            if (paramStartIndex == -1) {
-                params = "{}";
-                method = request.trim();
-            } else {
-                params = request.substring(paramStartIndex);
-                method = request.substring(0, paramStartIndex).trim();
-            }
-
-            resp.getWriter().println("method: " + method);
-            resp.getWriter().println("params: " + params);
-        }
-
-*/
+        getHandler().handleGet(req, resp);
     }
 
     protected void sendApiDoc(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
@@ -148,7 +107,7 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
 
         req.getRequestDispatcher("/WEB-INF/therapi/ui.jsp").forward(req, resp);
     }
-    
+
     private void sendJavascriptClient(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // "application/javascript" is more correct, but might alienate IE8
         resp.setContentType("text/javascript; charset=UTF-8");
@@ -243,15 +202,4 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
         }
 
     }
-
-    private int getParamStartIndex(String s) {
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '[' || c == '{') {
-                return i;
-            }
-        }
-        return -1;
-    }
-
 }

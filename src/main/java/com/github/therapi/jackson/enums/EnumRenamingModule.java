@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.introspect.NopAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+/**
+ * Customizes the way Jackson serializes enums.
+ */
 public abstract class EnumRenamingModule extends SimpleModule {
     public EnumRenamingModule() {
         super("therapi-enum-renaming");

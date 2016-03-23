@@ -1,19 +1,19 @@
 package com.github.therapi.jsonrpc;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.therapi.core.MethodRegistry;
-import com.github.therapi.core.annotation.Remotable;
-import net.javacrumbs.jsonunit.JsonAssert;
-import org.junit.Before;
-import org.junit.Test;
+import static com.github.therapi.core.internal.JacksonHelper.newLenientObjectMapper;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static com.github.therapi.core.internal.JacksonHelper.newLenientObjectMapper;
-import static org.junit.Assert.assertEquals;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.therapi.core.MethodRegistry;
+import com.github.therapi.core.annotation.Remotable;
+import net.javacrumbs.jsonunit.JsonAssert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class JsonRpcDispatcherImplTest {
     private JsonRpcDispatcherImpl dispatcher;
@@ -22,8 +22,8 @@ public class JsonRpcDispatcherImplTest {
     public void setup() {
         MethodRegistry registry = new MethodRegistry(newLenientObjectMapper());
         registry.scan(new ExampleServiceImpl());
-        dispatcher = new JsonRpcDispatcherImpl(registry);
-        dispatcher.setExceptionTranslator(new ExceptionTranslatorImpl().excludeDetails());
+        dispatcher = new JsonRpcDispatcherImpl(registry,
+                new DefaultExceptionTranslator().excludeDetails());
     }
 
     @Remotable("")
@@ -160,6 +160,15 @@ public class JsonRpcDispatcherImplTest {
                         "  {'jsonrpc': '2.0', 'method': 'notify_hello', 'params': [7]}\n" +
                         "]",
                 "");
+    }
+
+    @Test
+    public void rpc_call_shorthand() throws Exception {
+        check("subtract[42, 23]",
+                "{jsonrpc: '2.0', result: 19, id: ''}");
+
+        check("subtract{minuend:42, subtrahend:23}",
+                "{jsonrpc: '2.0', result: 19, id: ''}");
     }
 
     private void check(String jsonRpcRequest, String expectedResponse) throws IOException {
