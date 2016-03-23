@@ -1,4 +1,4 @@
-package com.github.therapi.example;
+package com.github.therapi.example.calculator;
 
 import com.github.therapi.core.annotation.ExampleModel;
 import com.github.therapi.core.annotation.Remotable;

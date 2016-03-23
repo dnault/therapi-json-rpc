@@ -40,7 +40,7 @@ Here's what the service interface looks like:
 
 [source,java]
 ----
-include::{example}/CalculatorService.java[]
+include::{example}/calculator/CalculatorService.java[]
 ----
 
 Notice that the interface is annotated as `@Remotable`. This is what tells Therapi that the interface methods
@@ -54,7 +54,7 @@ Now let's implement the `CalculatorService` interface:
 
 [source,java]
 ----
-include::{example}/CalculatorServiceImpl.java[]
+include::{example}/calculator/CalculatorServiceImpl.java[]
 ----
 
 No surprises there -- just standard Java.

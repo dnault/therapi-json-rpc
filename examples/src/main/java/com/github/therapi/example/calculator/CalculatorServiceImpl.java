@@ -1,4 +1,4 @@
-package com.github.therapi.example;
+package com.github.therapi.example.calculator;
 
 import java.util.List;
 

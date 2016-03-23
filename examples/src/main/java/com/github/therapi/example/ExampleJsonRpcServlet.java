@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.therapi.core.MethodRegistry;
+import com.github.therapi.example.calculator.CalculatorServiceImpl;
 import com.github.therapi.example.devilsdictionary.DictionaryServiceImpl;
 import com.github.therapi.jackson.enums.LowerCamelCaseEnumModule;
 import com.github.therapi.jsonrpc.DefaultExceptionTranslator;
