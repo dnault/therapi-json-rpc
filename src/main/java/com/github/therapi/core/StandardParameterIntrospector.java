@@ -12,7 +12,6 @@ import java.util.function.Supplier;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.therapi.core.annotation.Default;
-import com.github.therapi.core.internal.ParameterDefinition;
 import com.github.therapi.core.internal.TypesHelper;
 
 public class StandardParameterIntrospector implements ParameterIntrospector {

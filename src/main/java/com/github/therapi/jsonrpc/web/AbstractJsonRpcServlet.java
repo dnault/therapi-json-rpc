@@ -16,8 +16,8 @@ import java.util.Set;
 import com.github.therapi.apidoc.ApiDocProvider;
 import com.github.therapi.apidoc.JsonSchemaProvider;
 import com.github.therapi.core.MethodRegistry;
-import com.github.therapi.core.internal.MethodDefinition;
-import com.github.therapi.core.internal.ParameterDefinition;
+import com.github.therapi.core.MethodDefinition;
+import com.github.therapi.core.ParameterDefinition;
 import com.github.therapi.core.internal.TypesHelper;
 
 public abstract class AbstractJsonRpcServlet extends HttpServlet {

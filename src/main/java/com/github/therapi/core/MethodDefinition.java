@@ -1,4 +1,4 @@
-package com.github.therapi.core.internal;
+package com.github.therapi.core;
 
 import static com.google.common.base.Strings.emptyToNull;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.github.therapi.core.internal.JacksonHelper;
 import com.google.common.collect.ImmutableList;
 
 public class MethodDefinition {

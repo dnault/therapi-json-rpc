@@ -11,8 +11,8 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.therapi.core.StandardParameterIntrospector;
-import com.github.therapi.core.internal.MethodDefinition;
-import com.github.therapi.core.internal.ParameterDefinition;
+import com.github.therapi.core.MethodDefinition;
+import com.github.therapi.core.ParameterDefinition;
 import org.junit.Test;
 
 public class JsonSchemaProviderTest {

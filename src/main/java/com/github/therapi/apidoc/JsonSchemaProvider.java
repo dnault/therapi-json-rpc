@@ -16,8 +16,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import com.fasterxml.jackson.module.jsonSchema.factories.VisitorContext;
-import com.github.therapi.core.internal.MethodDefinition;
-import com.github.therapi.core.internal.ParameterDefinition;
+import com.github.therapi.core.MethodDefinition;
+import com.github.therapi.core.ParameterDefinition;
 
 public class JsonSchemaProvider {
 

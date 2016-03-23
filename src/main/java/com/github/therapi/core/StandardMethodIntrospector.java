@@ -2,7 +2,6 @@ package com.github.therapi.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.therapi.core.annotation.Remotable;
-import com.github.therapi.core.internal.MethodDefinition;
 import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.reflect.Modifier;

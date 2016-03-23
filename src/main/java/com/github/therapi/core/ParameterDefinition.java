@@ -1,4 +1,4 @@
-package com.github.therapi.core.internal;
+package com.github.therapi.core;
 
 import javax.annotation.Nullable;
 import java.util.Optional;

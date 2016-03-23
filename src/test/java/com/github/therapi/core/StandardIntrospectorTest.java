@@ -8,7 +8,6 @@ import java.util.Collection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.therapi.core.annotation.Default;
 import com.github.therapi.core.annotation.Remotable;
-import com.github.therapi.core.internal.MethodDefinition;
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
