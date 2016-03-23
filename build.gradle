@@ -33,15 +33,17 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
+    def slf4jVersion = '1.7.19'
+    def jacksonVersion = '2.7.3'
+
     provided 'javax.servlet:javax.servlet-api:3.1.0'
 
-    compile 'org.slf4j:slf4j-api:1.7.12'
+    compile "org.slf4j:slf4j-api:${slf4jVersion}"
 
     compile 'com.google.code.findbugs:jsr305:3.0.0'
-    compile 'com.google.guava:guava:18.0'
+    compile 'com.google.guava:guava:19.0'
     compile 'org.apache.commons:commons-lang3:3.4'
 
-    def jacksonVersion = '2.7.2'
     compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     compile "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
     compile "com.fasterxml.jackson.module:jackson-module-jsonSchema:${jacksonVersion}"
@@ -54,7 +56,7 @@ dependencies {
 
     testCompile 'junit:junit:4.11'
     testCompile 'net.javacrumbs.json-unit:json-unit:1.6.0'
-    testCompile 'org.slf4j:slf4j-simple:1.7.12'
+    testCompile "org.slf4j:slf4j-simple:${slf4jVersion}"
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {
