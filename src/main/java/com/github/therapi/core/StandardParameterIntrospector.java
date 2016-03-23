@@ -1,5 +1,7 @@
 package com.github.therapi.core;
 
+import static com.github.therapi.core.internal.JacksonHelper.getTypeReference;
+
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -9,11 +11,9 @@ import java.util.function.Supplier;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.therapi.core.internal.TypesHelper;
 import com.github.therapi.core.annotation.Default;
 import com.github.therapi.core.internal.ParameterDefinition;
-
-import static com.github.therapi.core.internal.JacksonHelper.getTypeReference;
+import com.github.therapi.core.internal.TypesHelper;
 
 public class StandardParameterIntrospector implements ParameterIntrospector {
     private final ObjectMapper objectMapper;
@@ -32,9 +32,8 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
         return params;
     }
 
-    protected
     @Nullable
-    Supplier<?> getDefaultValueSupplier(Parameter p, TypeReference typeReference) {
+    protected Supplier<?> getDefaultValueSupplier(Parameter p, TypeReference typeReference) {
         Default defaultAnnotation = p.getAnnotation(Default.class);
         if (defaultAnnotation == null) {
             return null;
@@ -60,7 +59,9 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
     protected boolean isNullable(Parameter p, Method method) {
         if (p.getAnnotation(Nullable.class) != null) {
             if (p.getType().isPrimitive()) {
-                throw new InvalidAnnotationException("Annotation " + Nullable.class.getName() + " may not be applied to primitive " + p.getType() + " parameter '" + p.getName() + "' of method: " + method);
+                throw new InvalidAnnotationException("Annotation " + Nullable.class.getName()
+                        + " may not be applied to primitive " + p.getType()
+                        + " parameter '" + p.getName() + "' of method: " + method);
             }
 
             return true;

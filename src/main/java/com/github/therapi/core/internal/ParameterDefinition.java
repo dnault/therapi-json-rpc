@@ -1,10 +1,10 @@
 package com.github.therapi.core.internal;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-
 import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 public class ParameterDefinition {
     private final String name;
@@ -37,10 +37,10 @@ public class ParameterDefinition {
 
     @Override
     public String toString() {
-        return "ParameterDefinition{" +
-                "name='" + name + '\'' +
-                ", nullable=" + nullable +
-                ", defaultValue=" + (defaultValueSupplier.isPresent() ? defaultValueSupplier.get().get() : "N/A") +
-                '}';
+        return "ParameterDefinition{"
+                + "name='" + name + '\''
+                + ", nullable=" + nullable
+                + ", defaultValue=" + (defaultValueSupplier.isPresent() ? defaultValueSupplier.get().get() : "N/A")
+                + '}';
     }
 }

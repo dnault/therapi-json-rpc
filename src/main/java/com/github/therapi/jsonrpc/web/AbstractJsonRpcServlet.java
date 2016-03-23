@@ -115,16 +115,16 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
 
         // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error#Custom_Error_Types
-        writer.println("\n" +
-                "function JsonRpcError(jsonRpcErrorResponse) {\n" +
-                "    this.name = \"JsonRpcError\";\n" +
-                "    this.code = jsonRpcErrorResponse.code;\n" +
-                "    this.message = jsonRpcErrorResponse.message;\n" +
-                "    this.data = jsonRpcErrorResponse.data;\n" +
-                "    this.stack = (new Error()).stack;\n" +
-                "}\n" +
-                "JsonRpcError.prototype = Object.create(Error.prototype);\n" +
-                "JsonRpcError.prototype.constructor = JsonRpcError;");
+        writer.println("\n"
+                + "function JsonRpcError(jsonRpcErrorResponse) {\n"
+                + "    this.name = \"JsonRpcError\";\n"
+                + "    this.code = jsonRpcErrorResponse.code;\n"
+                + "    this.message = jsonRpcErrorResponse.message;\n"
+                + "    this.data = jsonRpcErrorResponse.data;\n"
+                + "    this.stack = (new Error()).stack;\n"
+                + "}\n"
+                + "JsonRpcError.prototype = Object.create(Error.prototype);\n"
+                + "JsonRpcError.prototype.constructor = JsonRpcError;");
 
         writer.println();
 
@@ -184,20 +184,19 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
                     "    });\n" +
                     "};");
 */
-            writer.println("    return new Promise(function (resolve, reject) {\n" +
-                    "        $.jsonRPC.request('" + mdef.getQualifiedName(".") + "', {\n" +
-                    "            params: {" + paramMap + "},\n" +
-                    "            success: function (result) {\n" +
-                    //"                console.debug(JSON.stringify(result));\n" +
-                    "                resolve(result.result);\n" +
-                    "            },\n" +
-                    "            error: function (result) {\n" +
-                    //"                console.warn(JSON.stringify(result));\n" +
-                    "                reject(new JsonRpcError(result.error));\n" +
-                    "            }\n" +
-                    "        });\n" +
-                    "    });\n};\n");
-
+            writer.println("    return new Promise(function (resolve, reject) {\n"
+                    + "        $.jsonRPC.request('" + mdef.getQualifiedName(".") + "', {\n"
+                    + "            params: {" + paramMap + "},\n"
+                    + "            success: function (result) {\n"
+                    // + "                console.debug(JSON.stringify(result));\n"
+                    + "                resolve(result.result);\n"
+                    + "            },\n"
+                    + "            error: function (result) {\n"
+                    // + "                console.warn(JSON.stringify(result));\n"
+                    + "                reject(new JsonRpcError(result.error));\n"
+                    + "            }\n"
+                    + "        });\n"
+                    + "    });\n};\n");
 
         }
 

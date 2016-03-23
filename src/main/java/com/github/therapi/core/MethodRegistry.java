@@ -221,8 +221,8 @@ public class MethodRegistry {
         String jacksonErrorMessage = e.getMessage().replace("\n at [Source: N/A; line: -1, column: -1]", "");
 
         String typeName = param.getType().getType().toString();
-        return "Can't bind parameter '" + param.getName() + "' of type " + typeName + " to " +
-                arg.getNodeType() + " value " + arg.toString() + " : " + jacksonErrorMessage;
+        return "Can't bind parameter '" + param.getName() + "' of type " + typeName + " to "
+                + arg.getNodeType() + " value " + arg.toString() + " : " + jacksonErrorMessage;
     }
 
     public Collection<MethodDefinition> getMethods() {

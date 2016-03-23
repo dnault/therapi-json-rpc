@@ -48,17 +48,17 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
         return methodRegistry.getObjectMapper();
     }
 
-    protected JsonNode parseNode(String s) {
+    protected JsonNode parseNode(String json) {
         try {
-            return getObjectMapper().readTree(s);
+            return getObjectMapper().readTree(json);
         } catch (IOException e) {
             throw new ParseException(e);
         }
     }
 
-    protected JsonNode parseNode(InputStream is) {
+    protected JsonNode parseNode(InputStream json) {
         try {
-            return getObjectMapper().readTree(is);
+            return getObjectMapper().readTree(json);
         } catch (IOException e) {
             throw new ParseException(e);
         }
@@ -143,12 +143,12 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
             params = request.substring(paramStartIndex);
         }
 
-        return "{" +
-                "\"jsonrpc\":\"2.0\"," +
-                "\"id\":\"\"," +
-                "\"method\":\"" + method + "\"," +
-                "\"params\":" + params +
-                "}";
+        return "{"
+                + "\"jsonrpc\":\"2.0\","
+                + "\"id\":\"\","
+                + "\"method\":\"" + method + "\","
+                + "\"params\":" + params
+                + "}";
     }
 
     protected boolean isValidSoloRequest(JsonNode soloRequest) {

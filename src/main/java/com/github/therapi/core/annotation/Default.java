@@ -8,8 +8,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Indicates the annotated parameter is optional and may be omitted from the request.
- * <p>
- * For compatibility with positional parameter binding, default parameters should appear
+ * <p>For compatibility with positional parameter binding, default parameters should appear
  * together at the end of a method's parameter list.
  */
 @Retention(RUNTIME)

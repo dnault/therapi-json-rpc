@@ -26,7 +26,7 @@ public class PolymorphicGenericsTest extends AbstractMethodRegistryTest {
     @JsonSubTypes({
             @Type(value = Dog.class, name = "Dog"),
             @Type(value = Cat.class, name = "Cat")})
-    private static abstract class Pet {
+    private abstract static class Pet {
         private final String name;
 
         public Pet(String name) {

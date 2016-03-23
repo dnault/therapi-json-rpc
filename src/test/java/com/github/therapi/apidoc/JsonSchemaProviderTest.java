@@ -42,7 +42,7 @@ public class JsonSchemaProviderTest {
                               boolean primitiveBoolean,
                               Boolean boxedBoolean,
                               int primitiveInt,
-                              Integer BoxedInt,
+                              Integer boxedInt,
                               long primitiveLong,
                               Long boxedLong,
                               float primitiveFloat,
@@ -82,7 +82,7 @@ public class JsonSchemaProviderTest {
                 "    \"primitiveInt\" : {\n" +
                 "      \"type\" : \"integer\"\n" +
                 "    },\n" +
-                "    \"BoxedInt\" : {\n" +
+                "    \"boxedInt\" : {\n" +
                 "      \"type\" : \"integer\"\n" +
                 "    },\n" +
                 "    \"primitiveLong\" : {\n" +

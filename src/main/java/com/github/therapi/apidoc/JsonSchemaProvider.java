@@ -41,13 +41,6 @@ public class JsonSchemaProvider {
         }
     }
 
-    private JsonNode getParamSchema(ObjectMapper objectMapper, ParameterDefinition paramDef) throws JsonMappingException {
-        SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
-        objectMapper.acceptJsonFormatVisitor(objectMapper.constructType(paramDef.getType().getType()), visitor);
-        JsonSchema jsonSchema = visitor.finalSchema();
-        return objectMapper.convertValue(jsonSchema, JsonNode.class);
-    }
-
     public Optional<String> getSchema(ObjectMapper objectMapper, Class modelClass) throws IOException {
         SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
         visitor.setVisitorContext(new VisitorContextWithoutSchemaInlining());
@@ -95,5 +88,12 @@ public class JsonSchemaProvider {
                     || type.getRawClass() == Float.class
                     || type.getRawClass() == Double.class;
         }
+    }
+
+    private JsonNode getParamSchema(ObjectMapper objectMapper, ParameterDefinition paramDef) throws JsonMappingException {
+        SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
+        objectMapper.acceptJsonFormatVisitor(objectMapper.constructType(paramDef.getType().getType()), visitor);
+        JsonSchema jsonSchema = visitor.finalSchema();
+        return objectMapper.convertValue(jsonSchema, JsonNode.class);
     }
 }
