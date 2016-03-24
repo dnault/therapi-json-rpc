@@ -3,6 +3,7 @@
 [COMPLETE] polymorphic type handling
 [COMPLETE] Invoke methods over http
 [COMPLETE] lowercase enum module
+[COMPLETE] spring integration
 
 automatic documentation [IN PROGRESS]
 \- schemas
@@ -14,8 +15,6 @@ binary responses
 upload requests
 
 method interception?
-
-spring integration
 
 automatic client
 
