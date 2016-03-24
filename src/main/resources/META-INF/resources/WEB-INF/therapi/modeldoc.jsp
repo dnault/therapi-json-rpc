@@ -2,8 +2,8 @@
 <%@ page import="com.github.therapi.runtimejavadoc.RuntimeJavadocReader" %>
 <%@ page import="com.github.therapi.runtimejavadoc.ClassJavadoc" %>
 <%@ page import="com.github.therapi.runtimejavadoc.CommentFormatter" %>
-<%@ page import="com.github.therapi.apidoc.TherapiNamespaceDoc" %>
-<%@ page import="com.github.therapi.apidoc.TherapiParamDoc" %>
+<%@ page import="com.github.therapi.apidoc.ApiNamespaceDoc" %>
+<%@ page import="com.github.therapi.apidoc.ApiParamDoc" %>
 <%@ page import="com.github.therapi.apidoc.ApiDocProvider" %>
 <%@ page import="static org.apache.commons.lang3.StringEscapeUtils.escapeHtml3" %>
 <%@ page import="static com.github.therapi.core.internal.TypesHelper.findClass" %>
