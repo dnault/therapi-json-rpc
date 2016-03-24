@@ -61,6 +61,7 @@ public class ApiDocProvider {
 
                 final ApiMethodDoc mdoc = new ApiMethodDoc();
                 mdoc.setName(mdef.getUnqualifiedName());
+                mdoc.setReturnType(toJsonType(mdef.getReturnTypeRef()));
                 mdoc.setRequestSchema(schemaProvider.getSchema(registry.getObjectMapper(), mdef));
 
                 final Optional<MethodJavadoc> methodJavadocOptional = getJavadoc(mdef);
@@ -71,7 +72,9 @@ public class ApiDocProvider {
                 if (methodJavadocOptional.isPresent()) {
                     mdoc.setDescription(render(methodJavadocOptional.get().getComment()));
                     mdoc.setReturns(render(methodJavadocOptional.get().getReturns()));
-                    mdoc.setReturnType(toJsonType(mdef.getReturnTypeRef()));
+                } else {
+                    mdoc.setDescription("");
+                    mdoc.setReturns("");
                 }
 
                 final List<ApiParamDoc> paramDocs = new ArrayList<>();

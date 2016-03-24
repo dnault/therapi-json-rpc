@@ -153,7 +153,7 @@
         </h2>
         <div style="padding-left: 10px; padding-right: 10px;">
         <span>
-            <%= methodDoc.getDescription() %>
+            <%= escapeHtml3(methodDoc.getDescription()) %>
         </span>
 
         <p>
@@ -193,7 +193,7 @@
             </tr>
             <tr>
                 <td><%= ApiDocProvider.activateModelLinks(methodDoc.getReturnType()) %></td>
-                <td><%= escapeHtml3(nullToEmpty(methodDoc.getReturns())) %></td>
+                <td><%= escapeHtml3(methodDoc.getReturns()) %></td>
             </tr>
         </table>
 
