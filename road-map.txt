@@ -20,4 +20,6 @@ automatic client
 
 metrics
 
+web socket example
+
 unit test support?
