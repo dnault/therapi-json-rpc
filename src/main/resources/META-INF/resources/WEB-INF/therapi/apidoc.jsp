@@ -53,20 +53,20 @@
         margin-right: 10px;
     }
 
-    table {
+    table.params {
         border-collapse: collapse;
         width: 100%;
         margin: 0 0 20px 0;
     }
 
-    caption {
+    table.params caption {
         text-align: left;
         font-family: "Source Sans Pro", sans-serif;
         font-weight: 700;
         padding: 2px 0px;
     }
 
-    th {
+    table.params th {
         background-color: #f5f5f5;
         text-align: left;
         font-family: "Source Sans Pro", sans-serif;
@@ -76,7 +76,7 @@
         font-size: 90%;
     }
 
-    td {
+    table.params td {
         vertical-align: top;
         padding: 2px 8px;
         border: #e0e0e0 1px solid;
@@ -157,7 +157,7 @@
         </span>
 
         <p>
-        <table>
+        <table class="params">
             <caption>Parameters<caption>
             <tr>
                 <th>Name</th>
@@ -185,7 +185,7 @@
 
         </table>
         <p>
-        <table>
+        <table class="params">
             <caption>Returns<caption>
             <tr>
                 <th>Type</th>
