@@ -306,7 +306,7 @@ $(document).ready(function(){
                 method: methodName,
                 params: copy,
             };
-            console.debug(JSON.stringify(req))
+
             $("#request_" + methodName.replace(/\./g,'_')).text(JSON.stringify(req, null, 2))
 
               //$('pre code div').each(function(i, block) {
