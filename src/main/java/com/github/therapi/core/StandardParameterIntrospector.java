@@ -48,7 +48,12 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
             return () -> defaultValueStr;
         }
 
-        return () -> objectMapper.convertValue(defaultValueStr, typeReference);
+        Supplier<?> result = () -> objectMapper.convertValue(defaultValueStr, typeReference);
+
+        // fail fast; better to find out right away that the default value can't be deserialized
+        result.get();
+
+        return result;
     }
 
     protected String getName(Parameter p) {

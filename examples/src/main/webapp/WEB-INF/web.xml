@@ -12,6 +12,7 @@
     <servlet>
         <servlet-name>JsonRpcServlet</servlet-name>
         <servlet-class>com.github.therapi.example.ExampleJsonRpcServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
     </servlet>
 
     <servlet-mapping>
