@@ -3,7 +3,6 @@ package com.github.therapi.jsonrpc.web;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
