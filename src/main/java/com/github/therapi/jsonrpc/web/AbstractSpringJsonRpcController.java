@@ -1,5 +1,6 @@
 package com.github.therapi.jsonrpc.web;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.therapi.apidoc.ApiDocProvider;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.annotation.Remotable;
 import com.github.therapi.jsonrpc.DefaultExceptionTranslator;
@@ -54,6 +56,13 @@ public abstract class AbstractSpringJsonRpcController implements ApplicationList
     @RequestMapping(method = RequestMethod.POST)
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         handler.handlePost(req, resp);
+    }
+
+    @RequestMapping(path="/apidoc", method = RequestMethod.GET)
+    public void sendApiDoc(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        ApiDocProvider provider = new ApiDocProvider();
+        req.setAttribute("therapiNamespaces", provider.getDocumentation(handler.getRegistry()));
+        req.getRequestDispatcher("/WEB-INF/therapi/apidoc.jsp").forward(req, resp);
     }
 
     /**

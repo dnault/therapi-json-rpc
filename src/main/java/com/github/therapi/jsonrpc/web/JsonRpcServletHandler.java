@@ -2,6 +2,7 @@ package com.github.therapi.jsonrpc.web;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -98,6 +99,6 @@ public class JsonRpcServletHandler {
         out.println("If you just want to poke around, you can manually submit a request object as the 'r' query parameter of a GET request.");
         out.println("Don't forget the 'id' property of your request object, otherwise it will be treated as a notification and you won't see the response.");
         out.println("<p>");
-        out.println("API documentation is <a href=\"" + req.getContextPath() + req.getServletPath() + "/apidoc\">over here</a>.");
+        out.println("API documentation is <a href=\"" + req.getContextPath() + removeEnd(req.getServletPath(), "/") + "/apidoc\">over here</a>.");
     }
 }
