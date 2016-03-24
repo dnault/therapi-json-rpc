@@ -38,6 +38,9 @@ dependencies {
 
     provided 'javax.servlet:javax.servlet-api:3.1.0'
 
+    // optional dependency
+    provided 'org.springframework:spring-web:4.2.5.RELEASE'
+
     compile "org.slf4j:slf4j-api:${slf4jVersion}"
 
     compile 'com.google.code.findbugs:jsr305:3.0.0'
@@ -49,10 +52,6 @@ dependencies {
     compile "com.fasterxml.jackson.module:jackson-module-jsonSchema:${jacksonVersion}"
 
     compile "com.github.therapi:therapi-runtime-javadoc:0.1.2"
-
-    //def springVersion = '4.1.6.RELEASE'
-    //compile "org.springframework:spring-beans:${springVersion}"
-    //compile "org.springframework:spring-context:${springVersion}"
 
     testCompile 'junit:junit:4.11'
     testCompile 'net.javacrumbs.json-unit:json-unit:1.6.0'

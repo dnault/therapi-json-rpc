@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -60,10 +61,13 @@ public class MethodRegistry {
         return objectMapper;
     }
 
-    public void scan(Object o) {
+    public List<String> scan(Object o) {
+        List<String> methodNames = new ArrayList<>();
         for (MethodDefinition methodDef : scanner.findMethods(o)) {
             add(methodDef);
+            methodNames.add(getName(methodDef));
         }
+        return methodNames;
     }
 
     private void add(MethodDefinition methodDef) {

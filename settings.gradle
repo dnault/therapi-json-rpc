@@ -2,3 +2,4 @@
 rootProject.name = 'therapi-json-rpc'
 
 include 'examples'
+include 'spring-boot-example'

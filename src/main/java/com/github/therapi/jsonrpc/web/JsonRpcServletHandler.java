@@ -61,11 +61,11 @@ public class JsonRpcServletHandler {
         return registry;
     }
 
-    public void handlePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void handlePost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         sendResponse(resp, dispatcher.invoke(req.getInputStream()));
     }
 
-    public void handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void handleGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String jsonRequest = req.getParameter("r");
 
         if (isEmpty(jsonRequest)) {
