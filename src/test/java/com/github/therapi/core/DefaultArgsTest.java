@@ -1,17 +1,22 @@
 package com.github.therapi.core;
 
+import javax.annotation.Nullable;
+
 import com.github.therapi.core.annotation.Default;
 import com.github.therapi.core.annotation.Remotable;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.annotation.Nullable;
 
 public class DefaultArgsTest extends AbstractMethodRegistryTest {
 
     @Before
     public void setup() {
         registry.scan(newEchoProxyInstance(EchoService.class));
+    }
+
+    @SuppressWarnings("unused")
+    private static class Widget {
+        public String serialNumber;
     }
 
     @Remotable("")
@@ -36,7 +41,16 @@ public class DefaultArgsTest extends AbstractMethodRegistryTest {
         String echoStringDefaultEmpty(@Default("") String value);
 
         String echoStringDefaultNonEmpty(@Default("xyzzy") String value);
+
+        Widget echoDefaultModel(@Default("{serialNumber:'12345'}") Widget widget);
     }
+
+    @Remotable("")
+    @SuppressWarnings("unused")
+    private interface InvalidDefaultService {
+        Widget echoDefaultModel(@Default("{badProperty:'12345'}") Widget widget);
+    }
+
 
     @Test
     public void booleanObjectDefaultValues() throws Exception {
@@ -78,4 +92,20 @@ public class DefaultArgsTest extends AbstractMethodRegistryTest {
     public void echoBooleanObjectDefaultTrueRequiresNonNullNamed() throws Exception {
         check("echoBooleanObjectDefaultTrue", "{value:null}", "null");
     }
+
+    @Test
+    public void echoDefaultModel() throws Exception {
+        check("echoDefaultModel", "[]", "{serialNumber:'12345'}");
+    }
+
+    @Test
+    public void echoModel() throws Exception {
+        check("echoDefaultModel", "[{serialNumber:'7777'}]", "{serialNumber:'7777'}");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void failFastOnBadDefault() throws Exception {
+        registry.scan(newEchoProxyInstance(InvalidDefaultService.class));
+    }
+
 }

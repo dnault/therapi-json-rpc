@@ -1,8 +1,10 @@
 package com.github.therapi.core;
 
 import static com.github.therapi.core.internal.JacksonHelper.getTypeReference;
+import static com.google.common.base.Throwables.propagate;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -48,7 +50,14 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
             return () -> defaultValueStr;
         }
 
-        Supplier<?> result = () -> objectMapper.convertValue(defaultValueStr, typeReference);
+        Supplier<?> result = () -> {
+            try {
+                return objectMapper.readValue(defaultValueStr, typeReference);
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Failed to deserialize default value for parameter "
+                        + "'" + p.getName() + "' of " + p.getDeclaringExecutable(), e);
+            }
+        };
 
         // fail fast; better to find out right away that the default value can't be deserialized
         result.get();
