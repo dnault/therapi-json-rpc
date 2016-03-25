@@ -94,6 +94,13 @@ checkstyle {
     toolVersion = "6.16.1"
 }
 
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+
 asciidoctor {
     attributes 'source-highlighter': 'coderay',
            // toc: '',
