@@ -21,7 +21,7 @@
 
 <%
     ClassJavadoc classDoc = new RuntimeJavadocReader().getDocumentation(modelClassName);
-    if (classDoc != null) {
+    if (classDoc != null && classDoc.getComment() != null) {
         out.println("<h2>Description</h2>");
         out.println(escapeHtml3(new CommentFormatter().format(classDoc.getComment())));
     }
