@@ -58,7 +58,7 @@ public abstract class AbstractSpringJsonRpcController implements ApplicationList
         handler.handlePost(req, resp);
     }
 
-    @RequestMapping(path="/apidoc", method = RequestMethod.GET)
+    @RequestMapping(path = "/apidoc", method = RequestMethod.GET)
     public void sendApiDoc(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         ApiDocProvider provider = new ApiDocProvider();
         req.setAttribute("therapiNamespaces", provider.getDocumentation(handler.getRegistry()));

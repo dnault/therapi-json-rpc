@@ -1,7 +1,6 @@
 package com.github.therapi.core;
 
 import static com.github.therapi.core.internal.JacksonHelper.getTypeReference;
-import static com.google.common.base.Throwables.propagate;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
