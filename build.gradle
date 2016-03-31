@@ -27,7 +27,7 @@ repositories {
 }
 
 group = "com.github.therapi"
-version = "0.1.0-SNAPSHOT"
+version = "0.1.0"
 
 def githubProjectName = "therapi-json-rpc"
 def projectDescription = "JSON-RPC Microframework for Java"
