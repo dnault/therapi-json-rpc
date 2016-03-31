@@ -29,6 +29,9 @@ repositories {
 group = "com.github.therapi"
 version = "0.1.0-SNAPSHOT"
 
+def githubProjectName = "therapi-json-rpc"
+def projectDescription = "JSON-RPC Microframework for Java"
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -66,9 +69,43 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
+
+def gitUrl = "git@github.com:dnault/${githubProjectName}.git";
+
+def pomConfig = {
+    name "${group}:${project.name}"
+    description projectDescription
+    url "https://github.com/dnault/${githubProjectName}"
+    scm {
+        url "${gitUrl}"
+        connection "scm:git:${gitUrl}"
+        developerConnection "scm:git:${gitUrl}"
+    }
+    licenses {
+        license {
+            name 'Apache License 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+        }
+    }
+    developers {
+        developer {
+            name 'David Nault'
+            email 'dnault@mac.com'
+            organization 'dnault'
+            organizationUrl 'https://github.com/dnault'
+        }
+    }
+}
+
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            pom.withXml {
+                asNode().appendNode('description', projectDescription)
+                asNode().children().last() + pomConfig
+            }
+
             from components.java
 
             artifact sourceJar {
@@ -138,9 +175,9 @@ bintray {
         //  userOrg = 'myorg' //An optional organization name when the repo belongs to one of the user's orgs
         name = 'therapi-json-rpc'
         desc = 'JSON-RPC 2.0 framework for Java'
-        websiteUrl = 'https://github.com/dnault/therapi-json-rpc'
-        issueTrackerUrl = 'https://github.com/dnault/therapi-json-rpc/issues'
-        vcsUrl = 'https://github.com/dnault/therapi-json-rpc.git'
+        websiteUrl = "https://github.com/dnault/${githubProjectName}"
+        issueTrackerUrl = "https://github.com/dnault/${githubProjectName}/issues"
+        vcsUrl = "https://github.com/dnault/${githubProjectName}.git"
         licenses = ['Apache-2.0']
         labels = ['json-rpc']
         publicDownloadNumbers = false//true
