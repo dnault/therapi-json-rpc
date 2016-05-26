@@ -53,6 +53,10 @@ public class ServiceFactory {
                             throw new JsonRpcException(objectMapper.convertValue(error, JsonRpcError.class));
                         }
 
+                        if (method.getReturnType() == Void.TYPE) {
+                            return null;
+                        }
+
                         return objectMapper.convertValue(result, getReturnTypeReference(method, serviceInterface));
 
                     } catch (Exception e) {
@@ -63,7 +67,7 @@ public class ServiceFactory {
 
     protected <T> String getNamespace(Class<T> serviceInterface) {
         Remotable annotation = serviceInterface.getAnnotation(Remotable.class);
-        checkArgument(annotation != null, serviceInterface + " is not annotated with @" + Remotable.class.getSimpleName());
+        checkArgument(annotation != null, "%s is not annotated with @%s", serviceInterface, Remotable.class.getSimpleName());
         return annotation.value();
     }
 
