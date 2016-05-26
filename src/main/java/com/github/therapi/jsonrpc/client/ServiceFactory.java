@@ -73,11 +73,13 @@ public class ServiceFactory {
                 .put("id", "")
                 .put("method", method);
 
-        ArrayNode argsNode = objectMapper.createArrayNode();
-        for (Object arg : params) {
-            argsNode.addPOJO(arg);
+        if (params != null) {
+            ArrayNode argsNode = objectMapper.createArrayNode();
+            for (Object arg : params) {
+                argsNode.addPOJO(arg);
+            }
+            request.set("params", argsNode);
         }
-        request.set("params", argsNode);
         return request;
     }
 }
