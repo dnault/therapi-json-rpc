@@ -56,7 +56,6 @@ public class ServiceFactoryTest {
 
     @Test
     public void canEchoParams() throws Exception {
-
         JsonRpcHttpClient client = (objectMapper1, jsonRpcRequest) -> {
             ObjectNode response = objectMapper1.createObjectNode();
             ObjectNode requestNode = objectMapper1.convertValue(jsonRpcRequest, ObjectNode.class);
@@ -65,6 +64,22 @@ public class ServiceFactoryTest {
         };
 
         ServiceFactory factory = new ServiceFactory(objectMapper, client);
+        TestService service = factory.createService(TestService.class);
+
+        assertEquals(ImmutableList.of("a", "b"), service.echo(ImmutableList.of("a", "b")));
+    }
+
+    @Test
+    public void canEchoParamsWithNamedArguments() throws Exception {
+        JsonRpcHttpClient client = (objectMapper1, jsonRpcRequest) -> {
+            ObjectNode response = objectMapper1.createObjectNode();
+            ObjectNode requestNode = objectMapper1.convertValue(jsonRpcRequest, ObjectNode.class);
+            response.set("result", requestNode.get("params").get("args"));
+            return response;
+        };
+
+        ServiceFactory factory = new ServiceFactory(objectMapper, client);
+        factory.setUseNamedArguments(true);
         TestService service = factory.createService(TestService.class);
 
         assertEquals(ImmutableList.of("a", "b"), service.echo(ImmutableList.of("a", "b")));

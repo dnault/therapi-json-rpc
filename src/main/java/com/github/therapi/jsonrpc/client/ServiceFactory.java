@@ -1,5 +1,17 @@
 package com.github.therapi.jsonrpc.client;
 
+import static com.github.therapi.core.internal.JacksonHelper.getReturnTypeReference;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Throwables.propagate;
+import static java.util.stream.Collectors.toList;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.Proxy;
+import java.util.Arrays;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -9,17 +21,11 @@ import com.github.therapi.core.StandardMethodIntrospector;
 import com.github.therapi.core.annotation.Remotable;
 import com.github.therapi.jsonrpc.JsonRpcError;
 
-import java.io.IOException;
-import java.lang.reflect.Proxy;
-
-import static com.github.therapi.core.internal.JacksonHelper.getReturnTypeReference;
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Throwables.propagate;
-
 public class ServiceFactory {
     protected final MethodIntrospector methodIntrospector;
     protected final ObjectMapper objectMapper;
     protected final JsonRpcHttpClient httpClient;
+    protected boolean useNamedArguments;
 
     public ServiceFactory(ObjectMapper objectMapper, JsonRpcHttpClient httpClient) {
         this(new StandardMethodIntrospector(objectMapper), objectMapper, httpClient);
@@ -31,6 +37,10 @@ public class ServiceFactory {
         this.httpClient = httpClient;
     }
 
+    public void setUseNamedArguments(boolean useNamedArguments) {
+        this.useNamedArguments = useNamedArguments;
+    }
+
     public <T> T createService(final Class<T> serviceInterface) {
         final String namespace = getNamespace(serviceInterface);
 
@@ -38,7 +48,7 @@ public class ServiceFactory {
                 new Class[]{serviceInterface}, (proxy, method, args) -> {
                     try {
                         String qualifiedName = namespace.isEmpty() ? method.getName() : namespace + "." + method.getName();
-                        ObjectNode request = createJsonRpcRequest(qualifiedName, args);
+                        ObjectNode request = createJsonRpcRequest(method, qualifiedName, args);
 
                         JsonNode jsonRpcResponse = httpClient.execute(objectMapper, request);
 
@@ -71,19 +81,38 @@ public class ServiceFactory {
         return annotation.value();
     }
 
-    protected ObjectNode createJsonRpcRequest(String method, Object... params) {
+    protected List<String> getParameterNames(Method m) {
+        return Arrays.stream(m.getParameters())
+                .map(Parameter::getName)
+                .collect(toList());
+    }
+
+    protected ObjectNode createJsonRpcRequest(Method method, String methodName, Object... params) {
         ObjectNode request = objectMapper.createObjectNode()
                 .put("jsonrpc", "2.0")
                 .put("id", "")
-                .put("method", method);
+                .put("method", methodName);
 
-        if (params != null) {
+        if (params == null) {
+            return request;
+        }
+
+        if (useNamedArguments) {
+            ObjectNode argsNode = objectMapper.createObjectNode();
+            int index = 0;
+            for (String paramName : getParameterNames(method)) {
+                argsNode.putPOJO(paramName, params[index++]);
+            }
+            request.set("params", argsNode);
+
+        } else {
             ArrayNode argsNode = objectMapper.createArrayNode();
             for (Object arg : params) {
                 argsNode.addPOJO(arg);
             }
             request.set("params", argsNode);
         }
+
         return request;
     }
 }
