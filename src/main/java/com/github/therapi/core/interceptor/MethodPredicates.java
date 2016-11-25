@@ -4,12 +4,11 @@ import java.lang.annotation.Annotation;
 import java.util.function.Predicate;
 
 import com.github.therapi.core.MethodDefinition;
-import org.aopalliance.intercept.MethodInterceptor;
 
 /**
  * Factory methods for common method predicates, useful for registering method interceptors.
  *
- * @see com.github.therapi.core.MethodRegistry#intercept(Predicate, MethodInterceptor)
+ * @see com.github.therapi.core.MethodRegistry#intercept(Predicate, org.aopalliance.intercept.MethodInterceptor)
  */
 public class MethodPredicates {
     private MethodPredicates() {
