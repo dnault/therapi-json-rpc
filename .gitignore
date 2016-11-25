@@ -18,6 +18,8 @@ gradle-app.setting
 !gradle-wrapper.jar
 
 # IntelliJ IDEA
+.idea/
+classes/
 *.iml
 *.ipr
 *.iws

@@ -1,26 +1,5 @@
 package com.github.therapi.core;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.util.TokenBuffer;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-import com.google.common.collect.TreeMultimap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import static com.github.therapi.core.internal.JacksonHelper.isLikeNull;
 import static com.google.common.base.Throwables.propagate;
 import static java.util.Collections.unmodifiableCollection;
@@ -28,6 +7,33 @@ import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.TokenBuffer;
+import com.github.therapi.core.interceptor.SimpleMethodInvocation;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import com.google.common.collect.TreeMultimap;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MethodRegistry {
     private static final Logger log = LoggerFactory.getLogger(MethodRegistry.class);
@@ -37,6 +43,22 @@ public class MethodRegistry {
     private MethodIntrospector scanner;
     private final ObjectMapper objectMapper;
     private String namespaceSeparator = ".";
+
+    private static class InterceptorRegistration {
+        private final Predicate<MethodDefinition> predicate;
+        private final MethodInterceptor interceptor;
+
+        private InterceptorRegistration(Predicate<MethodDefinition> predicate, MethodInterceptor interceptor) {
+            this.predicate = predicate;
+            this.interceptor = interceptor;
+        }
+    }
+
+    // populated as the user registers interceptors
+    private final List<InterceptorRegistration> interceptorRegistrations = new ArrayList<>();
+
+    // populated on-the-fly based on the values in interceptorRegistrations at the time a method is first invoked
+    private final ConcurrentMap<MethodDefinition, ImmutableList<MethodInterceptor>> methodDefinitionToInterceptors = new ConcurrentHashMap<>();
 
     private boolean suggestMethods = true;
 
@@ -59,6 +81,59 @@ public class MethodRegistry {
 
     public ObjectMapper getObjectMapper() {
         return objectMapper;
+    }
+
+    /**
+     * Registers the given method interceptor to be applied to all methods
+     * matching the given predicate. Interceptors will be invoked in the same order
+     * they are registered.
+     * <p>
+     * The effective list of interceptors for a method is determined when the method
+     * is first invoked; subesequent interceptor registrations will not affect the method.
+     * <p>
+     * Here's an example that matches any method and prints how long the invocation takes:
+     * <pre>
+     * methodRegistry.intercept(MethodPredicates.any(), invocation -> {
+     *   Stopwatch timer = Stopwatch.createStarted();
+     *   String methodName = MethodDefinitionInvocation.getQualifiedName(invocation);
+     *   try {
+     *     return invocation.proceed();
+     *   } finally {
+     *     System.out.println("Method '" + methodName + "' completed in " + timer);
+     *   }
+     * });
+     * </pre>
+     *
+     * @see com.github.therapi.core.interceptor.MethodPredicates
+     */
+    public void intercept(Predicate<MethodDefinition> predicate, MethodInterceptor interceptor) {
+        requireNonNull(predicate);
+        requireNonNull(interceptor);
+        interceptorRegistrations.add(new InterceptorRegistration(predicate, interceptor));
+    }
+
+    protected ImmutableList<MethodInterceptor> getInterceptors(MethodDefinition methodDef) {
+        return computeIfAbsent(methodDefinitionToInterceptors, methodDef, methodDefintion -> {
+            ImmutableList.Builder<MethodInterceptor> builder = ImmutableList.builder();
+            interceptorRegistrations.stream()
+                    .filter(registration -> registration.predicate.test(methodDefintion))
+                    .forEach(registration -> builder.add(registration.interceptor));
+            return builder.build();
+        });
+    }
+
+    protected MethodInvocation newMethodInvocation(MethodDefinition methodDef, Object[] args, List<MethodInterceptor> interceptors) {
+        return new SimpleMethodInvocation(methodDef, args, interceptors);
+    }
+
+    /**
+     * Unlike {@link ConcurrentHashMap#computeIfAbsent(Object, Function)} this method
+     * is optimized for the case where the entry already exists, and does not always
+     * use synchronization.
+     */
+    private static <K, V> V computeIfAbsent(ConcurrentMap<K, V> map, K key, Function<? super K, ? extends V> mappingFunction) {
+        V result = map.get(key);
+        return result != null ? result : map.computeIfAbsent(key, mappingFunction);
     }
 
     public List<String> scan(Object o) {
@@ -100,34 +175,20 @@ public class MethodRegistry {
         }
 
         Object[] boundArgs = bindArgs(method, args);
-        try {
-            return invoke(method, boundArgs);
-
-        } catch (IllegalAccessException e) {
-            method.getMethod().setAccessible(true);
-
-            try {
-                return invoke(method, boundArgs);
-
-            } catch (IOException | IllegalAccessException e2) {
-                throw propagate(e2);
-            }
-
-        } catch (IOException e) {
-            throw propagate(e);
-        }
+        return invoke(method, boundArgs);
     }
 
-    private JsonNode invoke(MethodDefinition method, Object[] boundArgs) throws IOException, IllegalAccessException {
+    private JsonNode invoke(MethodDefinition method, Object[] args) {
         try {
-            Object result = method.getMethod().invoke(method.getOwner(), boundArgs);
+            MethodInvocation invocation = newMethodInvocation(method, args, getInterceptors(method));
+            Object result = invocation.proceed();
 
             TokenBuffer buffer = new TokenBuffer(objectMapper, false);
             objectMapper.writerFor(method.getReturnTypeRef()).writeValue(buffer, result);
             return objectMapper.readTree(buffer.asParser());
 
-        } catch (InvocationTargetException e) {
-            throw propagate(e.getCause());
+        } catch (Throwable e) {
+            throw propagate(e);
         }
     }
 
