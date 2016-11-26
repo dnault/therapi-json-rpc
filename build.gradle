@@ -132,6 +132,10 @@ checkstyle {
     toolVersion = "6.16.1"
 }
 
+findbugs {
+    excludeFilter = file("config/findbugs/findbugs-exclude.xml")
+}
+
 tasks.withType(FindBugs) {
     reports {
         xml.enabled = false
