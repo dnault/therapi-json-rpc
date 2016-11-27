@@ -1,6 +1,6 @@
-package com.github.therapi.qndhtml;
+package com.github.therapi.apidoc.qndhtml;
 
-import static com.github.therapi.qndhtml.Tag.escape;
+import static com.github.therapi.apidoc.qndhtml.Tag.escape;
 import static com.google.common.base.Throwables.propagate;
 
 import java.io.IOException;

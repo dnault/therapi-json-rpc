@@ -1,4 +1,4 @@
-package com.github.therapi.qndhtml;
+package com.github.therapi.apidoc.qndhtml;
 
 import static com.google.common.base.Throwables.propagate;
 
