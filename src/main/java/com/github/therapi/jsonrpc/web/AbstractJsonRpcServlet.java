@@ -14,9 +14,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.github.therapi.apidoc.ApiDocProvider;
+import com.github.therapi.apidoc.ApiDocWriter;
 import com.github.therapi.apidoc.JsonSchemaProvider;
-import com.github.therapi.core.MethodRegistry;
+import com.github.therapi.apidoc.ModelDocWriter;
 import com.github.therapi.core.MethodDefinition;
+import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.ParameterDefinition;
 import com.github.therapi.core.internal.TypesHelper;
 
@@ -57,11 +59,6 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
                 return;
             }
 
-            if (pathInfo.startsWith("/ui/")) {
-                sendUi(req, resp, removeStart(pathInfo, "/ui/"));
-                return;
-            }
-
             if ("/client.js".equals(req.getPathInfo())) {
                 sendJavascriptClient(req, resp);
                 return;
@@ -73,8 +70,9 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
 
     protected void sendApiDoc(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         ApiDocProvider provider = new ApiDocProvider();
-        req.setAttribute("therapiNamespaces", provider.getDocumentation(getMethodRegistry()));
-        req.getRequestDispatcher("/WEB-INF/therapi/apidoc.jsp").forward(req, resp);
+
+        resp.setContentType("text/html;charset=UTF-8");
+        ApiDocWriter.writeTo(provider.getDocumentation(getMethodRegistry()), resp.getWriter());
     }
 
     protected void sendModelDoc(HttpServletRequest req, HttpServletResponse resp, String modelClassName) throws IOException, ServletException {
@@ -87,25 +85,8 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
 
         String schema = new JsonSchemaProvider().getSchema(getMethodRegistry().getObjectMapper(), modelClass).orElse(null);
 
-        req.setAttribute("modelClassName", modelClassName);
-        req.setAttribute("schema", schema);
-        req.getRequestDispatcher("/WEB-INF/therapi/modeldoc.jsp").include(req, resp);
-    }
-
-    protected void sendUi(HttpServletRequest req, HttpServletResponse resp, String methodName) throws IOException, ServletException {
-
-        MethodDefinition methodDef = getMethodRegistry().getMethod(methodName).orElse(null);
-        if (methodDef == null) {
-            resp.sendError(404, "Method not found: " + methodName);
-            return;
-        }
-
-        String schema = new JsonSchemaProvider().getSchema(getMethodRegistry().getObjectMapper(), methodDef);
-
-        req.setAttribute("schema", schema);
-        req.setAttribute("methodName", methodName);
-
-        req.getRequestDispatcher("/WEB-INF/therapi/ui.jsp").forward(req, resp);
+        resp.setContentType("text/html;charset=UTF-8");
+        ModelDocWriter.writeTo(modelClassName, schema, resp.getWriter());
     }
 
     private void sendJavascriptClient(HttpServletRequest req, HttpServletResponse resp) throws IOException {

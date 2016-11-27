@@ -9,8 +9,12 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.therapi.apidoc.ApiDocProvider;
+import com.github.therapi.apidoc.ApiDocWriter;
+import com.github.therapi.apidoc.JsonSchemaProvider;
+import com.github.therapi.apidoc.ModelDocWriter;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.annotation.Remotable;
+import com.github.therapi.core.internal.TypesHelper;
 import com.github.therapi.jsonrpc.DefaultExceptionTranslator;
 import com.google.common.base.Stopwatch;
 import org.slf4j.Logger;
@@ -18,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -61,8 +66,24 @@ public abstract class AbstractSpringJsonRpcController implements ApplicationList
     @RequestMapping(path = "/apidoc", method = RequestMethod.GET)
     public void sendApiDoc(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         ApiDocProvider provider = new ApiDocProvider();
-        req.setAttribute("therapiNamespaces", provider.getDocumentation(handler.getRegistry()));
-        req.getRequestDispatcher("/WEB-INF/therapi/apidoc.jsp").forward(req, resp);
+
+        resp.setContentType("text/html;charset=UTF-8");
+        ApiDocWriter.writeTo(provider.getDocumentation(handler.getRegistry()), resp.getWriter());
+    }
+
+    @RequestMapping(path = "/modeldoc/{modelClassName:.+}", method = RequestMethod.GET)
+    public void sendModelDoc(HttpServletRequest req, HttpServletResponse resp, @PathVariable String modelClassName) throws IOException, ServletException {
+        Class modelClass = TypesHelper.findClass(modelClassName).orElse(null);
+
+        if (modelClass == null) {
+            resp.sendError(404, "Model class not found: " + modelClassName);
+            return;
+        }
+
+        String schema = new JsonSchemaProvider().getSchema(handler.getRegistry().getObjectMapper(), modelClass).orElse(null);
+
+        resp.setContentType("text/html;charset=UTF-8");
+        ModelDocWriter.writeTo(modelClassName, schema, resp.getWriter());
     }
 
     /**

@@ -25,17 +25,10 @@ dependencies {
     // compile "com.github.therapi:therapi-json-rpc:<version>"
 
     compile("org.springframework.boot:spring-boot-starter-web") {
-//        exclude module: "spring-boot-starter-tomcat"
+        exclude module: "spring-boot-starter-tomcat"
     }
-//    compile("org.springframework.boot:spring-boot-starter-jetty")
+    compile("org.springframework.boot:spring-boot-starter-jetty")
     compile("org.springframework.boot:spring-boot-starter-actuator")
-
-    // Spring Boot only supports JSPs when Tomcat is used as the servlet container,
-    // and only when 'war' packaging is used and the following jars are present at compile time.
-    // Since the API doc is implemented as JSPs, we're stuck with Tomcat for now.
-    // See http://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-developing-web-applications.html#boot-features-jsp-limitations
-    providedCompile("org.apache.tomcat.embed:tomcat-embed-jasper")
-    providedCompile("javax.servlet:jstl")
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.slf4j:slf4j-simple:1.7.12'

@@ -1,0 +1,132 @@
+
+
+<button id="${tryItButtonId}" class="btn btn-primary">Try it!</button>
+
+
+<p>
+
+<div style="display: none;" id="${explorerId}">
+    <div id="${formContainerId}"></div>
+    <p>
+
+    <button class="btn btn-primary" onclick="submitForm('${methodNameJsEscaped}', '${formVar}')">Invoke</button>
+    &nbsp;
+    <button class="btn btn-primary" onclick="$('#${tryItButtonId}').show(); $('#${explorerId}').hide(150, function(){$('#${formContainerId}').empty();});">Close</button>
+
+
+    <h4>Request</h4>
+    <pre>
+        <div class="json" id="${requestContainerId}" style="max-height: 500px; overflow: auto;"></div>
+    </pre>
+
+    <h4>Result</h4>
+    <pre>
+        <div class="json" id="${responseContainerId}" style="max-height: 500px; overflow: auto;"></div>
+    </pre>
+</div>
+
+<script>
+TherapiForms = {}
+
+$(document).ready(function() {
+    $("#${tryItButtonId}").click(function() {
+
+        $("#${tryItButtonId}").hide();
+
+        var schema = "${requestSchema}"
+        var BrutusinForms = brutusin["json-forms"];
+        var form = BrutusinForms.create(JSON.parse(schema));
+
+        var container = document.getElementById('${formContainerId}');
+        form.render(container);
+
+        TherapiForms['${formVar}'] = form;
+
+        $("#${explorerId}").show(150);
+    });
+});
+
+function JsonRpcError(jsonRpcErrorResponse) {
+    this.name = "JsonRpcError";
+    this.code = jsonRpcErrorResponse.code;
+    this.message = jsonRpcErrorResponse.message;
+    this.data = jsonRpcErrorResponse.data;
+    this.stack = (new Error()).stack;
+}
+JsonRpcError.prototype = Object.create(Error.prototype);
+JsonRpcError.prototype.constructor = JsonRpcError;
+
+function invokeJsonRpc(name, params) {
+    return new Promise(function(resolve, reject) {
+        $.jsonRPC.request(name, {
+            params: params,
+            success: function(result) {
+                resolve(result.result);
+            },
+            error: function(result) {
+                reject(new JsonRpcError(result.error));
+            }
+        });
+    });
+}
+
+logit = function(x) {
+    if (x instanceof JsonRpcError) {
+        logerr(x);
+    } else {
+        alert(JSON.stringify(x, null, 2))
+    }
+};
+//        logit = function(x) { if (x instanceof JsonRpcError) { logerr(x);} else { $("#result").text(JSON.stringify(x, null, 2))} };
+logerr = function(x) {
+    alert("error:" + JSON.stringify(x, null, 2));
+    if (x.data && x.data.detail) {
+        console.warn(x.data.detail);
+    }
+};
+//logerr = function(x) { console.warn(x); if (x.data && x.data.detail) {console.warn(x.data.detail);}};
+rethrow = function(e) {
+    throw e;
+};
+
+
+function submitForm(methodName, formName) {
+    var form = TherapiForms[formName];
+
+    // alert('${responseContainerId}');
+    //alert(JSON.stringify(form.getData(), null, 2));
+
+    invokeJsonRpc(methodName, form.getData()).then(function(result) {
+        var json = JSON.stringify(result, null, 2);
+        //alert(json);
+        //alert('${responseContainerId}');
+        $("#response_" + methodName.replace(/\./g, '_')).text(json);
+
+
+        //              $('pre code div').each(function(i, block) { hljs.highlightBlock(block); });
+        $("#response_" + methodName.replace(/\./g, '_')).each(function(i, block) {
+            hljs.highlightBlock(block);
+        });
+
+    }).catch(logerr);
+    var copy = JSON.parse(JSON.stringify(form.getData()));
+    var req = {
+        jsonrpc: "2.0",
+        id: "",
+        method: methodName,
+        params: copy,
+    };
+
+    $("#request_" + methodName.replace(/\./g, '_')).text(JSON.stringify(req, null, 2))
+
+    //$('pre code div').each(function(i, block) {
+    //hljs.highlightBlock(block);
+    //});
+
+    $("#request_" + methodName.replace(/\./g, '_')).each(function(i, block) {
+        hljs.highlightBlock(block);
+    });
+}
+</script>
+
+

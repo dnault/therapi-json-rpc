@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Bean;
  * @see ExampleJsonRpcController
  * @see SomeOtherRestController
  * @see GreetingServiceImpl
- *
  */
 @SpringBootApplication
 public class Application {
