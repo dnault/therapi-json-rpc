@@ -1,28 +1,36 @@
 package com.github.therapi.apidoc;
 
-import static com.github.therapi.apidoc.Tag.a;
-import static com.github.therapi.apidoc.Tag.body;
-import static com.github.therapi.apidoc.Tag.br;
-import static com.github.therapi.apidoc.Tag.code;
-import static com.github.therapi.apidoc.Tag.div;
-import static com.github.therapi.apidoc.Tag.h2;
-import static com.github.therapi.apidoc.Tag.head;
-import static com.github.therapi.apidoc.Tag.html;
-import static com.github.therapi.apidoc.Tag.inlineScript;
-import static com.github.therapi.apidoc.Tag.li;
-import static com.github.therapi.apidoc.Tag.meta;
-import static com.github.therapi.apidoc.Tag.p;
-import static com.github.therapi.apidoc.Tag.preEscapedText;
-import static com.github.therapi.apidoc.Tag.scriptLink;
-import static com.github.therapi.apidoc.Tag.span;
-import static com.github.therapi.apidoc.Tag.styleSheetLink;
-import static com.github.therapi.apidoc.Tag.table;
-import static com.github.therapi.apidoc.Tag.tag;
-import static com.github.therapi.apidoc.Tag.td;
-import static com.github.therapi.apidoc.Tag.th;
-import static com.github.therapi.apidoc.Tag.title;
-import static com.github.therapi.apidoc.Tag.tr;
-import static com.github.therapi.apidoc.Tag.ul;
+import static com.github.therapi.qndhtml.Attributes.attrs;
+import static com.github.therapi.qndhtml.Attributes.clazz;
+import static com.github.therapi.qndhtml.Attributes.href;
+import static com.github.therapi.qndhtml.Attributes.id;
+import static com.github.therapi.qndhtml.Attributes.name;
+import static com.github.therapi.qndhtml.Attributes.style;
+import static com.github.therapi.qndhtml.Tag.a;
+import static com.github.therapi.qndhtml.Tag.body;
+import static com.github.therapi.qndhtml.Tag.br;
+import static com.github.therapi.qndhtml.Tag.caption;
+import static com.github.therapi.qndhtml.Tag.code;
+import static com.github.therapi.qndhtml.Tag.div;
+import static com.github.therapi.qndhtml.Tag.h2;
+import static com.github.therapi.qndhtml.Tag.head;
+import static com.github.therapi.qndhtml.Tag.html;
+import static com.github.therapi.qndhtml.Tag.inlineScript;
+import static com.github.therapi.qndhtml.Tag.li;
+import static com.github.therapi.qndhtml.Tag.meta;
+import static com.github.therapi.qndhtml.Tag.p;
+import static com.github.therapi.qndhtml.Tag.preEscapedText;
+import static com.github.therapi.qndhtml.Tag.scriptLink;
+import static com.github.therapi.qndhtml.Tag.span;
+import static com.github.therapi.qndhtml.Tag.styleSheetLink;
+import static com.github.therapi.qndhtml.Tag.table;
+import static com.github.therapi.qndhtml.Tag.td;
+import static com.github.therapi.qndhtml.Tag.text;
+import static com.github.therapi.qndhtml.Tag.th;
+import static com.github.therapi.qndhtml.Tag.title;
+import static com.github.therapi.qndhtml.Tag.tr;
+import static com.github.therapi.qndhtml.Tag.transform;
+import static com.github.therapi.qndhtml.Tag.ul;
 import static com.google.common.base.Throwables.propagate;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript;
@@ -37,18 +45,20 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.github.therapi.qndhtml.Tag;
 import com.google.common.io.CharStreams;
 
 public class ApiDocWriter {
     private static final String RESOURCE_PREFIX = "../therapi/";
 
     public static void writeTo(List<ApiNamespaceDoc> apiNamespaceDocs, Appendable out) throws IOException {
-        html().attr("lang", "en").content(
+        html(attrs("lang", "en"),
                 apiDocHead(),
-                body().content(
-                        div().attr("class", "container").content(
-                                div("sidebar").content(sidebarMenu(apiNamespaceDocs)),
-                                div("header"),
+                body(
+                        div(clazz("container"),
+                                div(id("sidebar"),
+                                        sidebarMenu(apiNamespaceDocs)),
+                                div(id("header")),
                                 apiDocContent(apiNamespaceDocs)
                         )
                 )
@@ -56,12 +66,12 @@ public class ApiDocWriter {
     }
 
     private static Tag apiDocHead() {
-        return head().content(
-                meta().attr("charset", "UTF-8"),
-                meta().attr("http-equiv", "X-UA-Compatible").attr("content", "IE=edge"),
-                meta().attr("http-equiv", "X-UA-Compatible").attr("content", "IE=edge"),
+        return head(
+                meta(attrs("charset", "UTF-8")),
+                meta(attrs("http-equiv", "X-UA-Compatible").attr("content", "IE=edge")),
+                meta(attrs("http-equiv", "X-UA-Compatible").attr("content", "IE=edge")),
 
-                meta().attr("name", "viewport").attr("content", "width=device-width, initial-scale=1"),
+                meta(attrs("name", "viewport").attr("content", "width=device-width, initial-scale=1")),
 
                 styleSheetLink(RESOURCE_PREFIX + "cssmenu/styles.css"),
                 scriptLink("https://code.jquery.com/jquery-1.11.3.min.js"),
@@ -87,35 +97,32 @@ public class ApiDocWriter {
     }
 
     private static Tag sidebarMenu(List<ApiNamespaceDoc> apiNamespaces) {
-        return div("cssmenu").content(
-                ul().generateContent(apiNamespaces, ns ->
-                        li().attr("class", "has-sub").content(
-                                a("#").content(span().text(ns.getName())),
-                                ul().generateContent(ns.getMethods(), method ->
-                                        li().content(
-                                                a("#" + ns.getName() + "." + method.getName()).content(
-                                                        span().text(method.getName())))))));
+        return div(id("cssmenu"),
+                ul(transform(apiNamespaces, ns ->
+                        li(clazz("has-sub"),
+                                a(href("#"),
+                                        span(text(ns.getName())),
+                                        ul(transform(ns.getMethods(), method ->
+                                                li(
+                                                        a(href("#" + ns.getName() + "." + method.getName()),
+                                                                span(text(method.getName())))))))))));
     }
 
     private static Tag apiDocContent(List<ApiNamespaceDoc> apiNamespaces) {
-        return div("content").generateContent(apiNamespaces, ns ->
-                div().content(
-                        a().attr("name", ns.getName())
-                ).generateContent(ns.getMethods(), method -> methodDocContent(ns, method)));
-    }
-
-    private static String name(ApiNamespaceDoc ns, ApiMethodDoc method, String type) {
-        return (type + "." + ns.getName() + "." + method.getName()).replace(".", "_");
+        return div(id("content"),
+                transform(apiNamespaces, ns -> div(
+                        a(name(ns.getName())),
+                        transform(ns.getMethods(), method -> methodDocContent(ns, method)))));
     }
 
     private static Tag methodDocContent(ApiNamespaceDoc ns, ApiMethodDoc method) {
         final String qualifiedMethodName = ns.getName() + "." + method.getName();
 
-        return div().content(
-                a().attr("name", qualifiedMethodName),
-                h2().content(span().text(qualifiedMethodName)),
-                div().attr("style", "padding-left: 10px; padding-right: 10px;").content(
-                        span().text(method.getDescription()),
+        return div(
+                a(name(qualifiedMethodName)),
+                h2(span(text(qualifiedMethodName))),
+                div(style("padding-left: 10px; padding-right: 10px;"),
+                        span(text(method.getDescription())),
                         p(),
                         parametersTable(method),
                         returnTypeTable(method),
@@ -125,34 +132,35 @@ public class ApiDocWriter {
     }
 
     private static Tag parametersTable(ApiMethodDoc method) {
-        return table().attr("class", "params").content(
-                tag("caption").text("Parameters"),
-                tr().content(
-                        th().text("Name"),
-                        th().text("Type"),
-                        th().text("Description"),
-                        th().text("Default")
-                )).generateContent(method.getParams(), param ->
-                tr().content(
-                        td().text(param.getName()),
-                        td().content(preEscapedText(ApiDocProvider.activateModelLinks(param.getType()))),
-                        td().text(param.getDescription()),
-                        td().content(
-                                code().text(param.getDefaultValue()))
+        return table(clazz("params"),
+                caption(text("Parameters")),
+                tr(
+                        th(text("Name")),
+                        th(text("Type")),
+                        th(text("Description")),
+                        th(text("Default"))
+                ),
+                transform(method.getParams(), param ->
+                        tr(
+                                td(text(param.getName())),
+                                td(preEscapedText(ApiDocProvider.activateModelLinks(param.getType()))),
+                                td(text(param.getDescription())),
+                                td(code(text(param.getDefaultValue())))
+                        )
                 )
         );
     }
 
     private static Tag returnTypeTable(ApiMethodDoc method) {
-        return table().attr("class", "params").content(
-                tag("caption").text("Returns"),
-                tr().content(
-                        th().text("Type"),
-                        th().text("Description")
+        return table(clazz("params"),
+                caption(text("Returns")),
+                tr(
+                        th(text("Type")),
+                        th(text("Description"))
                 ),
-                tr().content(
-                        td().content(preEscapedText(ApiDocProvider.activateModelLinks(method.getReturnType()))),
-                        td().text(method.getReturns())
+                tr(
+                        td(preEscapedText(ApiDocProvider.activateModelLinks(method.getReturnType()))),
+                        td(text(method.getReturns()))
                 )
         );
     }
@@ -165,13 +173,13 @@ public class ApiDocWriter {
                 "tryItButtonId",
                 "explorerId",
                 "formVar")
-                .forEach(variableName -> variables.put(variableName, name(ns, method, variableName)));
+                .forEach(variableName -> variables.put(variableName, buildName(ns, method, variableName)));
 
         variables.put("methodNameJsEscaped", escapeEcmaScript(ns.getName() + "." + method.getName()));
         variables.put("requestSchema", escapeEcmaScript(method.getRequestSchema()));
 
-        variables.put("requestContainerId", name(ns, method, "request"));
-        variables.put("responseContainerId", name(ns, method, "response"));
+        variables.put("requestContainerId", buildName(ns, method, "request"));
+        variables.put("responseContainerId", buildName(ns, method, "response"));
 
         try (InputStream is = ApiDocWriter.class.getResourceAsStream("apidoc-try-it.html")) {
             String template = CharStreams.toString(new InputStreamReader(is, UTF_8));
@@ -191,5 +199,9 @@ public class ApiDocWriter {
         } catch (IOException e) {
             throw propagate(e);
         }
+    }
+
+    private static String buildName(ApiNamespaceDoc ns, ApiMethodDoc method, String type) {
+        return (type + "." + ns.getName() + "." + method.getName()).replace(".", "_");
     }
 }

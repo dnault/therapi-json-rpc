@@ -1,14 +1,18 @@
 package com.github.therapi.apidoc;
 
-import static com.github.therapi.apidoc.Tag.body;
-import static com.github.therapi.apidoc.Tag.div;
-import static com.github.therapi.apidoc.Tag.h2;
-import static com.github.therapi.apidoc.Tag.html;
-import static com.github.therapi.apidoc.Tag.pre;
+import static com.github.therapi.qndhtml.Tag.body;
+import static com.github.therapi.qndhtml.Tag.div;
+import static com.github.therapi.qndhtml.Tag.h2;
+import static com.github.therapi.qndhtml.Tag.html;
+import static com.github.therapi.qndhtml.Tag.pre;
+import static com.github.therapi.qndhtml.Tag.preEscapedText;
+import static com.github.therapi.qndhtml.Tag.seq;
+import static com.github.therapi.qndhtml.Tag.text;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
 
+import com.github.therapi.qndhtml.Tag;
 import com.github.therapi.runtimejavadoc.ClassJavadoc;
 import com.github.therapi.runtimejavadoc.CommentFormatter;
 import com.github.therapi.runtimejavadoc.RuntimeJavadocReader;
@@ -16,18 +20,16 @@ import com.github.therapi.runtimejavadoc.RuntimeJavadocReader;
 public class ModelDocWriter {
 
     public static void writeTo(String modelClassName, @Nullable String schema, Appendable out) throws IOException {
-        html().content(
-                body().content(
-                        getDescription(modelClassName),
-                        getSchema(schema)
-                )
-        ).writeTo(out);
+        html(body(
+                getDescription(modelClassName),
+                getSchema(schema)
+        )).writeTo(out);
     }
 
     private static Tag getSchema(String schema) {
-        return schema == null ? null : div().content(
-                h2().text("Schema"),
-                pre().text(schema));
+        return schema == null ? null : seq(
+                h2(text("Schema")),
+                pre(text(schema)));
     }
 
     private static Tag getDescription(String modelClassName) throws IOException {
@@ -37,8 +39,8 @@ public class ModelDocWriter {
             return null;
         }
 
-        return div().content(
-                h2().text("Description")
-        ).text(new CommentFormatter().format(classDoc.getComment()));
+        return div(
+                h2(text("Description")),
+                preEscapedText(new CommentFormatter().format(classDoc.getComment())));
     }
 }
