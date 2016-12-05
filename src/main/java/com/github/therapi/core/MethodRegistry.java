@@ -93,7 +93,7 @@ public class MethodRegistry {
      * <p>
      * Here's an example that matches any method and prints how long the invocation takes:
      * <pre>
-     * methodRegistry.intercept(MethodPredicates.any(), invocation -> {
+     * methodRegistry.intercept(MethodPredicates.any(), invocation -&gt; {
      *   Stopwatch timer = Stopwatch.createStarted();
      *   String methodName = MethodDefinitionInvocation.getQualifiedName(invocation);
      *   try {

@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 
 /**
- * Quick & dirty HTML generation so we don't have to rely on Spring Boot's marginal JSP support.
+ * Quick and dirty HTML generation so we don't have to rely on Spring Boot's marginal JSP support.
  */
 public class Tag {
     //CHECKSTYLE.OFF: MethodName - so we can use single-letter method names like "a" and "p"
