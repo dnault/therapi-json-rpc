@@ -21,6 +21,6 @@ The JAR is available in [JCenter](https://bintray.com/bintray/jcenter) at these 
     <dependency>
       <groupId>com.github.therapi</groupId>
       <artifactId>therapi-json-rpc</artifactId>
-      <version>0.1.0</version>
+      <version>0.2.0</version>
     </dependency>
 
