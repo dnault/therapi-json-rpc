@@ -1,0 +1,8 @@
+
+v0.2.0 - 2016-12-04
+    Fix the Spring Boot examples.
+    Use pure java to build apidoc pages since Spring Boot has poor JSP support.
+    Upgrade to therapi-runtime-javadoc 0.2.0.
+
+
+v0.1.0 - Initial release

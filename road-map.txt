@@ -4,6 +4,7 @@
 [COMPLETE] Invoke methods over http
 [COMPLETE] lowercase enum module
 [COMPLETE] spring integration
+[COMPLETE] method interception?
 
 automatic documentation [IN PROGRESS]
 \- schemas
@@ -13,8 +14,6 @@ json views
 binary responses
 
 upload requests
-
-method interception?
 
 automatic client
 
