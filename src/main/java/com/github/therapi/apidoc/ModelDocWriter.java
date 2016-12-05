@@ -15,7 +15,7 @@ import java.io.IOException;
 import com.github.therapi.apidoc.qndhtml.Tag;
 import com.github.therapi.runtimejavadoc.ClassJavadoc;
 import com.github.therapi.runtimejavadoc.CommentFormatter;
-import com.github.therapi.runtimejavadoc.RuntimeJavadocReader;
+import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
 
 public class ModelDocWriter {
 
@@ -33,7 +33,7 @@ public class ModelDocWriter {
     }
 
     private static Tag getDescription(String modelClassName) throws IOException {
-        ClassJavadoc classDoc = new RuntimeJavadocReader().getDocumentation(modelClassName);
+        ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(modelClassName).orElse(null);
 
         if (classDoc == null || classDoc.getComment() == null) {
             return null;

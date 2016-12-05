@@ -24,14 +24,13 @@ import com.github.therapi.runtimejavadoc.Comment;
 import com.github.therapi.runtimejavadoc.CommentFormatter;
 import com.github.therapi.runtimejavadoc.MethodJavadoc;
 import com.github.therapi.runtimejavadoc.ParamJavadoc;
-import com.github.therapi.runtimejavadoc.RuntimeJavadocReader;
+import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 
 public class ApiDocProvider {
     private final CommentFormatter commentFormatter = new CommentFormatter();
-    private final RuntimeJavadocReader javadocReader = new RuntimeJavadocReader();
     private final JsonSchemaProvider schemaProvider = new JsonSchemaProvider();
 
     public List<ApiNamespaceDoc> getDocumentation(MethodRegistry registry) throws IOException {
@@ -111,7 +110,7 @@ public class ApiDocProvider {
     }
 
     public Optional<MethodJavadoc> getJavadoc(MethodDefinition m) throws IOException {
-        ClassJavadoc classJavadoc = javadocReader.getDocumentation(m.getMethod().getDeclaringClass().getName());
+        ClassJavadoc classJavadoc = RuntimeJavadoc.getJavadoc(m.getMethod().getDeclaringClass().getName()).orElse(null);
         if (classJavadoc == null) {
             return Optional.empty();
         }
@@ -127,7 +126,7 @@ public class ApiDocProvider {
     }
 
     public Optional<ApiMethodDoc> getMethodDoc(MethodDefinition m) throws IOException {
-        ClassJavadoc classJavadoc = javadocReader.getDocumentation(m.getMethod().getDeclaringClass().getName());
+        ClassJavadoc classJavadoc = RuntimeJavadoc.getJavadoc(m.getMethod().getDeclaringClass().getName()).orElse(null);
         if (classJavadoc == null) {
             return Optional.empty();
         }

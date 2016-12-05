@@ -5,13 +5,11 @@ buildscript {
 
     dependencies {
         classpath "org.akhikhl.gretty:gretty:1.2.4"
-        classpath 'com.github.therapi:therapi-runtime-javadoc:0.1.2'
     }
 }
 
 apply plugin: 'war'
 apply plugin: 'org.akhikhl.gretty'
-apply plugin: 'com.github.therapi.runtime-javadoc'
 
 repositories {
     jcenter()
