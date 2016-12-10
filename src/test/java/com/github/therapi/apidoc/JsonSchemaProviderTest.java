@@ -3,8 +3,6 @@ package com.github.therapi.apidoc;
 import static com.github.therapi.apidoc.JsonSchemaProvider.classNameToHyperlink;
 import static com.github.therapi.jackson.ObjectMappers.newLenientObjectMapper;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
-import static org.apache.commons.lang3.StringUtils.deleteWhitespace;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.lang.reflect.Method;
@@ -16,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.therapi.core.MethodDefinition;
 import com.github.therapi.core.ParameterDefinition;
 import com.github.therapi.core.StandardParameterIntrospector;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.junit.Test;
 
 public class JsonSchemaProviderTest {
@@ -151,24 +150,26 @@ public class JsonSchemaProviderTest {
 
     @Test
     public void testGetSchema() throws Exception {
-        Optional<String> schema = new JsonSchemaProvider().getSchemaForHtml(new ObjectMapper(), Zoo.class, classNameToHyperlink());
-        String expected = "{\n"
-                + "  &quot;type&quot; : &quot;object&quot;,\n"
-                + "  &quot;id&quot; : &quot;com.github.therapi.apidoc.JsonSchemaProviderTest$Zoo&quot;,\n"
-                + "  &quot;properties&quot; : {\n"
-                + "    &quot;name&quot; : {\n"
-                + "      &quot;type&quot; : &quot;string&quot;\n"
-                + "    },\n"
-                + "    &quot;animals&quot; : {\n"
-                + "      &quot;type&quot; : &quot;array&quot;,\n"
-                + "      &quot;items&quot; : {\n"
-                + "        &quot;type&quot; : &quot;object&quot;,\n"
-                + "        &quot;$ref&quot; : &quot;<a href=\"com.github.therapi.apidoc.JsonSchemaProviderTest$Animal\">com.github.therapi.apidoc.JsonSchemaProviderTest$Animal</a>&quot;\n"
-                + "      }\n"
-                + "    }\n"
-                + "  }\n"
-                + "}";
-        assertEquals(deleteWhitespace(expected), deleteWhitespace(schema.get()));
+        Optional<String> schema = new JsonSchemaProvider().getSchemaForHtml(new ObjectMapper(), Zoo.class, className -> "LINK:" + className);
+        String expected = "{\n" +
+                "  \"type\" : \"object\",\n" +
+                "  \"id\" : \"com.github.therapi.apidoc.JsonSchemaProviderTest$Zoo\",\n" +
+                "  \"properties\" : {\n" +
+                "    \"name\" : {\n" +
+                "      \"type\" : \"string\"\n" +
+                "    },\n" +
+                "    \"animals\" : {\n" +
+                "      \"type\" : \"array\",\n" +
+                "      \"items\" : {\n" +
+                "        \"type\" : \"object\",\n" +
+                "        \"$ref\" : \"LINK:com.github.therapi.apidoc.JsonSchemaProviderTest$Animal\"\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+
+        String actual = StringEscapeUtils.unescapeHtml3(schema.get());
+        assertJsonEquals(expected, actual);
     }
 
     @Test
