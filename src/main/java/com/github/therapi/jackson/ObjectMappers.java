@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import com.github.therapi.jackson.enums.LowerCamelCaseEnumModule;
 
 public class ObjectMappers {
     public static ObjectMapper newLenientObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new LowerCamelCaseEnumModule());
         mapper.registerModule(new ParameterNamesModule());
 
         mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);

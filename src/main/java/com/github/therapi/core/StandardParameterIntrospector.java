@@ -43,7 +43,16 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
             return TypesHelper.getDefaultValueSupplier(p.getType());
         }
 
-        String defaultValueStr = defaultAnnotation.value();
+
+        String defValue = defaultAnnotation.value();
+        // allow enums to be unquoted (quotes added here)
+        if (p.getType().isEnum()) {
+            if (!defValue.startsWith("\"") && !defValue.startsWith("'")) {
+                defValue = "\"" + defValue + "\"";
+            }
+        }
+
+        String defaultValueStr = defValue;
 
         if (p.getType().equals(String.class)) {
             return () -> defaultValueStr;

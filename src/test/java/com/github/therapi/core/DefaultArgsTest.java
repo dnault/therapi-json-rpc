@@ -9,6 +9,10 @@ import org.junit.Test;
 
 public class DefaultArgsTest extends AbstractMethodRegistryTest {
 
+    enum Flavor {
+        CHOCOLATE, FRENCH_VANILLA
+    }
+
     @Before
     public void setup() {
         registry.scan(newEchoProxyInstance(EchoService.class));
@@ -51,6 +55,10 @@ public class DefaultArgsTest extends AbstractMethodRegistryTest {
         String echoStringDefaultNonEmpty(@Default("xyzzy") String value);
 
         Widget echoDefaultModel(@Default("{serialNumber:'12345'}") Widget widget);
+
+        Flavor echoDefaultEnumUnquoted(@Default("chocolate") Flavor flavor);
+
+        Flavor echoDefaultEnumQuoted(@Default("'frenchVanilla'") Flavor flavor);
     }
 
     @Remotable("")
@@ -109,6 +117,13 @@ public class DefaultArgsTest extends AbstractMethodRegistryTest {
     @Test
     public void echoModel() throws Exception {
         check("echoDefaultModel", "[{serialNumber:'7777'}]", "{serialNumber:'7777'}");
+    }
+
+    @Test
+    public void echoEnum() throws Exception {
+        check("echoDefaultEnumUnquoted", "[]", "'chocolate'");
+        check("echoDefaultEnumQuoted", "[]", "'frenchVanilla'");
+        check("echoDefaultEnumUnquoted", "['frenchVanilla']", "'frenchVanilla'");
     }
 
     @Test(expected = IllegalArgumentException.class)
