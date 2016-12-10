@@ -21,7 +21,6 @@ import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import com.fasterxml.jackson.module.jsonSchema.factories.VisitorContext;
 import com.github.therapi.core.MethodDefinition;
 import com.github.therapi.core.ParameterDefinition;
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 public class JsonSchemaProvider {

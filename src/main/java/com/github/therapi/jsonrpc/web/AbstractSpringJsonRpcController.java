@@ -19,7 +19,6 @@ import com.github.therapi.core.annotation.Remotable;
 import com.github.therapi.core.internal.TypesHelper;
 import com.github.therapi.jsonrpc.DefaultExceptionTranslator;
 import com.google.common.base.Stopwatch;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ListableBeanFactory;

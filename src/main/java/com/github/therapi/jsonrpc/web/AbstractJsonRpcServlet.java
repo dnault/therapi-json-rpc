@@ -22,7 +22,6 @@ import com.github.therapi.core.MethodDefinition;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.ParameterDefinition;
 import com.github.therapi.core.internal.TypesHelper;
-import org.apache.commons.lang3.StringEscapeUtils;
 
 public abstract class AbstractJsonRpcServlet extends HttpServlet {
 
