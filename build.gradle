@@ -126,6 +126,12 @@ tasks.withType(JavaCompile) {
     options.compilerArgs << "-parameters"
 }
 
+test {
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
+
 checkstyle {
     toolVersion = "6.16.1"
 }
