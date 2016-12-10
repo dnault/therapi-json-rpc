@@ -132,7 +132,7 @@ public class JsonSchemaProviderTest {
                 "            \"properties\" : {\n" +
                 "              \"color\" : {\n" +
                 "                \"type\" : \"string\",\n" +
-                "                \"enum\" : [ \"RED\", \"GREEN\", \"BLUE\" ]\n" +
+                "                \"enum\" : [ \"red\", \"green\", \"blue\" ]\n" +
                 "              },\n" +
                 "              \"species\" : {\n" +
                 "                \"type\" : \"string\"\n" +
