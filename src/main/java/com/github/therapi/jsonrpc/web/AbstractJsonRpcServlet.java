@@ -1,5 +1,6 @@
 package com.github.therapi.jsonrpc.web;
 
+import static com.github.therapi.apidoc.JsonSchemaProvider.classNameToHyperlink;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.removeStart;
@@ -21,6 +22,7 @@ import com.github.therapi.core.MethodDefinition;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.ParameterDefinition;
 import com.github.therapi.core.internal.TypesHelper;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 public abstract class AbstractJsonRpcServlet extends HttpServlet {
 
@@ -83,7 +85,9 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
             return;
         }
 
-        String schema = new JsonSchemaProvider().getSchema(getMethodRegistry().getObjectMapper(), modelClass).orElse(null);
+        String schema = new JsonSchemaProvider()
+                .getSchemaForHtml(getMethodRegistry().getObjectMapper(), modelClass, classNameToHyperlink())
+                .orElse(null);
 
         resp.setContentType("text/html;charset=UTF-8");
         ModelDocWriter.writeTo(modelClassName, schema, resp.getWriter());

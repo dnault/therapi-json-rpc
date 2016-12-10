@@ -1,7 +1,9 @@
 package com.github.therapi.apidoc;
 
+import static com.github.therapi.apidoc.JsonSchemaProvider.classNameToHyperlink;
 import static com.github.therapi.jackson.ObjectMappers.newLenientObjectMapper;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.lang.reflect.Method;
@@ -10,9 +12,9 @@ import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.therapi.core.StandardParameterIntrospector;
 import com.github.therapi.core.MethodDefinition;
 import com.github.therapi.core.ParameterDefinition;
+import com.github.therapi.core.StandardParameterIntrospector;
 import org.junit.Test;
 
 public class JsonSchemaProviderTest {
@@ -58,7 +60,7 @@ public class JsonSchemaProviderTest {
     public void testGetMethodSchema() throws Exception {
         ObjectMapper objectMapper = newLenientObjectMapper();
 
-        Method method = Arrays.asList(getClass().getMethods()).stream()
+        Method method = Arrays.stream(getClass().getMethods())
                 .filter(m -> m.getName().equals("exampleMethod"))
                 .findAny().get();
 
@@ -148,28 +150,30 @@ public class JsonSchemaProviderTest {
 
     @Test
     public void testGetSchema() throws Exception {
-        Optional<String> schema = new JsonSchemaProvider().getSchema(new ObjectMapper(), Zoo.class);
-        String expected = "{\n" +
-                "  \"type\" : \"object\",\n" +
-                "  \"id\" : \"urn:jsonschema:com:github:therapi:apidoc:JsonSchemaProviderTest:Zoo\",\n" +
-                "  \"properties\" : {\n" +
-                "    \"name\" : {\n" +
-                "      \"type\" : \"string\"\n" +
-                "    },\n" +
-                "    \"animals\" : {\n" +
-                "      \"type\" : \"array\",\n" +
-                "      \"items\" : {\n" +
-                "        \"type\" : \"object\",\n" +
-                "        \"$ref\" : \"urn:jsonschema:com:github:therapi:apidoc:JsonSchemaProviderTest:Animal\"\n" +
-                "      }\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
-        assertJsonEquals(expected, schema.get());
+        Optional<String> schema = new JsonSchemaProvider().getSchemaForHtml(new ObjectMapper(), Zoo.class, classNameToHyperlink());
+        String expected = "{\n"
+                + "  &quot;type&quot; : &quot;object&quot;,\n"
+                + "  &quot;id&quot; : &quot;com.github.therapi.apidoc.JsonSchemaProviderTest$Zoo&quot;,\n"
+                + "  &quot;properties&quot; : {\n"
+                + "    &quot;name&quot; : {\n"
+                + "      &quot;type&quot; : &quot;string&quot;\n"
+                + "    },\n"
+                + "    &quot;animals&quot; : {\n"
+                + "      &quot;type&quot; : &quot;array&quot;,\n"
+                + "      &quot;items&quot; : {\n"
+                + "        &quot;type&quot; : &quot;object&quot;,\n"
+                + "        &quot;$ref&quot; : &quot;<a href=\"com.github.therapi.apidoc.JsonSchemaProviderTest$Animal\">com.github.therapi.apidoc.JsonSchemaProviderTest$Animal</a>&quot;\n"
+                + "      }\n"
+                + "    }\n"
+                + "  }\n"
+                + "}";
+        assertEquals(expected, schema.get());
     }
 
     @Test
     public void noSchema() throws Exception {
-        assertFalse(new JsonSchemaProvider().getSchema(new ObjectMapper(), NoPublicFields.class).isPresent());
+        assertFalse(new JsonSchemaProvider()
+                .getSchemaForHtml(new ObjectMapper(), NoPublicFields.class, classNameToHyperlink())
+                .isPresent());
     }
 }

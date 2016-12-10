@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
@@ -18,6 +21,8 @@ import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import com.fasterxml.jackson.module.jsonSchema.factories.VisitorContext;
 import com.github.therapi.core.MethodDefinition;
 import com.github.therapi.core.ParameterDefinition;
+import com.google.common.annotations.VisibleForTesting;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 public class JsonSchemaProvider {
 
@@ -41,9 +46,13 @@ public class JsonSchemaProvider {
         }
     }
 
-    public Optional<String> getSchema(ObjectMapper objectMapper, Class modelClass) throws IOException {
+    public Optional<String> getSchemaForHtml(ObjectMapper objectMapper, Class modelClass, Function<String, String> classNameToHyperlink) throws IOException {
         SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
-        visitor.setVisitorContext(new VisitorContextWithoutSchemaInlining());
+        visitor.setVisitorContext(new VisitorContextWithoutSchemaInlining() {
+            public String javaTypeToUrn(JavaType jt) {
+                return jt.toCanonical();
+            }
+        });
 
         objectMapper.acceptJsonFormatVisitor(objectMapper.constructType(modelClass), visitor);
         JsonSchema jsonSchema = visitor.finalSchema();
@@ -53,8 +62,30 @@ public class JsonSchemaProvider {
             return Optional.empty();
         }
 
-        return Optional.of(
-                objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(schemaNode));
+        String result = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(schemaNode);
+        result = StringEscapeUtils.escapeHtml3(result);
+        result = activateRefLinks(result, classNameToHyperlink);
+
+        return Optional.of(result);
+    }
+
+    private static final Pattern REF_LINK_PATTERN = Pattern.compile("(&quot;\\$ref&quot;\\s+?:\\s+?&quot;)(.+?)(&quot;)");
+
+    protected String activateRefLinks(String result, Function<String, String> classNameToHyperlink) {
+        StringBuffer sb = new StringBuffer();
+        Matcher m = REF_LINK_PATTERN.matcher(result);
+        while (m.find()) {
+            m.appendReplacement(sb, Matcher.quoteReplacement(
+                    m.group(1) + classNameToHyperlink.apply(m.group(2))) + m.group(3));
+        }
+        m.appendTail(sb);
+        return sb.toString();
+    }
+
+    public static Function<String, String> classNameToHyperlink() {
+        return className -> "<a href=\"" + className + "\">"
+                + StringEscapeUtils.escapeHtml3(className)
+                + "</a>";
     }
 
     /**

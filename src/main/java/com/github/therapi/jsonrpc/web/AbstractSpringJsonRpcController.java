@@ -1,5 +1,7 @@
 package com.github.therapi.jsonrpc.web;
 
+import static com.github.therapi.apidoc.JsonSchemaProvider.classNameToHyperlink;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +19,7 @@ import com.github.therapi.core.annotation.Remotable;
 import com.github.therapi.core.internal.TypesHelper;
 import com.github.therapi.jsonrpc.DefaultExceptionTranslator;
 import com.google.common.base.Stopwatch;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -80,7 +83,9 @@ public abstract class AbstractSpringJsonRpcController implements ApplicationList
             return;
         }
 
-        String schema = new JsonSchemaProvider().getSchema(handler.getRegistry().getObjectMapper(), modelClass).orElse(null);
+        String schema = new JsonSchemaProvider()
+                .getSchemaForHtml(handler.getRegistry().getObjectMapper(), modelClass, classNameToHyperlink())
+                .orElse(null);
 
         resp.setContentType("text/html;charset=UTF-8");
         ModelDocWriter.writeTo(modelClassName, schema, resp.getWriter());

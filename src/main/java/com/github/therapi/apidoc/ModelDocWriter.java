@@ -29,7 +29,7 @@ public class ModelDocWriter {
     private static Tag getSchema(String schema) {
         return schema == null ? null : seq(
                 h2(text("Schema")),
-                pre(text(schema)));
+                pre(preEscapedText(schema)));
     }
 
     private static Tag getDescription(String modelClassName) throws IOException {
