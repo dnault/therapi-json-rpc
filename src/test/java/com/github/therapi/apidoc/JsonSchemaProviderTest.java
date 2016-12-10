@@ -3,6 +3,7 @@ package com.github.therapi.apidoc;
 import static com.github.therapi.apidoc.JsonSchemaProvider.classNameToHyperlink;
 import static com.github.therapi.jackson.ObjectMappers.newLenientObjectMapper;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
+import static org.apache.commons.lang3.StringUtils.deleteWhitespace;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -167,7 +168,7 @@ public class JsonSchemaProviderTest {
                 + "    }\n"
                 + "  }\n"
                 + "}";
-        assertEquals(expected, schema.get());
+        assertEquals(deleteWhitespace(expected), deleteWhitespace(schema.get()));
     }
 
     @Test
