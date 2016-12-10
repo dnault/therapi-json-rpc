@@ -33,6 +33,7 @@ import static com.github.therapi.apidoc.qndhtml.Tag.transform;
 import static com.github.therapi.apidoc.qndhtml.Tag.ul;
 import static com.google.common.base.Throwables.propagate;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.regex.Matcher.quoteReplacement;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript;
 
 import java.io.IOException;
@@ -42,10 +43,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.github.therapi.apidoc.qndhtml.Tag;
+import com.github.therapi.core.internal.LangHelper;
 import com.google.common.io.CharStreams;
 
 public class ApiDocWriter {
@@ -186,15 +187,10 @@ public class ApiDocWriter {
 
             Pattern variablePattern = Pattern.compile("\\$\\{(.+?)\\}");
 
-            StringBuffer sb = new StringBuffer();
-            Matcher m = variablePattern.matcher(template);
-            while (m.find()) {
-                String variableName = m.group(1);
-                String replacement = variables.get(variableName);
-                m.appendReplacement(sb, Matcher.quoteReplacement(replacement));
-            }
-            m.appendTail(sb);
-            return sb.toString();
+            return LangHelper.replace(template, variablePattern, matcher -> {
+                String variableName = matcher.group(1);
+                return quoteReplacement(variables.get(variableName));
+            });
 
         } catch (IOException e) {
             throw propagate(e);

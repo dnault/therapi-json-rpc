@@ -1,6 +1,7 @@
 package com.github.therapi.apidoc;
 
 import static com.google.common.base.Throwables.propagate;
+import static java.util.regex.Matcher.quoteReplacement;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -21,6 +22,7 @@ import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import com.fasterxml.jackson.module.jsonSchema.factories.VisitorContext;
 import com.github.therapi.core.MethodDefinition;
 import com.github.therapi.core.ParameterDefinition;
+import com.github.therapi.core.internal.LangHelper;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 public class JsonSchemaProvider {
@@ -68,17 +70,12 @@ public class JsonSchemaProvider {
         return Optional.of(result);
     }
 
-    private static final Pattern REF_LINK_PATTERN = Pattern.compile("(&quot;\\$ref&quot;\\s+?:\\s+?&quot;)(.+?)(&quot;)");
+    private static final Pattern REF_PROPERTY_PATTERN = Pattern.compile(
+            "(&quot;\\$ref&quot;\\s*:\\s*?&quot;)(.+?)(&quot;)");
 
     protected String activateRefLinks(String result, Function<String, String> classNameToHyperlink) {
-        StringBuffer sb = new StringBuffer();
-        Matcher m = REF_LINK_PATTERN.matcher(result);
-        while (m.find()) {
-            m.appendReplacement(sb, Matcher.quoteReplacement(
-                    m.group(1) + classNameToHyperlink.apply(m.group(2))) + m.group(3));
-        }
-        m.appendTail(sb);
-        return sb.toString();
+        return LangHelper.replace(result, REF_PROPERTY_PATTERN, (Matcher m) ->
+                quoteReplacement(m.group(1) + classNameToHyperlink.apply(m.group(2))) + m.group(3));
     }
 
     public static Function<String, String> classNameToHyperlink() {
