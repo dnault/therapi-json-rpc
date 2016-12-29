@@ -239,6 +239,14 @@ public class Tag {
         return new Tag("code", content);
     }
 
+    public static Tag input(Attributes attrs, Tag... content) {
+        return new Tag("input", attrs, content).noClose();
+    }
+
+    public static Tag input(Tag... content) {
+        return new Tag("input", content).noClose();
+    }
+
     public static Tag text(String text) {
         return new Tag("") {
             @Override

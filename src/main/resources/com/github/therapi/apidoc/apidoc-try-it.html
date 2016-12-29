@@ -59,6 +59,7 @@ JsonRpcError.prototype.constructor = JsonRpcError;
 function invokeJsonRpc(name, params) {
     return new Promise(function(resolve, reject) {
         $.jsonRPC.request(name, {
+            headers: ${requestHeaders},
             params: params,
             success: function(result) {
                 resolve(result.result);
@@ -96,15 +97,15 @@ function submitForm(methodName, formName) {
     // alert('${responseContainerId}');
     //alert(JSON.stringify(form.getData(), null, 2));
 
+    var responseFieldId = "#response_" + methodName.replace(/\./g, '_');
+    var requestFieldId = "#request_" + methodName.replace(/\./g, '_');
+
+    $(responseFieldId).text("");
+
     invokeJsonRpc(methodName, form.getData()).then(function(result) {
         var json = JSON.stringify(result, null, 2);
-        //alert(json);
-        //alert('${responseContainerId}');
-        $("#response_" + methodName.replace(/\./g, '_')).text(json);
-
-
-        //              $('pre code div').each(function(i, block) { hljs.highlightBlock(block); });
-        $("#response_" + methodName.replace(/\./g, '_')).each(function(i, block) {
+        $(responseFieldId).text(json);
+        $(responseFieldId).each(function(i, block) {
             hljs.highlightBlock(block);
         });
 
@@ -117,13 +118,8 @@ function submitForm(methodName, formName) {
         params: copy,
     };
 
-    $("#request_" + methodName.replace(/\./g, '_')).text(JSON.stringify(req, null, 2))
-
-    //$('pre code div').each(function(i, block) {
-    //hljs.highlightBlock(block);
-    //});
-
-    $("#request_" + methodName.replace(/\./g, '_')).each(function(i, block) {
+    $(requestFieldId).text(JSON.stringify(req, null, 2))
+    $(requestFieldId).each(function(i, block) {
         hljs.highlightBlock(block);
     });
 }

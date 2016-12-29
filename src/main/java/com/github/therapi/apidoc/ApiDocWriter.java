@@ -16,11 +16,13 @@ import static com.github.therapi.apidoc.qndhtml.Tag.h2;
 import static com.github.therapi.apidoc.qndhtml.Tag.head;
 import static com.github.therapi.apidoc.qndhtml.Tag.html;
 import static com.github.therapi.apidoc.qndhtml.Tag.inlineScript;
+import static com.github.therapi.apidoc.qndhtml.Tag.input;
 import static com.github.therapi.apidoc.qndhtml.Tag.li;
 import static com.github.therapi.apidoc.qndhtml.Tag.meta;
 import static com.github.therapi.apidoc.qndhtml.Tag.p;
 import static com.github.therapi.apidoc.qndhtml.Tag.preEscapedText;
 import static com.github.therapi.apidoc.qndhtml.Tag.scriptLink;
+import static com.github.therapi.apidoc.qndhtml.Tag.seq;
 import static com.github.therapi.apidoc.qndhtml.Tag.span;
 import static com.github.therapi.apidoc.qndhtml.Tag.styleSheetLink;
 import static com.github.therapi.apidoc.qndhtml.Tag.table;
@@ -36,6 +38,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.regex.Matcher.quoteReplacement;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript;
 
+import com.github.therapi.apidoc.qndhtml.Tag;
+import com.github.therapi.core.internal.LangHelper;
+import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -44,10 +49,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import com.github.therapi.apidoc.qndhtml.Tag;
-import com.github.therapi.core.internal.LangHelper;
-import com.google.common.io.CharStreams;
 
 public class ApiDocWriter {
     private static final String RESOURCE_PREFIX = "../therapi/";
@@ -115,10 +116,25 @@ public class ApiDocWriter {
 
     protected Tag apiDocContent(List<ApiNamespaceDoc> apiNamespaces) {
         return div(id("content"),
-                transform(apiNamespaces, ns -> div(
-                        a(name(ns.getName())),
-                        transform(ns.getMethods(), method -> methodDocContent(ns, method)))));
+            apiDocContentHeader(),
+            transform(apiNamespaces, ns -> div(
+                a(name(ns.getName())),
+                transform(ns.getMethods(), method -> methodDocContent(ns, method)))),
+            apiDocContentFooter());
     }
+
+
+  protected Tag apiDocContentHeader() {
+    return seq(
+        text("Auth Token: "),
+        input(id("authToken").attr("size", "64")),
+        br()
+    );
+  }
+
+  protected Tag apiDocContentFooter() {
+    return null;
+  }
 
     protected Tag methodDocContent(ApiNamespaceDoc ns, ApiMethodDoc method) {
         final String qualifiedMethodName = ns.getName() + "." + method.getName();
@@ -170,6 +186,19 @@ public class ApiDocWriter {
         );
     }
 
+    /**
+     * Returns a Javascript Object where the keys are the header names and the values are the header values.
+     * The default behavior is to use a single header with the name returned from {@link #getAuthHeaderName()}
+     * and the value from the HTML input field with id "authToken".
+     */
+    protected String getJsonRpcRequestHeaders() {
+        return "{'" + getAuthHeaderName() + "': $('#authToken').val() }";
+    }
+
+    protected String getAuthHeaderName() {
+      return "X-Auth-Token";
+    }
+
     protected String loadTryItResource(ApiNamespaceDoc ns, ApiMethodDoc method) {
         Map<String, String> variables = new HashMap<>();
 
@@ -180,6 +209,7 @@ public class ApiDocWriter {
                 "formVar")
                 .forEach(variableName -> variables.put(variableName, buildName(ns, method, variableName)));
 
+        variables.put("requestHeaders", getJsonRpcRequestHeaders());
         variables.put("methodNameJsEscaped", escapeEcmaScript(ns.getName() + "." + method.getName()));
         variables.put("requestSchema", escapeEcmaScript(method.getRequestSchema()));
 
