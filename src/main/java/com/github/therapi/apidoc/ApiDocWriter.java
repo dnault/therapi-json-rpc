@@ -52,7 +52,11 @@ import com.google.common.io.CharStreams;
 public class ApiDocWriter {
     private static final String RESOURCE_PREFIX = "../therapi/";
 
-    public static void writeTo(List<ApiNamespaceDoc> apiNamespaceDocs, Appendable out) throws IOException {
+    protected static String getResourcePrefix() {
+        return RESOURCE_PREFIX;
+    }
+
+    public void writeTo(List<ApiNamespaceDoc> apiNamespaceDocs, Appendable out) throws IOException {
         html(attrs("lang", "en"),
                 apiDocHead(),
                 body(
@@ -66,7 +70,7 @@ public class ApiDocWriter {
         ).writeTo(out);
     }
 
-    private static Tag apiDocHead() {
+    protected Tag apiDocHead() {
         return head(
                 meta(attrs("charset", "UTF-8")),
                 meta(attrs("http-equiv", "X-UA-Compatible").attr("content", "IE=edge")),
@@ -74,30 +78,30 @@ public class ApiDocWriter {
 
                 meta(attrs("name", "viewport").attr("content", "width=device-width, initial-scale=1")),
 
-                styleSheetLink(RESOURCE_PREFIX + "cssmenu/styles.css"),
+                styleSheetLink(getResourcePrefix() + "cssmenu/styles.css"),
                 scriptLink("https://code.jquery.com/jquery-1.11.3.min.js"),
-                scriptLink(RESOURCE_PREFIX + "cssmenu/script.js"),
+                scriptLink(getResourcePrefix() + "cssmenu/script.js"),
 
-                styleSheetLink(RESOURCE_PREFIX + "json-forms/css/brutusin-json-forms.min.css"),
-                scriptLink(RESOURCE_PREFIX + "json-forms/js/brutusin-json-forms.min.js"),
+                styleSheetLink(getResourcePrefix() + "json-forms/css/brutusin-json-forms.min.css"),
+                scriptLink(getResourcePrefix() + "json-forms/js/brutusin-json-forms.min.js"),
 
-                styleSheetLink(RESOURCE_PREFIX + "highlight/styles/github-gist.css"),
-                scriptLink(RESOURCE_PREFIX + "highlight/highlight.pack.js"),
+                styleSheetLink(getResourcePrefix() + "highlight/styles/github-gist.css"),
+                scriptLink(getResourcePrefix() + "highlight/highlight.pack.js"),
 
-                scriptLink(RESOURCE_PREFIX + "datagraph/jquery-jsonrpc/0.1.1/jquery.jsonrpc.js"),
-                scriptLink(RESOURCE_PREFIX + "jakearchibald/es6-promise-3.0.2/es6-promise.min.js"),
+                scriptLink(getResourcePrefix() + "datagraph/jquery-jsonrpc/0.1.1/jquery.jsonrpc.js"),
+                scriptLink(getResourcePrefix() + "jakearchibald/es6-promise-3.0.2/es6-promise.min.js"),
 
                 inlineScript("$.jsonRPC.setup({\n"
                         + "    endPoint: '../jsonrpc',\n"
                         + "});"),
 
-                styleSheetLink(RESOURCE_PREFIX + "apidoc.css"),
+                styleSheetLink(getResourcePrefix() + "apidoc.css"),
 
                 title("API Documentation")
         );
     }
 
-    private static Tag sidebarMenu(List<ApiNamespaceDoc> apiNamespaces) {
+    protected Tag sidebarMenu(List<ApiNamespaceDoc> apiNamespaces) {
         return div(id("cssmenu"),
                 ul(transform(apiNamespaces, ns ->
                         li(clazz("has-sub"),
@@ -109,14 +113,14 @@ public class ApiDocWriter {
                                                                 span(text(method.getName())))))))))));
     }
 
-    private static Tag apiDocContent(List<ApiNamespaceDoc> apiNamespaces) {
+    protected Tag apiDocContent(List<ApiNamespaceDoc> apiNamespaces) {
         return div(id("content"),
                 transform(apiNamespaces, ns -> div(
                         a(name(ns.getName())),
                         transform(ns.getMethods(), method -> methodDocContent(ns, method)))));
     }
 
-    private static Tag methodDocContent(ApiNamespaceDoc ns, ApiMethodDoc method) {
+    protected Tag methodDocContent(ApiNamespaceDoc ns, ApiMethodDoc method) {
         final String qualifiedMethodName = ns.getName() + "." + method.getName();
 
         return div(
@@ -132,7 +136,7 @@ public class ApiDocWriter {
         );
     }
 
-    private static Tag parametersTable(ApiMethodDoc method) {
+    protected Tag parametersTable(ApiMethodDoc method) {
         return table(clazz("params"),
                 caption(text("Parameters")),
                 tr(
@@ -152,7 +156,7 @@ public class ApiDocWriter {
         );
     }
 
-    private static Tag returnTypeTable(ApiMethodDoc method) {
+    protected Tag returnTypeTable(ApiMethodDoc method) {
         return table(clazz("params"),
                 caption(text("Returns")),
                 tr(
@@ -166,7 +170,7 @@ public class ApiDocWriter {
         );
     }
 
-    private static String loadTryItResource(ApiNamespaceDoc ns, ApiMethodDoc method) {
+    protected String loadTryItResource(ApiNamespaceDoc ns, ApiMethodDoc method) {
         Map<String, String> variables = new HashMap<>();
 
         Arrays.asList(
@@ -197,7 +201,7 @@ public class ApiDocWriter {
         }
     }
 
-    private static String buildName(ApiNamespaceDoc ns, ApiMethodDoc method, String type) {
+    protected String buildName(ApiNamespaceDoc ns, ApiMethodDoc method, String type) {
         return (type + "." + ns.getName() + "." + method.getName()).replace(".", "_");
     }
 }

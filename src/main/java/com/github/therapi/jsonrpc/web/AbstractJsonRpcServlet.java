@@ -71,7 +71,11 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
         ApiDocProvider provider = new ApiDocProvider();
 
         resp.setContentType("text/html;charset=UTF-8");
-        ApiDocWriter.writeTo(provider.getDocumentation(getMethodRegistry()), resp.getWriter());
+        getApiDocWriter().writeTo(provider.getDocumentation(getMethodRegistry()), resp.getWriter());
+    }
+
+    protected ApiDocWriter getApiDocWriter() {
+        return new ApiDocWriter();
     }
 
     protected void sendModelDoc(HttpServletRequest req, HttpServletResponse resp, String modelClassName) throws IOException, ServletException {
@@ -85,7 +89,11 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
         }
 
         resp.setContentType("text/html;charset=UTF-8");
-        ModelDocWriter.writeTo(modelDoc, resp.getWriter());
+        getModelDocWriter().writeTo(modelDoc, resp.getWriter());
+    }
+
+    protected ModelDocWriter getModelDocWriter() {
+        return new ModelDocWriter();
     }
 
     private void sendJavascriptClient(HttpServletRequest req, HttpServletResponse resp) throws IOException {

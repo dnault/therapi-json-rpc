@@ -67,7 +67,7 @@ public abstract class AbstractSpringJsonRpcController implements ApplicationList
         ApiDocProvider provider = new ApiDocProvider();
 
         resp.setContentType("text/html;charset=UTF-8");
-        ApiDocWriter.writeTo(provider.getDocumentation(handler.getRegistry()), resp.getWriter());
+        getApiDocWriter().writeTo(provider.getDocumentation(handler.getRegistry()), resp.getWriter());
     }
 
     @RequestMapping(path = "/modeldoc/{modelClassName:.+}", method = RequestMethod.GET)
@@ -82,7 +82,7 @@ public abstract class AbstractSpringJsonRpcController implements ApplicationList
         }
 
         resp.setContentType("text/html;charset=UTF-8");
-        ModelDocWriter.writeTo(modelDoc, resp.getWriter());
+        getModelDocWriter().writeTo(modelDoc, resp.getWriter());
     }
 
     /**
@@ -95,6 +95,14 @@ public abstract class AbstractSpringJsonRpcController implements ApplicationList
     }
 
     protected void postProcessRegistry(MethodRegistry registry) {
+    }
+
+    protected ApiDocWriter getApiDocWriter() {
+        return new ApiDocWriter();
+    }
+
+    protected ModelDocWriter getModelDocWriter() {
+        return new ModelDocWriter();
     }
 
     protected void registerRemotableBeans(MethodRegistry registry, ListableBeanFactory beanFactory) {

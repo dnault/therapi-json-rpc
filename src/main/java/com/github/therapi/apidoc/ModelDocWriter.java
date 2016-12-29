@@ -17,7 +17,7 @@ import com.github.therapi.apidoc.qndhtml.Tag;
 
 public class ModelDocWriter {
 
-    public static void writeTo(ApiModelDoc modelDoc, Appendable out) throws IOException {
+    public void writeTo(ApiModelDoc modelDoc, Appendable out) throws IOException {
         html(body(
                 getDescription(modelDoc),
                 getSchema(modelDoc),
@@ -25,14 +25,14 @@ public class ModelDocWriter {
         )).writeTo(out);
     }
 
-    private static Tag getSchema(ApiModelDoc modelDoc) {
+    protected Tag getSchema(ApiModelDoc modelDoc) {
         String schema = modelDoc.getSchemaHtml();
         return schema == null ? null : seq(
                 h2(text("Schema")),
                 pre(preEscapedText(schema)));
     }
 
-    private static Tag getDescription(ApiModelDoc modelDoc) throws IOException {
+    protected Tag getDescription(ApiModelDoc modelDoc) throws IOException {
         String commentHtml = modelDoc.getCommentHtml();
         if (commentHtml == null) {
             return null;
@@ -43,7 +43,7 @@ public class ModelDocWriter {
                 preEscapedText(modelDoc.getCommentHtml()));
     }
 
-    private static Tag getExamples(ApiModelDoc modelDoc) throws IOException {
+    protected Tag getExamples(ApiModelDoc modelDoc) throws IOException {
         List<ApiExampleModelDoc> examples = modelDoc.getExamples();
         if (examples.isEmpty()) {
             return null;
