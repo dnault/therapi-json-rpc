@@ -8,39 +8,49 @@ import static com.github.therapi.apidoc.qndhtml.Tag.pre;
 import static com.github.therapi.apidoc.qndhtml.Tag.preEscapedText;
 import static com.github.therapi.apidoc.qndhtml.Tag.seq;
 import static com.github.therapi.apidoc.qndhtml.Tag.text;
+import static com.github.therapi.apidoc.qndhtml.Tag.transform;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.List;
 
 import com.github.therapi.apidoc.qndhtml.Tag;
-import com.github.therapi.runtimejavadoc.ClassJavadoc;
-import com.github.therapi.runtimejavadoc.CommentFormatter;
-import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
 
 public class ModelDocWriter {
 
-    public static void writeTo(String modelClassName, @Nullable String schema, Appendable out) throws IOException {
+    public static void writeTo(ApiModelDoc modelDoc, Appendable out) throws IOException {
         html(body(
-                getDescription(modelClassName),
-                getSchema(schema)
+                getDescription(modelDoc),
+                getSchema(modelDoc),
+                getExamples(modelDoc)
         )).writeTo(out);
     }
 
-    private static Tag getSchema(String schema) {
+    private static Tag getSchema(ApiModelDoc modelDoc) {
+        String schema = modelDoc.getSchemaHtml();
         return schema == null ? null : seq(
                 h2(text("Schema")),
                 pre(preEscapedText(schema)));
     }
 
-    private static Tag getDescription(String modelClassName) throws IOException {
-        ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(modelClassName).orElse(null);
-
-        if (classDoc == null || classDoc.getComment() == null) {
+    private static Tag getDescription(ApiModelDoc modelDoc) throws IOException {
+        String commentHtml = modelDoc.getCommentHtml();
+        if (commentHtml == null) {
             return null;
         }
 
         return div(
                 h2(text("Description")),
-                preEscapedText(new CommentFormatter().format(classDoc.getComment())));
+                preEscapedText(modelDoc.getCommentHtml()));
+    }
+
+    private static Tag getExamples(ApiModelDoc modelDoc) throws IOException {
+        List<ApiExampleModelDoc> examples = modelDoc.getExamples();
+        if (examples.isEmpty()) {
+            return null;
+        }
+        return div(
+                h2(text("Examples")),
+                transform(examples, example -> pre(
+                        text(example.getExampleJson()))));
     }
 }

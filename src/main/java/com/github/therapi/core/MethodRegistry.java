@@ -2,12 +2,15 @@ package com.github.therapi.core;
 
 import static com.github.therapi.core.internal.JacksonHelper.isLikeNull;
 import static com.google.common.base.Throwables.propagate;
+import static java.lang.reflect.Modifier.isPublic;
+import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Collections.unmodifiableCollection;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,13 +28,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.TokenBuffer;
+import com.github.therapi.core.annotation.ExampleModel;
 import com.github.therapi.core.interceptor.SimpleMethodInvocation;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +49,13 @@ public class MethodRegistry {
     private MethodIntrospector scanner;
     private final ObjectMapper objectMapper;
     private String namespaceSeparator = ".";
+
+    private final ArrayListMultimap<Class, Method> modelClassToExampleFactoryMethods
+            = ArrayListMultimap.create();
+
+    public ImmutableList<Method> getExampleFactoryMethods(Class modelClass) {
+        return ImmutableList.copyOf(modelClassToExampleFactoryMethods.get(modelClass));
+    }
 
     private static class InterceptorRegistration {
         private final Predicate<MethodDefinition> predicate;
@@ -137,12 +150,32 @@ public class MethodRegistry {
     }
 
     public List<String> scan(Object o) {
+        scanForExampleModels(o);
+
         List<String> methodNames = new ArrayList<>();
         for (MethodDefinition methodDef : scanner.findMethods(o)) {
             add(methodDef);
             methodNames.add(getName(methodDef));
         }
         return methodNames;
+    }
+
+    protected void scanForExampleModels(Object o) {
+        List<Class<?>> classesToScan = ClassUtils.getAllInterfaces(o.getClass());
+        classesToScan.add(o.getClass());
+        for (Class<?> scanMe : classesToScan) {
+            for (Method m : scanMe.getMethods()) {
+                ExampleModel exampleModel = m.getAnnotation(ExampleModel.class);
+                if (exampleModel != null) {
+                    if (!isStatic(m.getModifiers()) || !isPublic(m.getModifiers())) {
+                        throw new IllegalArgumentException(
+                                "@ExampleModel annotation may only be applied to public static method, not " + m);
+                    }
+                    Class modelClass = m.getReturnType();
+                    modelClassToExampleFactoryMethods.put(modelClass, m);
+                }
+            }
+        }
     }
 
     private void add(MethodDefinition methodDef) {

@@ -1,7 +1,5 @@
 package com.github.therapi.jsonrpc.web;
 
-import static com.github.therapi.apidoc.JsonSchemaProvider.classNameToHyperlink;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,11 +10,10 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.therapi.apidoc.ApiDocProvider;
 import com.github.therapi.apidoc.ApiDocWriter;
-import com.github.therapi.apidoc.JsonSchemaProvider;
+import com.github.therapi.apidoc.ApiModelDoc;
 import com.github.therapi.apidoc.ModelDocWriter;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.annotation.Remotable;
-import com.github.therapi.core.internal.TypesHelper;
 import com.github.therapi.jsonrpc.DefaultExceptionTranslator;
 import com.google.common.base.Stopwatch;
 import org.slf4j.Logger;
@@ -75,19 +72,17 @@ public abstract class AbstractSpringJsonRpcController implements ApplicationList
 
     @RequestMapping(path = "/modeldoc/{modelClassName:.+}", method = RequestMethod.GET)
     public void sendModelDoc(HttpServletRequest req, HttpServletResponse resp, @PathVariable String modelClassName) throws IOException, ServletException {
-        Class modelClass = TypesHelper.findClass(modelClassName).orElse(null);
+        ApiDocProvider provider = new ApiDocProvider();
+        ApiModelDoc modelDoc = provider.getModelDocumentation(handler.getRegistry(), modelClassName)
+                .orElse(null);
 
-        if (modelClass == null) {
+        if (modelDoc == null) {
             resp.sendError(404, "Model class not found: " + modelClassName);
             return;
         }
 
-        String schema = new JsonSchemaProvider()
-                .getSchemaForHtml(handler.getRegistry().getObjectMapper(), modelClass, classNameToHyperlink())
-                .orElse(null);
-
         resp.setContentType("text/html;charset=UTF-8");
-        ModelDocWriter.writeTo(modelClassName, schema, resp.getWriter());
+        ModelDocWriter.writeTo(modelDoc, resp.getWriter());
     }
 
     /**

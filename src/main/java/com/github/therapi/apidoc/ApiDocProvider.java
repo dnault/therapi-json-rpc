@@ -1,11 +1,15 @@
 package com.github.therapi.apidoc;
 
+import static com.github.therapi.apidoc.JsonSchemaProvider.classNameToHyperlink;
 import static com.github.therapi.core.internal.LangHelper.index;
 import static com.github.therapi.core.internal.TypesHelper.getClassNames;
 import static com.github.therapi.core.internal.TypesHelper.getSimpleName;
+import static com.google.common.base.Throwables.propagate;
 import static com.google.common.html.HtmlEscapers.htmlEscaper;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -13,10 +17,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.MethodDefinition;
+import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.ParameterDefinition;
 import com.github.therapi.core.internal.TypesHelper;
 import com.github.therapi.runtimejavadoc.ClassJavadoc;
@@ -156,5 +161,59 @@ public class ApiDocProvider {
         }
 
         return result;
+    }
+
+    public Optional<ApiModelDoc> getModelDocumentation(MethodRegistry registry, String modelClassName) throws IOException {
+        Class modelClass = TypesHelper.findClass(modelClassName).orElse(null);
+
+        if (modelClass == null) {
+            return Optional.empty();
+        }
+
+        String commentHtml = null;
+        ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(modelClassName).orElse(null);
+        if (classDoc != null && classDoc.getComment() != null) {
+            commentHtml = new CommentFormatter().format(classDoc.getComment());
+        }
+
+        String schemaHtml = new JsonSchemaProvider()
+                .getSchemaForHtml(registry.getObjectMapper(), modelClass, classNameToHyperlink())
+                .orElse(null);
+
+        List<ApiExampleModelDoc> examples = getExamples(registry, modelClass);
+
+        return Optional.of(new ApiModelDoc(modelClass.getSimpleName(), modelClass.getName(),
+                commentHtml, schemaHtml, examples));
+    }
+
+    public List<ApiExampleModelDoc> getExamples(MethodRegistry registry, Class modelClass) {
+        List<ApiExampleModelDoc> results = new ArrayList<>();
+
+        for (Method factoryMethod : registry.getExampleFactoryMethods(modelClass)) {
+            try {
+                Object example = factoryMethod.invoke(null);
+                String commentHtml = null;
+
+//        ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(modelClass).orElse(null);
+//        if (classDoc != null) {
+//            for (MethodJavadoc methodJavadoc : classDoc.getMethods()) {
+//                methodJavadoc.
+//            }
+//        }
+                String exampleJson = registry.getObjectMapper().writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(example);
+
+                results.add(new ApiExampleModelDoc(commentHtml, exampleJson));
+
+            } catch (IllegalAccessException e) {
+                throw propagate(e);
+            } catch (InvocationTargetException e) {
+                throw propagate(e);
+            } catch (JsonProcessingException e) {
+                throw propagate(e);
+            }
+        }
+
+        return results;
     }
 }

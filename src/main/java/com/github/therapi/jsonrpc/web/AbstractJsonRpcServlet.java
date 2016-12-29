@@ -1,6 +1,5 @@
 package com.github.therapi.jsonrpc.web;
 
-import static com.github.therapi.apidoc.JsonSchemaProvider.classNameToHyperlink;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.removeStart;
@@ -16,12 +15,11 @@ import java.util.Set;
 
 import com.github.therapi.apidoc.ApiDocProvider;
 import com.github.therapi.apidoc.ApiDocWriter;
-import com.github.therapi.apidoc.JsonSchemaProvider;
+import com.github.therapi.apidoc.ApiModelDoc;
 import com.github.therapi.apidoc.ModelDocWriter;
 import com.github.therapi.core.MethodDefinition;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.ParameterDefinition;
-import com.github.therapi.core.internal.TypesHelper;
 
 public abstract class AbstractJsonRpcServlet extends HttpServlet {
 
@@ -77,19 +75,17 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
     }
 
     protected void sendModelDoc(HttpServletRequest req, HttpServletResponse resp, String modelClassName) throws IOException, ServletException {
-        Class modelClass = TypesHelper.findClass(modelClassName).orElse(null);
+        ApiDocProvider provider = new ApiDocProvider();
+        ApiModelDoc modelDoc = provider.getModelDocumentation(handler.getRegistry(), modelClassName)
+                .orElse(null);
 
-        if (modelClass == null) {
+        if (modelDoc == null) {
             resp.sendError(404, "Model class not found: " + modelClassName);
             return;
         }
 
-        String schema = new JsonSchemaProvider()
-                .getSchemaForHtml(getMethodRegistry().getObjectMapper(), modelClass, classNameToHyperlink())
-                .orElse(null);
-
         resp.setContentType("text/html;charset=UTF-8");
-        ModelDocWriter.writeTo(modelClassName, schema, resp.getWriter());
+        ModelDocWriter.writeTo(modelDoc, resp.getWriter());
     }
 
     private void sendJavascriptClient(HttpServletRequest req, HttpServletResponse resp) throws IOException {
