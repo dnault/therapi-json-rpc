@@ -1,12 +1,5 @@
 package com.github.therapi.jsonrpc.web;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.therapi.apidoc.ApiDocProvider;
 import com.github.therapi.apidoc.ApiDocWriter;
@@ -15,7 +8,14 @@ import com.github.therapi.apidoc.ModelDocWriter;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.annotation.Remotable;
 import com.github.therapi.jsonrpc.DefaultExceptionTranslator;
+import com.github.therapi.jsonrpc.ExceptionTranslator;
 import com.google.common.base.Stopwatch;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -49,7 +49,7 @@ public abstract class AbstractSpringJsonRpcController implements ApplicationList
         MethodRegistry registry = newMethodRegistry();
         registerRemotableBeans(registry, event.getApplicationContext());
         postProcessRegistry(registry);
-        handler = new JsonRpcServletHandler(registry, new DefaultExceptionTranslator());
+        handler = new JsonRpcServletHandler(registry, newExceptionTranslator());
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -89,6 +89,10 @@ public abstract class AbstractSpringJsonRpcController implements ApplicationList
      * @return the ObjectMapper to use when creating the MethodRegistry managed by this controller.
      */
     protected abstract ObjectMapper getObjectMapper();
+
+    protected ExceptionTranslator newExceptionTranslator() {
+        return new DefaultExceptionTranslator();
+    }
 
     protected MethodRegistry newMethodRegistry() {
         return new MethodRegistry(getObjectMapper());

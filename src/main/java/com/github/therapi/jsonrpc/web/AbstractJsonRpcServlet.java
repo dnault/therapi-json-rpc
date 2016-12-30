@@ -4,6 +4,8 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.removeStart;
 
+import com.github.therapi.jsonrpc.DefaultExceptionTranslator;
+import com.github.therapi.jsonrpc.ExceptionTranslator;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -76,6 +78,10 @@ public abstract class AbstractJsonRpcServlet extends HttpServlet {
 
     protected ApiDocWriter getApiDocWriter() {
         return new ApiDocWriter();
+    }
+
+    protected ExceptionTranslator newExceptionTranslator() {
+        return new DefaultExceptionTranslator();
     }
 
     protected void sendModelDoc(HttpServletRequest req, HttpServletResponse resp, String modelClassName) throws IOException, ServletException {

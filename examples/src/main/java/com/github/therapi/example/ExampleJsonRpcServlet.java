@@ -23,6 +23,6 @@ public class ExampleJsonRpcServlet extends AbstractJsonRpcServlet {
         registry.scan(new CalculatorServiceImpl());
         registry.scan(new DictionaryServiceImpl());
 
-        setHandler(new JsonRpcServletHandler(registry, new DefaultExceptionTranslator()));
+        setHandler(new JsonRpcServletHandler(registry, newExceptionTranslator()));
     }
 }
