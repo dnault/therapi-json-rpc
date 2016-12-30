@@ -239,6 +239,14 @@ public class Tag {
         return new Tag("code", content);
     }
 
+    public static Tag form(Attributes attrs, Tag... content) {
+        return new Tag("form", attrs, content);
+    }
+
+    public static Tag form(Tag... content) {
+        return new Tag("form", content);
+    }
+
     public static Tag input(Attributes attrs, Tag... content) {
         return new Tag("input", attrs, content).noClose();
     }
