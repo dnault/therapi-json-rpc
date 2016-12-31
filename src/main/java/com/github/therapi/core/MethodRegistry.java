@@ -88,8 +88,12 @@ public class MethodRegistry {
     }
 
     public MethodRegistry(ObjectMapper objectMapper) {
+        this(objectMapper, new StandardMethodIntrospector(objectMapper));
+    }
+
+    public MethodRegistry(ObjectMapper objectMapper, MethodIntrospector methodIntrospector) {
         this.objectMapper = requireNonNull(objectMapper);
-        this.scanner = new StandardMethodIntrospector(objectMapper);
+        this.scanner = methodIntrospector;
     }
 
     public ObjectMapper getObjectMapper() {

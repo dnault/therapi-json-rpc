@@ -5,6 +5,7 @@ import static com.github.therapi.jackson.ObjectMappers.newLenientObjectMapper;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static org.junit.Assert.assertFalse;
 
+import com.google.common.collect.ImmutableMap;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -65,7 +66,8 @@ public class JsonSchemaProviderTest {
                 .findAny().get();
 
         List<ParameterDefinition> paramDefs = new StandardParameterIntrospector(objectMapper).findParameters(method, this);
-        MethodDefinition methodDef = new MethodDefinition("test", "exampleMethod", method, this, paramDefs);
+        MethodDefinition methodDef = new MethodDefinition("test", "exampleMethod", method, this, paramDefs,
+            true, true, ImmutableMap.of());
         String result = new JsonSchemaProvider().getSchema(objectMapper, methodDef);
 
         String expected = "{\n" +

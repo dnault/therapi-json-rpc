@@ -5,7 +5,13 @@ import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorS
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.indexOfAny;
 
-import javax.annotation.Nullable;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.therapi.core.MethodDefinition;
+import com.github.therapi.core.MethodRegistry;
+import com.google.common.base.Stopwatch;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -16,12 +22,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.therapi.core.MethodRegistry;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,17 +32,20 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
     protected final MethodRegistry methodRegistry;
     protected final ExecutorService executorService;
     protected final ExceptionTranslator exceptionTranslator;
+    protected final JsonRpcLogger wireLogger;
 
     public JsonRpcDispatcherImpl(MethodRegistry registry, ExceptionTranslator translator) {
-        this(registry, translator, newDirectExecutorService());
+        this(registry, translator, newDirectExecutorService(), new DefaultJsonRpcLogger());
     }
 
     public JsonRpcDispatcherImpl(MethodRegistry registry,
                                  ExceptionTranslator translator,
-                                 ExecutorService executorService) {
+                                 ExecutorService executorService,
+                                 JsonRpcLogger jsonRpcLogger) {
         this.methodRegistry = requireNonNull(registry);
         this.executorService = requireNonNull(executorService);
         this.exceptionTranslator = requireNonNull(translator);
+        this.wireLogger = requireNonNull(jsonRpcLogger);
     }
 
     protected ObjectMapper getObjectMapper() {
@@ -226,20 +230,31 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
     }
 
     protected ObjectNode invokeSolo(Request validRequest) {
+        final Stopwatch timer = Stopwatch.createStarted();
+        final String methodName = validRequest.getMethodName();
+        final JsonNode arguments = validRequest.getParams();
+        final MethodDefinition methodDef = methodRegistry.getMethod(methodName).orElse(null);
+
         try {
-            JsonNode result = methodRegistry.invoke(validRequest.getMethodName(), validRequest.getParams());
+            wireLogger.logRequest(methodDef, methodName, arguments);
+
+            JsonNode result = methodRegistry.invoke(methodName, arguments);
 
             Map<String, Object> resultMap = new LinkedHashMap<>();
             resultMap.put("jsonrpc", "2.0");
             resultMap.put("id", validRequest.getId());
             resultMap.put("result", result);
 
-            return getObjectMapper().convertValue(resultMap, ObjectNode.class);
+            ObjectNode response = getObjectMapper().convertValue(resultMap, ObjectNode.class);
+            wireLogger.logSuccessResponse(methodDef, methodName, arguments, response, timer);
+            return response;
         } catch (Throwable t) {
             log.warn("exception raised during json-rpc invocation", t);
 
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
-            return buildErrorResponse(jsonRpcError, validRequest.id);
+            ObjectNode response = buildErrorResponse(jsonRpcError, validRequest.id);
+            wireLogger.logErrorResponse(methodDef, methodName, arguments, response, timer);
+            return response;
         }
     }
 

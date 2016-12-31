@@ -3,6 +3,8 @@ package com.github.therapi.core;
 import static com.google.common.base.Strings.emptyToNull;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
+import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -19,14 +21,23 @@ public class MethodDefinition {
     private final ImmutableList<ParameterDefinition> params;
     private final Optional<String> namespace;
     private final TypeReference returnTypeRef;
+    private final boolean requestLoggable;
+    private final boolean responseLoggable;
+    private final ImmutableMap<String, Object> customAttributes;
 
-    public MethodDefinition(@Nullable String namespace, @Nullable String shortName, Method method, Object owner, List<ParameterDefinition> params) {
+    public MethodDefinition(@Nullable String namespace, @Nullable String shortName, Method method, Object owner,
+            List<ParameterDefinition> params,
+            boolean requestLoggable, boolean responseLoggable,
+            Map<String, Object> customAttributes) {
         this.method = method;
         this.owner = owner;
         this.params = ImmutableList.copyOf(params);
         this.namespace = Optional.ofNullable(emptyToNull(namespace));
         this.shortName = defaultIfNull(shortName, method.getName());
-        returnTypeRef = JacksonHelper.getReturnTypeReference(method, owner.getClass());
+        this.requestLoggable = requestLoggable;
+        this.responseLoggable = responseLoggable;
+        this.returnTypeRef = JacksonHelper.getReturnTypeReference(method, owner.getClass());
+        this.customAttributes = ImmutableMap.copyOf(customAttributes);
     }
 
     public String getUnqualifiedName() {
@@ -55,5 +66,17 @@ public class MethodDefinition {
 
     public Optional<String> getNamespace() {
         return namespace;
+    }
+
+    public boolean isRequestLoggable() {
+        return requestLoggable;
+    }
+
+    public boolean isResponseLoggable() {
+        return responseLoggable;
+    }
+
+    public ImmutableMap<String, Object> getCustomAttributes() {
+        return customAttributes;
     }
 }

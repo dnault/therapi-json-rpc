@@ -4,6 +4,8 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 
+import com.github.therapi.jsonrpc.DefaultJsonRpcLogger;
+import com.github.therapi.jsonrpc.JsonRpcLogger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -30,7 +32,7 @@ public class JsonRpcServletHandler {
      */
     public JsonRpcServletHandler(MethodRegistry registry,
                                  ExceptionTranslator translator) {
-        this(registry, translator, MoreExecutors.newDirectExecutorService());
+        this(registry, translator, MoreExecutors.newDirectExecutorService(), new DefaultJsonRpcLogger());
     }
 
     /**
@@ -40,9 +42,10 @@ public class JsonRpcServletHandler {
      */
     public JsonRpcServletHandler(MethodRegistry registry,
                                  ExceptionTranslator translator,
-                                 ExecutorService executorService) {
+                                 ExecutorService executorService,
+                                 JsonRpcLogger jsonRpcLogger) {
         this(registry,
-                new JsonRpcDispatcherImpl(registry, translator, executorService),
+                new JsonRpcDispatcherImpl(registry, translator, executorService, jsonRpcLogger),
                 registry.getObjectMapper().writerWithDefaultPrettyPrinter());
     }
 
