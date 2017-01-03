@@ -121,6 +121,7 @@ public class JsonSchemaProvider {
         SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
         objectMapper.acceptJsonFormatVisitor(objectMapper.constructType(paramDef.getType().getType()), visitor);
         JsonSchema jsonSchema = visitor.finalSchema();
+        jsonSchema.setRequired(!paramDef.getDefaultValueSupplier().isPresent());
         return objectMapper.convertValue(jsonSchema, JsonNode.class);
     }
 }
