@@ -38,9 +38,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.regex.Matcher.quoteReplacement;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript;
 
-import com.github.therapi.apidoc.qndhtml.Tag;
-import com.github.therapi.core.internal.LangHelper;
-import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -49,6 +46,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import com.github.therapi.apidoc.qndhtml.Tag;
+import com.github.therapi.core.internal.LangHelper;
+import com.google.common.io.CharStreams;
 
 public class ApiDocWriter {
     private static final String RESOURCE_PREFIX = "../therapi/";
@@ -116,25 +117,25 @@ public class ApiDocWriter {
 
     protected Tag apiDocContent(List<ApiNamespaceDoc> apiNamespaces) {
         return div(id("content"),
-            apiDocContentHeader(),
-            transform(apiNamespaces, ns -> div(
-                a(name(ns.getName())),
-                transform(ns.getMethods(), method -> methodDocContent(ns, method)))),
-            apiDocContentFooter());
+                apiDocContentHeader(),
+                transform(apiNamespaces, ns -> div(
+                        a(name(ns.getName())),
+                        transform(ns.getMethods(), method -> methodDocContent(ns, method)))),
+                apiDocContentFooter());
     }
 
 
-  protected Tag apiDocContentHeader() {
-    return seq(
-        text("Auth Token: "),
-        input(id("authToken").attr("size", "64")),
-        br()
-    );
-  }
+    protected Tag apiDocContentHeader() {
+        return seq(
+                text("Auth Token: "),
+                input(id("authToken").attr("size", "64")),
+                br()
+        );
+    }
 
-  protected Tag apiDocContentFooter() {
-    return null;
-  }
+    protected Tag apiDocContentFooter() {
+        return null;
+    }
 
     protected Tag methodDocContent(ApiNamespaceDoc ns, ApiMethodDoc method) {
         final String qualifiedMethodName = ns.getName() + "." + method.getName();
@@ -196,7 +197,7 @@ public class ApiDocWriter {
     }
 
     protected String getAuthHeaderName() {
-      return "X-Auth-Token";
+        return "X-Auth-Token";
     }
 
     protected String loadTryItResource(ApiNamespaceDoc ns, ApiMethodDoc method) {

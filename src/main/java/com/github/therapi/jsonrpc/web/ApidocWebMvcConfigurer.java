@@ -13,9 +13,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  * To activate, add a bean of this class to your application context.
  */
 public class ApidocWebMvcConfigurer extends WebMvcConfigurerAdapter {
-  @Override
-  public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    registry.addResourceHandler("/therapi/**")
-        .addResourceLocations("classpath:/META-INF/resources/therapi/");
-  }
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/therapi/**")
+                .addResourceLocations("classpath:/META-INF/resources/therapi/");
+    }
 }

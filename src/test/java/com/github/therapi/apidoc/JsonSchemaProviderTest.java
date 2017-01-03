@@ -5,7 +5,6 @@ import static com.github.therapi.jackson.ObjectMappers.newLenientObjectMapper;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static org.junit.Assert.assertFalse;
 
-import com.google.common.collect.ImmutableMap;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.therapi.core.MethodDefinition;
 import com.github.therapi.core.ParameterDefinition;
 import com.github.therapi.core.StandardParameterIntrospector;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.junit.Test;
 
@@ -67,7 +67,7 @@ public class JsonSchemaProviderTest {
 
         List<ParameterDefinition> paramDefs = new StandardParameterIntrospector(objectMapper).findParameters(method, this);
         MethodDefinition methodDef = new MethodDefinition("test", "exampleMethod", method, this, paramDefs,
-            true, true, ImmutableMap.of());
+                true, true, ImmutableMap.of());
         String result = new JsonSchemaProvider().getSchema(objectMapper, methodDef);
 
         String expected = "{\n" +
@@ -75,51 +75,65 @@ public class JsonSchemaProviderTest {
                 "  \"id\" : \"urn:jsonschema:com:github:therapi:method:test.exampleMethod\",\n" +
                 "  \"properties\" : {\n" +
                 "    \"string\" : {\n" +
+                "      \"required\" : true,\n" +
                 "      \"type\" : \"string\"\n" +
                 "    },\n" +
                 "    \"primitiveBoolean\" : {\n" +
+                "      \"required\" : true,\n" +
                 "      \"type\" : \"boolean\"\n" +
                 "    },\n" +
                 "    \"boxedBoolean\" : {\n" +
+                "      \"required\" : true,\n" +
                 "      \"type\" : \"boolean\"\n" +
                 "    },\n" +
                 "    \"primitiveInt\" : {\n" +
+                "      \"required\" : true,\n" +
                 "      \"type\" : \"integer\"\n" +
                 "    },\n" +
                 "    \"boxedInt\" : {\n" +
+                "      \"required\" : true,\n" +
                 "      \"type\" : \"integer\"\n" +
                 "    },\n" +
                 "    \"primitiveLong\" : {\n" +
+                "      \"required\" : true,\n" +
                 "      \"type\" : \"integer\"\n" +
                 "    },\n" +
                 "    \"boxedLong\" : {\n" +
+                "      \"required\" : true,\n" +
                 "      \"type\" : \"integer\"\n" +
                 "    },\n" +
                 "    \"primitiveFloat\" : {\n" +
+                "      \"required\" : true,\n" +
                 "      \"type\" : \"number\"\n" +
                 "    },\n" +
                 "    \"boxedFloat\" : {\n" +
+                "      \"required\" : true,\n" +
                 "      \"type\" : \"number\"\n" +
                 "    },\n" +
                 "    \"primitiveDouble\" : {\n" +
+                "      \"required\" : true,\n" +
                 "      \"type\" : \"number\"\n" +
                 "    },\n" +
                 "    \"boxedDouble\" : {\n" +
+                "      \"required\" : true,\n" +
                 "      \"type\" : \"number\"\n" +
                 "    },\n" +
                 "    \"stringArray\" : {\n" +
+                "      \"required\" : true,\n" +
                 "      \"type\" : \"array\",\n" +
                 "      \"items\" : {\n" +
                 "        \"type\" : \"string\"\n" +
                 "      }\n" +
                 "    },\n" +
                 "    \"stringList\" : {\n" +
+                "      \"required\" : true,\n" +
                 "      \"type\" : \"array\",\n" +
                 "      \"items\" : {\n" +
                 "        \"type\" : \"string\"\n" +
                 "      }\n" +
                 "    },\n" +
                 "    \"zoo\" : {\n" +
+                "      \"required\" : true,\n" +
                 "      \"type\" : \"object\",\n" +
                 "      \"id\" : \"urn:jsonschema:com:github:therapi:apidoc:JsonSchemaProviderTest:Zoo\",\n" +
                 "      \"properties\" : {\n" +

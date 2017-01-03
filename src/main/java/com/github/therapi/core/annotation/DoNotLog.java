@@ -11,22 +11,22 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface DoNotLog {
-  Scope value() default Scope.BOTH;
+    Scope value() default Scope.BOTH;
 
-  enum Scope {
-    /**
-     * Indicates the request should not be logged, but it's okay to log the response.
-     */
-    REQUEST,
+    enum Scope {
+        /**
+         * Indicates the request should not be logged, but it's okay to log the response.
+         */
+        REQUEST,
 
-    /**
-     * Indicates the response should not be logged, but it's okay to log the request.
-     */
-    RESPONSE,
+        /**
+         * Indicates the response should not be logged, but it's okay to log the request.
+         */
+        RESPONSE,
 
-    /**
-     * Indicates neither the request nor the response should be logged.
-     */
-    BOTH
-  }
+        /**
+         * Indicates neither the request nor the response should be logged.
+         */
+        BOTH
+    }
 }
