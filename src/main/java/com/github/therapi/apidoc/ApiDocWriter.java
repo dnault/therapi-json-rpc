@@ -84,8 +84,8 @@ public class ApiDocWriter {
                 scriptLink("https://code.jquery.com/jquery-1.11.3.min.js"),
                 scriptLink(getResourcePrefix() + "cssmenu/script.js"),
 
-                styleSheetLink(getResourcePrefix() + "json-forms/css/brutusin-json-forms.min.css"),
-                scriptLink(getResourcePrefix() + "json-forms/js/brutusin-json-forms.js"),
+                styleSheetLink(getResourcePrefix() + "json-forms/1.5.3/css/brutusin-json-forms.min.css"),
+                scriptLink(getResourcePrefix() + "json-forms/1.5.3/js/brutusin-json-forms.js"),
 
                 styleSheetLink(getResourcePrefix() + "highlight/styles/github-gist.css"),
                 scriptLink(getResourcePrefix() + "highlight/highlight.pack.js"),

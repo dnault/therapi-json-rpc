@@ -2,7 +2,7 @@
 [![bower version](https://img.shields.io/bower/v/json-forms.svg?style=flat-square)](#bower)
 [![Build Status](https://api.travis-ci.org/brutusin/json-forms.svg?branch=master)](https://travis-ci.org/brutusin/json-forms)
 
-`org.brutusin:json-forms` is a javascript library that generates HTML forms from JSON Schemas.
+`org.brutusin:json-forms` is a javascript library that generates HTML forms from [JSON Schemas](http://json-schema.org).
 
 `Documentation in progress` 
 
@@ -14,10 +14,8 @@
   - [Demo](#demo)
   - [Dynamic schemas](#dynamic-schemas)
   - [API](#api)
-  - [Extensions](#extensions)
   - [TODO](#todo)
   - [CDN](#cdn)
-  - [See also](#see-also)
   - [Support, bugs and requests](#support-bugs-and-requests)
   - [Authors](#authors)
   - [License](#license)
@@ -39,12 +37,13 @@ Optionally, include the bootstrap extension (requires bootstrap):
 ```html
 <script src="dist/js/brutusin-json-forms-bootstrap.min.js"></script>
 ```
-Create the javascript `BrutusinForms` instance, being `schema` a javascript `object` representing the schema structure:
+Create the javascript `BrutusinForms` instance, `schema` being a javascript `object` representing the schema structure:
 ```javascript
+var schema = new Object({"type": "boolean"})
 var BrutusinForms = brutusin["json-forms"];
 var bf = BrutusinForms.create(schema);
 ```
-And finally, render the form inside a container, with optional JSON initial `data` preloaded:
+And finally render the form inside a container with optional preloaded JSON initial data, `data`:
 ```javascript
 var container = document.getElementById('container');
 bf.render(container, data);
@@ -85,17 +84,12 @@ Member|Description
 `bf.getData()`| Returns the javascript object with the data entered by the user
 `bf.schemaResolver(schemaIdArray, data)`| Schema resolver for [dynamic schemas](#dynamic-schemas)
 
-## Extensions
-
-
-##See also
-
 ##CDN
 
 http://www.jsdelivr.com/projects/brutusin.json-forms
 
 ## Support bugs and requests
-https://github.com/brutusin/json/issues
+https://github.com/brutusin/json-forms/issues
 
 ## Authors
 

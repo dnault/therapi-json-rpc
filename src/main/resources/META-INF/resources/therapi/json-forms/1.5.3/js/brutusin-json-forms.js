@@ -157,7 +157,7 @@ if (typeof brutusin === "undefined") {
 
         renderers["string"] = function (container, id, parentObject, propertyProvider, value) {
             /// TODO change the handler for when there is a 'media'
-            /// specifier so it becomes a file element.
+            /// specifier so it becomes a file element. 
             var schemaId = getSchemaId(id);
             var s = getSchema(schemaId);
             var input;
@@ -211,7 +211,12 @@ if (typeof brutusin === "undefined") {
                         value = null;
                     }
                 } else if (s.format === "date-time") {
-                    input.type = "datetime-local";
+                    try {
+                        input.type = "datetime-local";
+                    } catch (err) {
+                        // #46, problem in IE11. TODO polyfill?
+                        input.type = "text";
+                    }
                 } else if (s.format === "email") {
                     input.type = "email";
                 } else if (s.format === "text") {
@@ -301,7 +306,7 @@ if (typeof brutusin === "undefined") {
 //        if (s.required) {
 //            input.required = true;
 //        }
-//
+//       
 //        if (s.minimum) {
 //            input.min = s.minimum;
 //        }
@@ -548,11 +553,13 @@ if (typeof brutusin === "undefined") {
                     var td1 = document.createElement("td");
                     td1.className = "prop-name";
                     var propId = id + "." + prop;
+                    var propSchema = getSchema(getSchemaId(propId));
                     var td2 = document.createElement("td");
                     td2.className = "prop-value";
-                    appendChild(tbody, tr, s);
-                    appendChild(tr, td1, s);
-                    appendChild(tr, td2, s);
+
+                    appendChild(tbody, tr, propSchema);
+                    appendChild(tr, td1, propSchema);
+                    appendChild(tr, td2, propSchema);
                     var pp = createStaticPropertyProvider(prop);
                     var propInitialValue = null;
                     if (value) {
@@ -800,30 +807,36 @@ if (typeof brutusin === "undefined") {
         };
 
         obj.getData = function () {
-            function removeEmptiesAndNulls(object) {
+            function removeEmptiesAndNulls(object, schema) {
                 if (object instanceof Array) {
                     if (object.length === 0) {
                         return null;
                     }
                     var clone = new Array();
                     for (var i = 0; i < object.length; i++) {
-                        clone[i] = removeEmptiesAndNulls(object[i]);
+                        clone[i] = removeEmptiesAndNulls(object[i], schema.items);
                     }
                     return clone;
                 } else if (object === "") {
                     return null;
                 } else if (object instanceof Object) {
                     var clone = new Object();
+                    var nonEmpty = false;
                     for (var prop in object) {
                         if (prop.startsWith("$") && prop.endsWith("$")) {
                             continue;
                         }
-                        var value = removeEmptiesAndNulls(object[prop]);
+                        var value = removeEmptiesAndNulls(object[prop], schema.properties[prop]);
                         if (value !== null) {
                             clone[prop] = value;
+                            nonEmpty = true;
                         }
                     }
-                    return clone;
+                    if (nonEmpty || schema.required) {
+                        return clone;
+                    } else {
+                        return null;
+                    }
                 } else {
                     return object;
                 }
@@ -831,8 +844,7 @@ if (typeof brutusin === "undefined") {
             if (!container) {
                 return null;
             } else {
-                return removeEmptiesAndNulls(data);
-                ;
+                return removeEmptiesAndNulls(data, schema);
             }
         };
 
@@ -890,6 +902,7 @@ if (typeof brutusin === "undefined") {
             }
             return pseudoSchema;
         }
+
         function getDefinition(path) {
             var parts = path.split('/');
             var def = root;
@@ -904,6 +917,7 @@ if (typeof brutusin === "undefined") {
 
         function populateSchemaMap(name, schema) {
             var pseudoSchema = createPseudoSchema(schema);
+            pseudoSchema["$id"] = name;
             schemaMap[name] = pseudoSchema;
 
             if (schema.hasOwnProperty("oneOf")) {
@@ -965,10 +979,10 @@ if (typeof brutusin === "undefined") {
                 for (var i = 0; i < schema.dependsOn.length; i++) {
                     if (!schema.dependsOn[i]) {
                         arr[i] = "$";
-                        // Relative cases
+                        // Relative cases 
                     } else if (schema.dependsOn[i].startsWith("$")) {
                         arr[i] = schema.dependsOn[i];
-                        // Relative cases
+                        // Relative cases 
                     } else if (name.endsWith("]")) {
                         arr[i] = name + "." + schema.dependsOn[i];
                     } else {
