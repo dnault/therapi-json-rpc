@@ -2,6 +2,7 @@ package com.github.therapi.core;
 
 import static com.github.therapi.core.internal.JacksonHelper.getTypeReference;
 
+import java.lang.annotation.Annotation;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -27,16 +28,18 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
         List<ParameterDefinition> params = new ArrayList<>();
         for (Parameter p : method.getParameters()) {
             TypeReference typeReference = getTypeReference(p, owner.getClass());
-            params.add(new ParameterDefinition(getName(p), isNullable(p, method), getDefaultValueSupplier(p, typeReference), typeReference));
+            boolean nullable = isNullable(p, method);
+            Supplier<?> defaultValueSupplier = getDefaultValueSupplier(p, typeReference, nullable);
+            params.add(new ParameterDefinition(getName(p), nullable, defaultValueSupplier, typeReference));
         }
         return params;
     }
 
     @Nullable
-    protected Supplier<?> getDefaultValueSupplier(Parameter p, TypeReference typeReference) {
+    protected Supplier<?> getDefaultValueSupplier(Parameter p, TypeReference typeReference, boolean nullable) {
         Default defaultAnnotation = p.getAnnotation(Default.class);
         if (defaultAnnotation == null) {
-            return null;
+            return nullable ? () -> null : null;
         }
 
         if (Default.NULL.equals(defaultAnnotation.value())) {
@@ -78,7 +81,7 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
     }
 
     protected boolean isNullable(Parameter p, Method method) {
-        if (p.getAnnotation(Nullable.class) != null) {
+        if (hasNullableAnnotation(p)) {
             if (p.getType().isPrimitive()) {
                 throw new InvalidAnnotationException("Annotation " + Nullable.class.getName()
                         + " may not be applied to primitive " + p.getType()
@@ -90,5 +93,14 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
 
         Default defaultAnnontation = p.getAnnotation(Default.class);
         return defaultAnnontation != null && Default.NULL.equals(defaultAnnontation.value());
+    }
+
+    private boolean hasNullableAnnotation(Parameter p) {
+        for (Annotation a : p.getAnnotations()) {
+            if (a.annotationType().getSimpleName().equals("Nullable")) {
+                return true;
+            }
+        }
+        return false;
     }
 }
