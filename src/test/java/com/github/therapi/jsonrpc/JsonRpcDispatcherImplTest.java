@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.annotation.Remotable;
 import net.javacrumbs.jsonunit.JsonAssert;
@@ -16,14 +17,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class JsonRpcDispatcherImplTest {
-    private JsonRpcDispatcherImpl dispatcher;
+    private JsonRpcDispatcher dispatcher;
+    private final ObjectMapper mapper = newLenientObjectMapper();
 
     @Before
     public void setup() {
-        MethodRegistry registry = new MethodRegistry(newLenientObjectMapper());
+        MethodRegistry registry = new MethodRegistry(mapper);
         registry.scan(new ExampleServiceImpl());
-        dispatcher = new JsonRpcDispatcherImpl(registry,
-                new DefaultExceptionTranslator().excludeDetails());
+        dispatcher = new JsonRpcDispatcherBuilder(registry)
+                .exceptionTranslator(new DefaultExceptionTranslator().excludeDetails())
+                .build();
     }
 
     @Remotable("")
@@ -181,8 +184,9 @@ public class JsonRpcDispatcherImplTest {
     }
 
     private void assertJsonEquals(String expected, String actual) throws IOException {
-        JsonNode expectedNode = dispatcher.getObjectMapper().readTree(expected);
-        JsonNode actualNode = dispatcher.getObjectMapper().readTree(actual);
+        ObjectMapper mapper = dispatcher.getMethodRegistry().getObjectMapper();
+        JsonNode expectedNode = mapper.readTree(expected);
+        JsonNode actualNode = mapper.readTree(actual);
         JsonAssert.assertJsonEquals(expectedNode, actualNode);
     }
 }

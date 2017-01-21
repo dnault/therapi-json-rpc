@@ -1,71 +1,52 @@
 package com.github.therapi.jsonrpc.web;
 
-import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.therapi.core.MethodRegistry;
+import com.github.therapi.jsonrpc.JsonRpcDispatcher;
 
-import com.github.therapi.jsonrpc.DefaultJsonRpcLogger;
-import com.github.therapi.jsonrpc.JsonRpcLogger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.github.therapi.core.MethodRegistry;
-import com.github.therapi.jsonrpc.ExceptionTranslator;
-import com.github.therapi.jsonrpc.JsonRpcDispatcher;
-import com.github.therapi.jsonrpc.JsonRpcDispatcherImpl;
-import com.google.common.util.concurrent.MoreExecutors;
+import static com.github.therapi.jsonrpc.web.JsonRpcServletHandler.ResponseFormat.COMPACT;
+import static com.github.therapi.jsonrpc.web.JsonRpcServletHandler.ResponseFormat.PRETTY;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
 
+/**
+ * A servlet or Spring Controller may delegate to this handler to support JSON-RPC via servlet request/response.
+ */
 public class JsonRpcServletHandler {
-    private final MethodRegistry registry;
     private final JsonRpcDispatcher dispatcher;
-    private final ObjectWriter objectWriter;
+    private final ObjectWriter compactWriter;
+    private final ObjectWriter prettyPrintWriter;
+    private final ResponseFormat defaultResponseFormat;
 
-    /**
-     * Constructs a handler that executes batched requests serially
-     * in the same thread that invokes the handler.
-     */
-    public JsonRpcServletHandler(MethodRegistry registry,
-                                 ExceptionTranslator translator) {
-        this(registry, translator, MoreExecutors.newDirectExecutorService(), new DefaultJsonRpcLogger());
+    public enum ResponseFormat {
+        COMPACT, PRETTY
     }
 
-    /**
-     * Constructs a handler that executes batched requests using the given executor service.
-     *
-     * @param registry the methods to expose
-     */
-    public JsonRpcServletHandler(MethodRegistry registry,
-                                 ExceptionTranslator translator,
-                                 ExecutorService executorService,
-                                 JsonRpcLogger jsonRpcLogger) {
-        this(registry,
-                new JsonRpcDispatcherImpl(registry, translator, executorService, jsonRpcLogger),
-                registry.getObjectMapper().writerWithDefaultPrettyPrinter());
-    }
-
-    /**
-     * Constructs a handler that executes requests using the given customizable components.
-     */
-    public JsonRpcServletHandler(MethodRegistry registry,
-                                 JsonRpcDispatcher dispatcher,
-                                 ObjectWriter objectWriter) {
-        this.registry = requireNonNull(registry);
+    public JsonRpcServletHandler(JsonRpcDispatcher dispatcher, ResponseFormat defaultResponseFormat) {
         this.dispatcher = requireNonNull(dispatcher);
-        this.objectWriter = requireNonNull(objectWriter);
+        this.defaultResponseFormat = requireNonNull(defaultResponseFormat);
+
+        ObjectMapper mapper = dispatcher.getMethodRegistry().getObjectMapper();
+        this.compactWriter = mapper.writer().without(SerializationFeature.INDENT_OUTPUT);
+        this.prettyPrintWriter = mapper.writerWithDefaultPrettyPrinter();
     }
 
     public MethodRegistry getRegistry() {
-        return registry;
+        return dispatcher.getMethodRegistry();
     }
 
     public void handlePost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        sendResponse(resp, dispatcher.invoke(req.getInputStream()));
+        sendResponse(req, resp, dispatcher.invoke(req.getInputStream()));
     }
 
     public void handleGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -76,14 +57,24 @@ public class JsonRpcServletHandler {
             return;
         }
 
-        sendResponse(resp, dispatcher.invoke(jsonRequest));
+        sendResponse(req, resp, dispatcher.invoke(jsonRequest));
     }
 
-    protected void sendResponse(HttpServletResponse resp, Optional<JsonNode> response) throws IOException {
+    protected void sendResponse(HttpServletRequest req, HttpServletResponse resp, Optional<JsonNode> response) throws IOException {
         if (response.isPresent()) {
             setResponseHeaders(resp);
-            objectWriter.writeValue(resp.getOutputStream(), response.get());
+            ObjectWriter responseWriter = getResponseFormat(req).orElse(defaultResponseFormat) == COMPACT
+                    ? compactWriter : prettyPrintWriter;
+
+            responseWriter.writeValue(resp.getOutputStream(), response.get());
         }
+    }
+
+    protected Optional<ResponseFormat> getResponseFormat(HttpServletRequest request) {
+        String prettyPrintHeader = request.getHeader("X-Pretty-Print");
+        return prettyPrintHeader == null
+                ? Optional.empty()
+                : Optional.of(prettyPrintHeader.equals("false") ? COMPACT : PRETTY);
     }
 
     protected void setResponseHeaders(HttpServletResponse resp) {

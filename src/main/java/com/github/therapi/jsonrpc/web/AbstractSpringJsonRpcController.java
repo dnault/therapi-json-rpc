@@ -7,15 +7,9 @@ import com.github.therapi.apidoc.ApiModelDoc;
 import com.github.therapi.apidoc.ModelDocWriter;
 import com.github.therapi.core.MethodRegistry;
 import com.github.therapi.core.annotation.Remotable;
-import com.github.therapi.jsonrpc.DefaultExceptionTranslator;
-import com.github.therapi.jsonrpc.ExceptionTranslator;
+import com.github.therapi.jsonrpc.JsonRpcDispatcher;
+import com.github.therapi.jsonrpc.web.JsonRpcServletHandler.ResponseFormat;
 import com.google.common.base.Stopwatch;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -24,6 +18,13 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Base class for a Spring controller that acts as a JSON-RPC 2.0 endpoint and
@@ -49,7 +50,15 @@ public abstract class AbstractSpringJsonRpcController implements ApplicationList
         MethodRegistry registry = newMethodRegistry();
         registerRemotableBeans(registry, event.getApplicationContext());
         postProcessRegistry(registry);
-        handler = new JsonRpcServletHandler(registry, newExceptionTranslator());
+        handler = new JsonRpcServletHandler(newJsonRpcDispatcher(registry), getDefaultResponseFormat());
+    }
+
+    protected ResponseFormat getDefaultResponseFormat() {
+        return ResponseFormat.PRETTY;
+    }
+
+    protected JsonRpcDispatcher newJsonRpcDispatcher(MethodRegistry registry) {
+        return JsonRpcDispatcher.builder(registry).build();
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -89,10 +98,6 @@ public abstract class AbstractSpringJsonRpcController implements ApplicationList
      * @return the ObjectMapper to use when creating the MethodRegistry managed by this controller.
      */
     protected abstract ObjectMapper getObjectMapper();
-
-    protected ExceptionTranslator newExceptionTranslator() {
-        return new DefaultExceptionTranslator();
-    }
 
     protected MethodRegistry newMethodRegistry() {
         return new MethodRegistry(getObjectMapper());

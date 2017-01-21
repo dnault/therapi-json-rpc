@@ -13,16 +13,22 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import static com.github.therapi.core.internal.JacksonHelper.isLikeNull;
-import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorService;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.indexOfAny;
 
+/**
+ * Implements the guts of JSON-RPC.
+ */
 public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
     private static final Logger log = LoggerFactory.getLogger(JsonRpcDispatcherImpl.class);
 
@@ -31,14 +37,10 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
     protected final ExceptionTranslator exceptionTranslator;
     protected final JsonRpcLogger jsonRpcLogger;
 
-    public JsonRpcDispatcherImpl(MethodRegistry registry, ExceptionTranslator translator) {
-        this(registry, translator, newDirectExecutorService(), new DefaultJsonRpcLogger());
-    }
-
-    public JsonRpcDispatcherImpl(MethodRegistry registry,
-                                 ExceptionTranslator translator,
-                                 ExecutorService executorService,
-                                 JsonRpcLogger jsonRpcLogger) {
+    JsonRpcDispatcherImpl(MethodRegistry registry,
+                          ExceptionTranslator translator,
+                          ExecutorService executorService,
+                          JsonRpcLogger jsonRpcLogger) {
         this.methodRegistry = requireNonNull(registry);
         this.executorService = requireNonNull(executorService);
         this.exceptionTranslator = requireNonNull(translator);
@@ -120,6 +122,11 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
             return Optional.of(buildErrorResponse(jsonRpcError, null));
         }
+    }
+
+    @Override
+    public MethodRegistry getMethodRegistry() {
+        return methodRegistry;
     }
 
     /**
@@ -256,6 +263,17 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
         }
     }
 
+    protected ObjectNode invokeSolo(JsonNode soloRequest) {
+        try {
+            return invokeSolo(validateSoloRequest(soloRequest));
+        } catch (Throwable t) {
+            jsonRpcLogger.logException(t);
+
+            JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
+            return buildErrorResponse(jsonRpcError, soloRequest.get("id"));
+        }
+    }
+
     private static JsonRpcLogger.RequestInfo newRequestInfo(String methodName,
                                                             @Nullable MethodDefinition methodDef,
                                                             JsonNode arguments) {
@@ -289,17 +307,6 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
                 return timer;
             }
         };
-    }
-
-    protected ObjectNode invokeSolo(JsonNode soloRequest) {
-        try {
-            return invokeSolo(validateSoloRequest(soloRequest));
-        } catch (Throwable t) {
-            jsonRpcLogger.logException(t);
-
-            JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
-            return buildErrorResponse(jsonRpcError, soloRequest.get("id"));
-        }
     }
 
     protected boolean isValidId(@Nullable JsonNode id) {
