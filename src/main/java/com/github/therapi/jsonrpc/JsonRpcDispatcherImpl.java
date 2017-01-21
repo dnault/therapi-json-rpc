@@ -1,10 +1,5 @@
 package com.github.therapi.jsonrpc;
 
-import static com.github.therapi.core.internal.JacksonHelper.isLikeNull;
-import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorService;
-import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.indexOfAny;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -12,19 +7,21 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.therapi.core.MethodDefinition;
 import com.github.therapi.core.MethodRegistry;
 import com.google.common.base.Stopwatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import javax.annotation.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.github.therapi.core.internal.JacksonHelper.isLikeNull;
+import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorService;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.indexOfAny;
 
 public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
     private static final Logger log = LoggerFactory.getLogger(JsonRpcDispatcherImpl.class);
@@ -32,7 +29,7 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
     protected final MethodRegistry methodRegistry;
     protected final ExecutorService executorService;
     protected final ExceptionTranslator exceptionTranslator;
-    protected final JsonRpcLogger wireLogger;
+    protected final JsonRpcLogger jsonRpcLogger;
 
     public JsonRpcDispatcherImpl(MethodRegistry registry, ExceptionTranslator translator) {
         this(registry, translator, newDirectExecutorService(), new DefaultJsonRpcLogger());
@@ -45,7 +42,7 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
         this.methodRegistry = requireNonNull(registry);
         this.executorService = requireNonNull(executorService);
         this.exceptionTranslator = requireNonNull(translator);
-        this.wireLogger = requireNonNull(jsonRpcLogger);
+        this.jsonRpcLogger = requireNonNull(jsonRpcLogger);
     }
 
     protected ObjectMapper getObjectMapper() {
@@ -79,7 +76,7 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
             return invoke(requestNode);
 
         } catch (Throwable t) {
-            log.warn("exception raised during json-rpc invocation", t);
+            jsonRpcLogger.logException(t);
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
             return Optional.of(buildErrorResponse(jsonRpcError, null));
         }
@@ -103,7 +100,7 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
             throw new InvalidRequestException("expected json-rpc request node to be ARRAY or OBJECT but found " + requestNode.getNodeType());
 
         } catch (Throwable t) {
-            log.warn("exception raised during json-rpc invocation", t);
+            jsonRpcLogger.logException(t);
 
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
             return Optional.of(buildErrorResponse(jsonRpcError, null));
@@ -119,8 +116,7 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
             return invoke(requestNode);
 
         } catch (Throwable t) {
-            log.warn("exception raised during json-rpc invocation", t);
-
+            jsonRpcLogger.logException(t);
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
             return Optional.of(buildErrorResponse(jsonRpcError, null));
         }
@@ -235,8 +231,10 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
         final JsonNode arguments = validRequest.getParams();
         final MethodDefinition methodDef = methodRegistry.getMethod(methodName).orElse(null);
 
+        final JsonRpcLogger.RequestInfo requestInfo = newRequestInfo(methodName, methodDef, arguments);
+
         try {
-            wireLogger.logRequest(methodDef, methodName, arguments);
+            jsonRpcLogger.logRequest(requestInfo);
 
             JsonNode result = methodRegistry.invoke(methodName, arguments);
 
@@ -246,23 +244,58 @@ public class JsonRpcDispatcherImpl implements JsonRpcDispatcher {
             resultMap.put("result", result);
 
             ObjectNode response = getObjectMapper().convertValue(resultMap, ObjectNode.class);
-            wireLogger.logSuccessResponse(methodDef, methodName, arguments, response, timer);
+            jsonRpcLogger.logSuccessResponse(requestInfo, newResponseInfo(response, timer));
             return response;
         } catch (Throwable t) {
-            log.warn("exception raised during json-rpc invocation", t);
+            jsonRpcLogger.logException(t);
 
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
             ObjectNode response = buildErrorResponse(jsonRpcError, validRequest.id);
-            wireLogger.logErrorResponse(methodDef, methodName, arguments, response, timer);
+            jsonRpcLogger.logErrorResponse(requestInfo, newResponseInfo(response, timer));
             return response;
         }
+    }
+
+    private static JsonRpcLogger.RequestInfo newRequestInfo(String methodName,
+                                                            @Nullable MethodDefinition methodDef,
+                                                            JsonNode arguments) {
+        return new JsonRpcLogger.RequestInfo() {
+            @Override
+            public String getMethodName() {
+                return methodName;
+            }
+
+            @Override
+            public Optional<MethodDefinition> getMethodDefinition() {
+                return Optional.ofNullable(methodDef);
+            }
+
+            @Override
+            public JsonNode getArguments() {
+                return arguments;
+            }
+        };
+    }
+
+    private static JsonRpcLogger.ResponseInfo newResponseInfo(ObjectNode response, Stopwatch timer) {
+        return new JsonRpcLogger.ResponseInfo() {
+            @Override
+            public ObjectNode getResponse() {
+                return response;
+            }
+
+            @Override
+            public Stopwatch getExecutionTimer() {
+                return timer;
+            }
+        };
     }
 
     protected ObjectNode invokeSolo(JsonNode soloRequest) {
         try {
             return invokeSolo(validateSoloRequest(soloRequest));
         } catch (Throwable t) {
-            log.warn("exception raised during json-rpc invocation", t);
+            jsonRpcLogger.logException(t);
 
             JsonRpcError jsonRpcError = exceptionTranslator.translate(t);
             return buildErrorResponse(jsonRpcError, soloRequest.get("id"));

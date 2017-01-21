@@ -1,10 +1,6 @@
 package com.github.therapi.jsonrpc;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.therapi.core.MethodDefinition;
-import com.google.common.base.Stopwatch;
-import javax.annotation.Nullable;
 import org.slf4j.Logger;
 
 public class DefaultJsonRpcLogger implements JsonRpcLogger {
@@ -25,45 +21,63 @@ public class DefaultJsonRpcLogger implements JsonRpcLogger {
         return LogLevel.INFO;
     }
 
-    public void logRequest(@Nullable MethodDefinition methodDef, String methodName, JsonNode arguments) {
-        final boolean loggable = methodDef != null && methodDef.isRequestLoggable();
-        getRequestLogLevel().log(log, "Invoking '{}' {}", methodName, loggable ? arguments : "(args not loggable)");
+    protected LogLevel getExceptionLogLevel() {
+        return LogLevel.WARN;
     }
 
-    public void logSuccessResponse(MethodDefinition methodDef, String methodName,
-            JsonNode arguments, ObjectNode response, Stopwatch executionTimer) {
+    @Override
+    public void logException(Throwable t) {
+        getExceptionLogLevel().log(log, "Exception thrown during json-rpc invocation", t);
+    }
 
-        getResponseTimeLogLevel().log(log, "'{}' completed successfully in {}", methodName, executionTimer);
+    @Override
+    public void logRequest(RequestInfo requestInfo) {
+        MethodDefinition methodDef = requestInfo.getMethodDefinition().orElse(null);
+        final boolean loggable = methodDef != null && methodDef.isRequestLoggable();
+        getRequestLogLevel().log(log, "Invoking '{}' {}",
+                requestInfo.getMethodName(), loggable ? requestInfo.getArguments() : "(args not loggable)");
+    }
+
+    @Override
+    public void logSuccessResponse(RequestInfo requestInfo, ResponseInfo responseInfo) {
+        String methodName = requestInfo.getMethodName();
+        MethodDefinition methodDef = requestInfo.getMethodDefinition().orElse(null);
+
+        getResponseTimeLogLevel().log(log, "'{}' completed successfully in {}", methodName, responseInfo.getExecutionTimer());
 
         final boolean loggable = methodDef != null && methodDef.isResponseLoggable();
         getSuccessfulResponseBodyLogLevel().log(log, "'{}' response: {}", methodName,
-                loggable ? response : "(not loggable)");
+                loggable ? responseInfo.getResponse() : "(not loggable)");
     }
 
-    public void logErrorResponse(@Nullable MethodDefinition methodDef, String methodName,
-            JsonNode arguments, ObjectNode response, Stopwatch executionTimer) {
-
-        getResponseTimeLogLevel().log(log, "'{}' completed with error in {}", methodName, executionTimer);
+    @Override
+    public void logErrorResponse(RequestInfo requestInfo, ResponseInfo responseInfo) {
+        String methodName = requestInfo.getMethodName();
+        getResponseTimeLogLevel().log(log, "'{}' completed with error in {}", methodName, responseInfo.getExecutionTimer());
 
         // note that error responses are logged regardless of whether the method was annotated @DoNotLog
-        getErrorResponseBodyLogLevel().log(log, "'{}' error response: {}", methodName, response);
+        getErrorResponseBodyLogLevel().log(log, "'{}' error response: {}", methodName, responseInfo.getResponse());
     }
 
     protected enum LogLevel {
         ERROR {
-            @Override public void log(Logger logger, String message, Object... args) {
+            @Override
+            public void log(Logger logger, String message, Object... args) {
                 logger.error(message, args);
             }
         }, WARN {
-            @Override public void log(Logger logger, String message, Object... args) {
+            @Override
+            public void log(Logger logger, String message, Object... args) {
                 logger.warn(message, args);
             }
         }, INFO {
-            @Override public void log(Logger logger, String message, Object... args) {
+            @Override
+            public void log(Logger logger, String message, Object... args) {
                 logger.info(message, args);
             }
         }, DEBUG {
-            @Override public void log(Logger logger, String message, Object... args) {
+            @Override
+            public void log(Logger logger, String message, Object... args) {
                 logger.debug(message, args);
             }
         };
