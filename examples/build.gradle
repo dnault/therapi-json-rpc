@@ -21,6 +21,10 @@ dependencies {
     compile project(':') // Core library; a real project would use the following line instead:
     // compile "com.github.therapi:therapi-json-rpc:<version>"
 
+    // Annotation processor, bakes Javadoc comments into the code
+    // so they can be used to generate API documentation.
+    compileOnly "com.github.therapi:therapi-runtime-javadoc-scribe:0.4.0"
+
     compile 'org.slf4j:slf4j-simple:1.7.12'
 
     compile 'commons-io:commons-io:2.4'
