@@ -50,7 +50,8 @@ public class ModelDocWriter {
         }
         return div(
                 h2(text("Examples")),
-                transform(examples, example -> pre(
-                        text(example.getExampleJson()))));
+                transform(examples, example -> seq(
+                        preEscapedText(example.getCommentHtml()),
+                        pre(text(example.getExampleJson())))));
     }
 }

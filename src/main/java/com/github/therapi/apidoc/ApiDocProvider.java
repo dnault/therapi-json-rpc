@@ -173,7 +173,7 @@ public class ApiDocProvider {
         String commentHtml = null;
         ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(modelClassName).orElse(null);
         if (classDoc != null && classDoc.getComment() != null) {
-            commentHtml = new CommentFormatter().format(classDoc.getComment());
+            commentHtml = commentFormatter.format(classDoc.getComment());
         }
 
         String schemaHtml = new JsonSchemaProvider()
@@ -192,24 +192,17 @@ public class ApiDocProvider {
         for (Method factoryMethod : registry.getExampleFactoryMethods(modelClass)) {
             try {
                 Object example = factoryMethod.invoke(null);
-                String commentHtml = null;
 
-//        ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(modelClass).orElse(null);
-//        if (classDoc != null) {
-//            for (MethodJavadoc methodJavadoc : classDoc.getMethods()) {
-//                methodJavadoc.
-//            }
-//        }
+                MethodJavadoc methodDoc = RuntimeJavadoc.getJavadoc(factoryMethod).orElse(null);
+                String commentHtml = methodDoc == null ? null
+                        : commentFormatter.format(methodDoc.getComment());
+
                 String exampleJson = registry.getObjectMapper().writerWithDefaultPrettyPrinter()
                         .writeValueAsString(example);
 
                 results.add(new ApiExampleModelDoc(commentHtml, exampleJson));
 
-            } catch (IllegalAccessException e) {
-                throw propagate(e);
-            } catch (InvocationTargetException e) {
-                throw propagate(e);
-            } catch (JsonProcessingException e) {
+            } catch (IllegalAccessException | InvocationTargetException | JsonProcessingException e) {
                 throw propagate(e);
             }
         }
