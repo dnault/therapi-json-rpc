@@ -48,7 +48,7 @@ dependencies {
     compile "org.slf4j:slf4j-api:${slf4jVersion}"
 
     compile 'com.google.code.findbugs:jsr305:3.0.0'
-    compile 'com.google.guava:guava:24.1-jre'
+    compile 'com.google.guava:guava:21.0'
     compile 'org.apache.commons:commons-lang3:3.7'
     compile 'org.apache.commons:commons-text:1.2'
     compile 'aopalliance:aopalliance:1.0'
