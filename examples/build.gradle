@@ -23,9 +23,9 @@ dependencies {
 
     // Annotation processor, bakes Javadoc comments into the code
     // so they can be used to generate API documentation.
-    compileOnly "com.github.therapi:therapi-runtime-javadoc-scribe:0.4.0"
+    annotationProcessor "com.github.therapi:therapi-runtime-javadoc-scribe:0.4.0"
 
-    compile 'org.slf4j:slf4j-simple:1.7.12'
+    compile 'org.slf4j:slf4j-simple:1.7.25'
 
     compile 'commons-io:commons-io:2.4'
 
