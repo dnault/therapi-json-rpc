@@ -33,7 +33,7 @@ import static com.github.therapi.apidoc.qndhtml.Tag.title;
 import static com.github.therapi.apidoc.qndhtml.Tag.tr;
 import static com.github.therapi.apidoc.qndhtml.Tag.transform;
 import static com.github.therapi.apidoc.qndhtml.Tag.ul;
-import static com.google.common.base.Throwables.propagate;
+import static com.github.therapi.core.internal.LangHelper.propagate;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.regex.Matcher.quoteReplacement;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript;

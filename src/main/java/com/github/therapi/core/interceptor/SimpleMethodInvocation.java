@@ -36,7 +36,7 @@ public class SimpleMethodInvocation implements MethodDefinitionInvocation {
 
     @Override
     public Method getMethod() {
-        return methodDefinition.getMethod();
+        return methodDefinition.getMethodForInvocation();
     }
 
     @Override
@@ -52,7 +52,7 @@ public class SimpleMethodInvocation implements MethodDefinitionInvocation {
     }
 
     protected Object invokeTargetMethod() throws Throwable {
-        Method method = methodDefinition.getMethod();
+        Method method = getMethod();
 
         try {
             return method.invoke(methodDefinition.getOwner(), arguments);
@@ -73,6 +73,6 @@ public class SimpleMethodInvocation implements MethodDefinitionInvocation {
 
     @Override
     public AccessibleObject getStaticPart() {
-        return methodDefinition.getMethod();
+        return getMethod();
     }
 }

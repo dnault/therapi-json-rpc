@@ -83,7 +83,7 @@ public class StandardParameterIntrospector implements ParameterIntrospector {
     protected boolean isNullable(Parameter p, Method method) {
         if (hasNullableAnnotation(p)) {
             if (p.getType().isPrimitive()) {
-                throw new InvalidAnnotationException("Annotation " + Nullable.class.getName()
+                throw new InvalidAnnotationException("Annotation @" + Nullable.class.getName()
                         + " may not be applied to primitive " + p.getType()
                         + " parameter '" + p.getName() + "' of method: " + method);
             }

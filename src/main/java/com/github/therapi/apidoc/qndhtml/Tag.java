@@ -1,6 +1,6 @@
 package com.github.therapi.apidoc.qndhtml;
 
-import static com.google.common.base.Throwables.propagate;
+import static com.github.therapi.core.internal.LangHelper.propagate;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -4,7 +4,7 @@ import static com.github.therapi.apidoc.JsonSchemaProvider.classNameToHyperlink;
 import static com.github.therapi.core.internal.LangHelper.index;
 import static com.github.therapi.core.internal.TypesHelper.getClassNames;
 import static com.github.therapi.core.internal.TypesHelper.getSimpleName;
-import static com.google.common.base.Throwables.propagate;
+import static com.github.therapi.core.internal.LangHelper.propagate;
 import static com.google.common.html.HtmlEscapers.htmlEscaper;
 
 import java.io.IOException;

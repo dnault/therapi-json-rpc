@@ -1,7 +1,7 @@
 package com.github.therapi.core;
 
 import static com.github.therapi.core.internal.JacksonHelper.isLikeNull;
-import static com.google.common.base.Throwables.propagate;
+import static com.github.therapi.core.internal.LangHelper.propagate;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Collections.unmodifiableCollection;

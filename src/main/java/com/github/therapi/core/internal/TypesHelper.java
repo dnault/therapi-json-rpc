@@ -1,11 +1,14 @@
 package com.github.therapi.core.internal;
 
+import static org.apache.commons.lang3.ClassUtils.getAllInterfaces;
 import static org.apache.commons.lang3.StringUtils.removeStart;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.apache.commons.lang3.StringUtils.substringBetween;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -128,5 +131,29 @@ public class TypesHelper {
         } catch (ClassNotFoundException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Returns the interface method overridden (implemented) by the given method,
+     * or returns the given method if its declaring class is an interface.
+     */
+    public static Optional<Method> findOnInterface(Method m) {
+        if (m.getDeclaringClass().isInterface()) {
+            return Optional.of(m);
+        }
+
+        final Class<?>[] parameterTypes = m.getParameterTypes();
+        for (Class<?> i : getAllInterfaces(m.getDeclaringClass())) {
+            try {
+                return Optional.of(i.getDeclaredMethod(m.getName(), parameterTypes));
+            } catch (NoSuchMethodException e) {
+                // ignore, continue searching
+            }
+        }
+        return Optional.empty();
+    }
+
+    public static boolean isPublic(Method m) {
+        return Modifier.isPublic(m.getModifiers());
     }
 }

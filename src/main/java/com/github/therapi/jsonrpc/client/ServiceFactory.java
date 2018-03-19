@@ -2,7 +2,7 @@ package com.github.therapi.jsonrpc.client;
 
 import static com.github.therapi.core.internal.JacksonHelper.getReturnTypeReference;
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Throwables.propagate;
+import static com.github.therapi.core.internal.LangHelper.propagate;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;

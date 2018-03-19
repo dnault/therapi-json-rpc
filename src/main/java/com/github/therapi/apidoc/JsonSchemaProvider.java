@@ -1,6 +1,6 @@
 package com.github.therapi.apidoc;
 
-import static com.google.common.base.Throwables.propagate;
+import static com.github.therapi.core.internal.LangHelper.propagate;
 import static java.util.regex.Matcher.quoteReplacement;
 
 import java.io.IOException;

@@ -15,7 +15,7 @@ import com.github.therapi.core.MethodDefinition;
 import com.github.therapi.core.ParameterDefinition;
 import com.github.therapi.core.StandardParameterIntrospector;
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.junit.Test;
 
 public class JsonSchemaProviderTest {

@@ -1,13 +1,13 @@
 package com.github.therapi.core.internal;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 public class LangHelper {
     public static <K, V> Map<K, V> index(Collection<V> collection, Function<V, K> keyGenerator) {
@@ -22,5 +22,15 @@ public class LangHelper {
         }
         m.appendTail(sb);
         return sb.toString();
+    }
+
+    public static RuntimeException propagate(Throwable throwable) {
+        if (throwable instanceof RuntimeException ) {
+            throw (RuntimeException) throwable;
+        }
+        if (throwable instanceof Error) {
+            throw (Error) throwable;
+        }
+        throw new RuntimeException(throwable);
     }
 }
