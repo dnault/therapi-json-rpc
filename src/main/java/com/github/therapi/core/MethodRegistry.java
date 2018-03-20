@@ -106,7 +106,7 @@ public class MethodRegistry {
      * they are registered.
      * <p>
      * The effective list of interceptors for a method is determined when the method
-     * is first invoked; subesequent interceptor registrations will not affect the method.
+     * is first invoked; subsequent interceptor registrations will not affect the method.
      * <p>
      * Here's an example that matches any method and prints how long the invocation takes:
      * <pre>
