@@ -39,7 +39,7 @@ Welcome to the Therapi JSON-RPC example webapp. The JSON-RPC endpoint is <a href
     documentation</a>
     for the example services. The text you see on that page comes from Javadoc in the source code.
     The Javadoc was baked into the code using the <a href="https://github.com/dnault/therapi-runtime-javadoc">
-    Therapi Runtime Javadoc</a> plugin for Gradle.
+    therapi-runtime-javadoc</a> annotation processor.
 
 <p>
     From the documentation you can press the "Try It!" buttons to invoke the service methods.
@@ -90,8 +90,8 @@ you're free to use any client library you like.
 
 <ul>
     <li><a href="jsonrpc?r=dictionary.list">Manually invoking a method with zero arguments</a></li>
-    <li><a href="jsonrpc?r=dictionary.list['a']">Manually invoking a method with positional arguments</a></li>
-    <li><a href="jsonrpc?r=dictionary.list{prefix:'a'}">Manually invoking a method with named arguments</a></li>
+    <li><a href="jsonrpc?r=dictionary.list[%22a%22]">Manually invoking a method with positional arguments</a></li>
+    <li><a href="jsonrpc?r=dictionary.list{prefix:%22a%22}">Manually invoking a method with named arguments</a></li>
 </ul>
 
 <h1>Diving deeper</h1>
@@ -110,8 +110,9 @@ class as a template. Don't forget to add your new servlet to <code>web.xml</code
     <li>Your service interfaces must be compiled with the <code>-parameters</code> option to <code>javac</code>
         so that parameter names are available at runtime.
     </li>
-    <li>If you want your Javadoc comments to be included in the API documentation, apply the Runtime Javadoc
-        plugin to your Gradle project.
+    <li>If you want your Javadoc comments to be included in the API documentation, use the
+        <a href="https://github.com/dnault/therapi-runtime-javadoc">therapi-runtime-javadoc</a>
+        annotation processor when compiling your project.
     </li>
 </ol>
 The example build script <code>build.gradle</code> takes care of both of these items.
@@ -121,7 +122,7 @@ Feel free to use it as a template.
     Found a bug? Have a feature request? <a href="https://github.com/dnault/therapi-json-rpc/issues">Let me know</a>.
 
 <p>
-    Okay, that's it. Have fun with Therapi, and welcome to the RESTless revolution!
+    Okay, that's it. Have fun with Therapi!
     <br><br><br>
 </body>
 </html>
