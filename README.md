@@ -83,6 +83,8 @@ Let's make some money by sharing this service with the world using
 Therapi's `@Remotable` annotation.
 
 ```java
+import com.github.therapi.core.annotation.*;
+ 
 @Remotable("greeting") // [1]
 public class GreetingService {    
     /**
@@ -150,6 +152,8 @@ There's a bit more documentation [over here](http://dnault.github.io/therapi-jso
 
 Some other features to explore on your own:
 
+* The Boot webapp in `spring-boot-example` and the vanilla webapp in `examples` have different
+example services. Try running them both. But not at the same time, unless you like port conflicts.
 * Use complex model classes as method arguments (anything Jackson can serialize/deserialize is supported). 
 * Wrap method invocations with AOP interceptors (see `MethodRegistry.intercept`).
 * Generate a Java client for your API from a `@Remotable` interface (see `ServiceFactory`). 
@@ -159,7 +163,8 @@ Some other features to explore on your own:
 * Annotate parameters as `@Nullable` to allow null values.
 * Annotate methods with `@DoNotLog` to suppress logging of sensitive requests/responses.
 * Customize the Jackson ObjectMapper (See `MethodRegistry` constructors).
-
+* When applying the `@Remotable` annotation to a method, specify a value to give the method a different name in the API.
+* Omit the value when applying `@Remotable` to a class or service to use a default name.
 
 ## Credits
 

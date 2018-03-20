@@ -2,14 +2,19 @@ package com.github.therapi.example.boot;
 
 import com.github.therapi.core.annotation.Default;
 import com.github.therapi.core.annotation.Remotable;
+import org.springframework.stereotype.Service;
 
+@Service
 @Remotable("greeting")
-public interface GreetingService {
+public class GreetingService {
     /**
-     * Generate a friendly greeting message.
+     * Starts a conversation.
      *
      * @param name The name of the person to greet
      * @return A friendly greeting message
      */
-    String greet(@Default("stranger") String name);
+    @Remotable
+    public String greet(@Default("stranger") String name) {
+        return "Hello, " + name + "!";
+    }
 }
