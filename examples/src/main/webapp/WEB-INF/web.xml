@@ -20,4 +20,17 @@
         <url-pattern>/jsonrpc/*</url-pattern>
     </servlet-mapping>
 
+    <!-- Don't need this unless you're deploying to Google App Engine
+         or some other servlet container that doesn't support
+         Servlet API 3.0 -->
+    <servlet>
+        <servlet-name>MetaInfResourceExporterServlet</servlet-name>
+        <servlet-class>com.github.therapi.jsonrpc.web.MetaInfResourceExporterServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MetaInfResourceExporterServlet</servlet-name>
+        <url-pattern>/therapi/*</url-pattern>
+    </servlet-mapping>
+
 </web-app>
