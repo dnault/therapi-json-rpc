@@ -7,7 +7,8 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * When applied to a public static method, indicates the serialized form of method's return value
+ * When applied to a public static method of an object scanned by the MethodRegistry,
+ * indicates the serialized form of method's return value
  * should be included in the API documentation as an example of the model type.
  */
 @Target(METHOD)
