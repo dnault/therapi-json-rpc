@@ -19,7 +19,7 @@ Relax. Everything is going to be okay. We'll work through this together.
 <dependency>
   <groupId>com.github.therapi</groupId>
   <artifactId>therapi-json-rpc</artifactId>
-  <version>0.3.0</version>
+  <version>0.4.0</version>
 </dependency>
 ```
 
