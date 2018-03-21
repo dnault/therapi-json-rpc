@@ -16,15 +16,15 @@ import java.io.OutputStream;
  * <p>
  * Add the following snippet to your web.xml and you should be good to go.
  * <pre>
- * &lt;servlet>
- *     &lt;servlet-name>MetaInfResourceExporterServlet&lt;/servlet-name>
- *     &lt;servlet-class>com.github.therapi.jsonrpc.web.MetaInfResourceExporterServlet&lt;/servlet-class>
- *     &lt;load-on-startup>0&lt;/load-on-startup>
- * &lt;/servlet>
- * &lt;servlet-mapping>
- *     &lt;servlet-name>MetaInfResourceExporterServlet&lt;/servlet-name>
- *     &lt;url-pattern>/therapi/*&lt;/url-pattern>
- * &lt;/servlet-mapping>
+ * &lt;servlet&gt;
+ *     &lt;servlet-name&gt;MetaInfResourceExporterServlet&lt;/servlet-name&gt;
+ *     &lt;servlet-class&gt;com.github.therapi.jsonrpc.web.MetaInfResourceExporterServlet&lt;/servlet-class&gt;
+ *     &lt;load-on-startup&gt;0&lt;/load-on-startup&gt;
+ * &lt;/servlet&gt;
+ * &lt;servlet-mapping&gt;
+ *     &lt;servlet-name&gt;MetaInfResourceExporterServlet&lt;/servlet-name&gt;
+ *     &lt;url-pattern&gt;/therapi/*&lt;/url-pattern&gt;
+ * &lt;/servlet-mapping&gt;
  * </pre>
  */
 public class MetaInfResourceExporterServlet extends HttpServlet {
