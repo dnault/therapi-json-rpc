@@ -1,22 +1,5 @@
 package com.github.therapi.apidoc;
 
-import static com.github.therapi.apidoc.JsonSchemaProvider.classNameToHyperlink;
-import static com.github.therapi.core.internal.LangHelper.index;
-import static com.github.therapi.core.internal.TypesHelper.getClassNames;
-import static com.github.therapi.core.internal.TypesHelper.getSimpleName;
-import static com.github.therapi.core.internal.LangHelper.propagate;
-import static com.google.common.html.HtmlEscapers.htmlEscaper;
-
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -30,9 +13,25 @@ import com.github.therapi.runtimejavadoc.CommentFormatter;
 import com.github.therapi.runtimejavadoc.MethodJavadoc;
 import com.github.therapi.runtimejavadoc.ParamJavadoc;
 import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
+
+import static com.github.therapi.apidoc.JsonSchemaProvider.classNameToHyperlink;
+import static com.github.therapi.core.internal.LangHelper.index;
+import static com.github.therapi.core.internal.LangHelper.propagate;
+import static com.github.therapi.core.internal.TypesHelper.getClassNames;
+import static com.github.therapi.core.internal.TypesHelper.getSimpleName;
+import static com.google.common.html.HtmlEscapers.htmlEscaper;
 
 public class ApiDocProvider {
     private final CommentFormatter commentFormatter = new CommentFormatter();
@@ -68,18 +67,10 @@ public class ApiDocProvider {
                 mdoc.setReturnType(toJsonType(mdef.getReturnTypeRef()));
                 mdoc.setRequestSchema(schemaProvider.getSchema(registry.getObjectMapper(), mdef));
 
-                final Optional<MethodJavadoc> methodJavadocOptional = getJavadoc(mdef);
-                final Map<String, ParamJavadoc> javadocsByParamName = methodJavadocOptional.isPresent()
-                        ? index(methodJavadocOptional.get().getParams(), ParamJavadoc::getName)
-                        : ImmutableMap.<String, ParamJavadoc>of();
-
-                if (methodJavadocOptional.isPresent()) {
-                    mdoc.setDescription(render(methodJavadocOptional.get().getComment()));
-                    mdoc.setReturns(render(methodJavadocOptional.get().getReturns()));
-                } else {
-                    mdoc.setDescription("");
-                    mdoc.setReturns("");
-                }
+                final MethodJavadoc methodJavadoc = RuntimeJavadoc.getJavadoc(mdef.getMethod());
+                final Map<String, ParamJavadoc> javadocsByParamName = index(methodJavadoc.getParams(), ParamJavadoc::getName);
+                mdoc.setDescription(render(methodJavadoc.getComment()));
+                mdoc.setReturns(render(methodJavadoc.getReturns()));
 
                 final List<ApiParamDoc> paramDocs = new ArrayList<>();
                 for (ParameterDefinition pdef : mdef.getParameters()) {
@@ -114,41 +105,6 @@ public class ApiDocProvider {
         return TypesHelper.toJsonType(typeRef.getType());
     }
 
-    public Optional<MethodJavadoc> getJavadoc(MethodDefinition m) throws IOException {
-        ClassJavadoc classJavadoc = RuntimeJavadoc.getJavadoc(m.getMethod().getDeclaringClass().getName()).orElse(null);
-        if (classJavadoc == null) {
-            return Optional.empty();
-        }
-
-        for (MethodJavadoc methodJavadoc : classJavadoc.getMethods()) {
-            if (methodJavadoc.getName().equals(m.getMethod().getName())) {
-                return Optional.of(methodJavadoc);
-            }
-
-        }
-
-        return Optional.empty();
-    }
-
-    public Optional<ApiMethodDoc> getMethodDoc(MethodDefinition m) throws IOException {
-        ClassJavadoc classJavadoc = RuntimeJavadoc.getJavadoc(m.getMethod().getDeclaringClass().getName()).orElse(null);
-        if (classJavadoc == null) {
-            return Optional.empty();
-        }
-
-        for (MethodJavadoc methodJavadoc : classJavadoc.getMethods()) {
-            if (methodJavadoc.getName().equals(m.getMethod().getName())) {
-                ApiMethodDoc doc = new ApiMethodDoc();
-                doc.setName(m.getQualifiedName("."));
-                doc.setDescription(render(methodJavadoc.getComment()));
-
-                return Optional.of(doc);
-            }
-
-        }
-        return Optional.empty();
-    }
-
     protected String render(Comment comment) {
         return commentFormatter.format(comment);
     }
@@ -170,11 +126,8 @@ public class ApiDocProvider {
             return Optional.empty();
         }
 
-        String commentHtml = null;
-        ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(modelClassName).orElse(null);
-        if (classDoc != null && classDoc.getComment() != null) {
-            commentHtml = commentFormatter.format(classDoc.getComment());
-        }
+        ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(modelClassName);
+        String commentHtml = render(classDoc.getComment());
 
         String schemaHtml = new JsonSchemaProvider()
                 .getSchemaForHtml(registry.getObjectMapper(), modelClass, classNameToHyperlink())
@@ -193,9 +146,8 @@ public class ApiDocProvider {
             try {
                 Object example = factoryMethod.invoke(null);
 
-                MethodJavadoc methodDoc = RuntimeJavadoc.getJavadoc(factoryMethod).orElse(null);
-                String commentHtml = methodDoc == null ? null
-                        : commentFormatter.format(methodDoc.getComment());
+                MethodJavadoc methodDoc = RuntimeJavadoc.getJavadoc(factoryMethod);
+                String commentHtml = render(methodDoc.getComment());
 
                 String exampleJson = registry.getObjectMapper().writerWithDefaultPrettyPrinter()
                         .writeValueAsString(example);

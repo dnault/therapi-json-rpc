@@ -16,7 +16,7 @@ apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
@@ -25,7 +25,7 @@ dependencies {
 
     // Annotation processor, bakes Javadoc comments into the code
     // so they can be used to generate API documentation.
-    annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.4.0'
+    annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.7.0'
 
     compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}") {
         exclude module: "spring-boot-starter-tomcat"

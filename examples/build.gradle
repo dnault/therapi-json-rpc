@@ -15,10 +15,10 @@ apply plugin: 'war'
 apply plugin: 'org.akhikhl.gretty'
 
 // don't need this unless you want to deplot to Google App Engine
-apply plugin: 'com.google.cloud.tools.appengine'
+//apply plugin: 'com.google.cloud.tools.appengine'
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
@@ -29,7 +29,7 @@ dependencies {
 
     // Annotation processor, bakes Javadoc comments into the code
     // so they can be used to generate API documentation.
-    annotationProcessor "com.github.therapi:therapi-runtime-javadoc-scribe:0.4.0"
+    annotationProcessor "com.github.therapi:therapi-runtime-javadoc-scribe:0.7.0"
 
     compile 'org.slf4j:slf4j-simple:1.7.25'
 
