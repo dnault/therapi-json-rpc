@@ -1,7 +1,7 @@
 package com.github.therapi.jsonrpc.web;
 
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Configures Spring to serve the static resources required by the API documentation web page.
@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  * <p>
  * To activate, add a bean of this class to your application context.
  */
-public class ApidocWebMvcConfigurer extends WebMvcConfigurerAdapter {
+public class ApidocWebMvcConfigurer implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/therapi/**")
