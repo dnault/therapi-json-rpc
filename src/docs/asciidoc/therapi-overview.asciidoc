@@ -1,9 +1,6 @@
 
 # Therapi JSON-RPC 2.0 Framework for Java
 
-image::therapi.png[]
-
-
 ## JSON-RPC in a Nutshell
 
 JSON-RPC 2.0 is a standard protocol for making remote procedure calls. The client makes a request to the server

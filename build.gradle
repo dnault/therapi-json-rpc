@@ -1,24 +1,12 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.2'
-    }
-}
 
 plugins {
     id "com.jfrog.bintray" version "1.3.1"
     id "com.github.spotbugs" version "4.6.1"
+    id 'org.asciidoctor.jvm.convert' version '3.1.0'
+    id 'java'
+    id 'maven-publish'
+    id 'checkstyle'
 }
-
-apply plugin: 'org.asciidoctor.convert'
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'maven-publish'
-apply plugin: 'checkstyle'
-
 
 repositories {
     mavenCentral()
@@ -45,25 +33,25 @@ dependencies {
     compileOnly "org.springframework:spring-webmvc:${springVersion}"
     compileOnly "org.springframework:spring-aop:${springVersion}"
 
-    compile "org.slf4j:slf4j-api:${slf4jVersion}"
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
 
-    compile 'com.google.code.findbugs:jsr305:3.0.0'
-    compile 'com.google.guava:guava:21.0'
-    compile 'org.apache.commons:commons-lang3:3.7'
-    compile 'org.apache.commons:commons-text:1.2'
-    compile 'aopalliance:aopalliance:1.0'
+    implementation 'com.google.code.findbugs:jsr305:3.0.0'
+    implementation 'com.google.guava:guava:21.0'
+    implementation 'org.apache.commons:commons-lang3:3.7'
+    implementation 'org.apache.commons:commons-text:1.2'
+    implementation 'aopalliance:aopalliance:1.0'
 
-    compile "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
-    compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-    compile "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
-    compile "com.fasterxml.jackson.module:jackson-module-jsonSchema:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.module:jackson-module-jsonSchema:${jacksonVersion}"
 
-    compile "com.github.therapi:therapi-runtime-javadoc:0.7.0"
+    implementation "com.github.therapi:therapi-runtime-javadoc:0.7.0"
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'net.javacrumbs.json-unit:json-unit:1.28.2'
-    testCompile "org.slf4j:slf4j-simple:${slf4jVersion}"
-    testCompile "org.springframework:spring-aop:${springVersion}"
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'net.javacrumbs.json-unit:json-unit:1.28.2'
+    testImplementation "org.slf4j:slf4j-simple:${slf4jVersion}"
+    testImplementation "org.springframework:spring-aop:${springVersion}"
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {
