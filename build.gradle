@@ -24,7 +24,7 @@ targetCompatibility = 1.8
 dependencies {
     def slf4jVersion = '1.7.25'
     def jacksonVersion = '2.9.4'
-    def springVersion = '5.3.4.RELEASE'
+    def springVersion = '5.3.4'
 
     compileOnly 'javax.servlet:javax.servlet-api:3.1.0'
 
