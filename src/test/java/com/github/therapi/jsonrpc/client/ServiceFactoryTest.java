@@ -29,7 +29,7 @@ public class ServiceFactoryTest {
 
     @Test
     public void canCallZeroArgMethod() throws Exception {
-        JsonRpcHttpClient client = (objectMapper1, jsonRpcRequest) ->
+        JsonRpcTransport client = (objectMapper1, jsonRpcRequest) ->
                 objectMapper1.readValue("{'result': ['hello', 'world']}", JsonNode.class);
 
         ServiceFactory factory = new ServiceFactory(objectMapper, client);
@@ -42,7 +42,7 @@ public class ServiceFactoryTest {
     public void canCallVoidMethod() throws Exception {
         AtomicBoolean invokedMethod = new AtomicBoolean();
 
-        JsonRpcHttpClient client = (objectMapper1, jsonRpcRequest) -> {
+        JsonRpcTransport client = (objectMapper1, jsonRpcRequest) -> {
             invokedMethod.set(true);
             return objectMapper1.readValue("{'result': {}}", JsonNode.class);
         };
@@ -56,7 +56,7 @@ public class ServiceFactoryTest {
 
     @Test
     public void canEchoParams() throws Exception {
-        JsonRpcHttpClient client = (objectMapper1, jsonRpcRequest) -> {
+        JsonRpcTransport client = (objectMapper1, jsonRpcRequest) -> {
             ObjectNode response = objectMapper1.createObjectNode();
             ObjectNode requestNode = objectMapper1.convertValue(jsonRpcRequest, ObjectNode.class);
             response.set("result", requestNode.get("params").get(0));
@@ -71,7 +71,7 @@ public class ServiceFactoryTest {
 
     @Test
     public void canEchoParamsWithNamedArguments() throws Exception {
-        JsonRpcHttpClient client = (objectMapper1, jsonRpcRequest) -> {
+        JsonRpcTransport client = (objectMapper1, jsonRpcRequest) -> {
             ObjectNode response = objectMapper1.createObjectNode();
             ObjectNode requestNode = objectMapper1.convertValue(jsonRpcRequest, ObjectNode.class);
             response.set("result", requestNode.get("params").get("args"));

@@ -24,17 +24,17 @@ import com.github.therapi.jsonrpc.JsonRpcError;
 public class ServiceFactory {
     protected final MethodIntrospector methodIntrospector;
     protected final ObjectMapper objectMapper;
-    protected final JsonRpcHttpClient httpClient;
+    protected final JsonRpcTransport transport;
     protected boolean useNamedArguments;
 
-    public ServiceFactory(ObjectMapper objectMapper, JsonRpcHttpClient httpClient) {
-        this(new StandardMethodIntrospector(objectMapper), objectMapper, httpClient);
+    public ServiceFactory(ObjectMapper objectMapper, JsonRpcTransport transport) {
+        this(new StandardMethodIntrospector(objectMapper), objectMapper, transport);
     }
 
-    public ServiceFactory(MethodIntrospector methodIntrospector, ObjectMapper objectMapper, JsonRpcHttpClient httpClient) {
+    public ServiceFactory(MethodIntrospector methodIntrospector, ObjectMapper objectMapper, JsonRpcTransport transport) {
         this.methodIntrospector = methodIntrospector;
         this.objectMapper = objectMapper;
-        this.httpClient = httpClient;
+        this.transport = transport;
     }
 
     public void setUseNamedArguments(boolean useNamedArguments) {
@@ -50,7 +50,7 @@ public class ServiceFactory {
                         String qualifiedName = namespace.isEmpty() ? method.getName() : namespace + "." + method.getName();
                         ObjectNode request = createJsonRpcRequest(method, qualifiedName, args);
 
-                        JsonNode jsonRpcResponse = httpClient.execute(objectMapper, request);
+                        JsonNode jsonRpcResponse = transport.execute(objectMapper, request);
 
                         JsonNode result = jsonRpcResponse.get("result");
 

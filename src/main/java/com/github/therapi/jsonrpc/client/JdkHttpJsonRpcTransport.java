@@ -13,13 +13,13 @@ import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-public class JdkHttpClient implements JsonRpcHttpClient {
+public class JdkHttpJsonRpcTransport implements JsonRpcTransport {
 
     private final URL endpoint;
     private int connectionTimeoutMillis;
     private int readTimeoutMillis;
 
-    public JdkHttpClient(String endpoint) throws MalformedURLException {
+    public JdkHttpJsonRpcTransport(String endpoint) throws MalformedURLException {
         this.endpoint = new URL(endpoint);
         setConnectionTimeout(30, SECONDS);
         setReadTimeout(30, SECONDS);
