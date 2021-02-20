@@ -1,41 +1,31 @@
-buildscript {
-    ext.springBootVersion = '2.0.0.RELEASE'
 
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-    }
+plugins {
+    id 'war'
+    id 'org.springframework.boot' version '2.4.3'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 }
-
-apply plugin: 'war'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'org.springframework.boot'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile project(':') // Core library; a real project would use the following line instead:
-    // compile "com.github.therapi:therapi-json-rpc:<version>"
+    implementation project(':') // Core library; a real project would use the following line instead:
+    // implementation "com.github.therapi:therapi-json-rpc:<version>"
 
     // Annotation processor, bakes Javadoc comments into the code
     // so they can be used to generate API documentation.
     annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.7.0'
 
-    compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}") {
+    implementation("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
     }
-    compile("org.springframework.boot:spring-boot-starter-jetty:${springBootVersion}")
-    compile("org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}")
+    implementation("org.springframework.boot:spring-boot-starter-jetty")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
-    testCompile 'junit:junit:4.11'
-    testCompile 'org.slf4j:slf4j-simple:1.7.25'
-    testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+    testImplementation 'junit:junit:4.11'
+    testImplementation 'org.slf4j:slf4j-simple:1.7.25'
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
 }
 
 sourceCompatibility = 1.8
