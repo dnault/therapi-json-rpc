@@ -1,41 +1,35 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
 
-    dependencies {
-        classpath 'org.akhikhl.gretty:gretty:1.4.0'
+plugins {
+    id 'war'
+    id "org.gretty" version "3.0.3"
 
-        // don't need this unless you want to deplot to Google App Engine
-        classpath 'com.google.cloud.tools:appengine-gradle-plugin:+'
-    }
+    // Don't need this unless you want to deploy to Google App Engine.
+    // See also the pluginManagement block in the top-level settings.gradle
+    id 'com.google.cloud.tools.appengine' version '2.4.1'
 }
-
-apply plugin: 'war'
-apply plugin: 'org.akhikhl.gretty'
-
-// don't need this unless you want to deplot to Google App Engine
-//apply plugin: 'com.google.cloud.tools.appengine'
 
 repositories {
     mavenCentral()
+
+    // for gretty... until this is resolved:
+    // https://github.com/gretty-gradle-plugin/gretty/issues/192
+    jcenter()
 }
 
 dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
 
-    compile project(':') // Core library; a real project would use the following line instead:
-    // compile "com.github.therapi:therapi-json-rpc:<version>"
+    implementation project(':') // Core library; a real project would use the following line instead:
+    // implementation "com.github.therapi:therapi-json-rpc:<version>"
 
     // Annotation processor, bakes Javadoc comments into the code
     // so they can be used to generate API documentation.
     annotationProcessor "com.github.therapi:therapi-runtime-javadoc-scribe:0.7.0"
 
-    compile 'org.slf4j:slf4j-simple:1.7.25'
+    implementation 'org.slf4j:slf4j-simple:1.7.25'
+    implementation 'commons-io:commons-io:2.4'
 
-    compile 'commons-io:commons-io:2.4'
-
-    testCompile 'junit:junit:4.11'
+    testImplementation 'junit:junit:4.11'
 }
 
 sourceCompatibility = 1.8
@@ -44,16 +38,4 @@ targetCompatibility = 1.8
 tasks.withType(JavaCompile) {
     // retain parameter names in class files
     options.compilerArgs << "-parameters"
-}
-
-project.afterEvaluate {
-    appRun.doFirst {
-        println """
-            *
-            * WARNING: Please use the 'appRunWar' task instead, otherwise you won't
-            * be able to view the API documentation. A real project using a pre-built
-            * therapi-json-rpc.jar does not have this limitation.
-            *
-            """.stripIndent()
-    }
 }
