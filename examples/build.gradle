@@ -19,17 +19,15 @@ repositories {
 dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
 
-    implementation project(':') // Core library; a real project would use the following line instead:
-    // implementation "com.github.therapi:therapi-json-rpc:<version>"
+    implementation "com.github.therapi:therapi-json-rpc:0.4.0"
 
-    // Annotation processor, bakes Javadoc comments into the code
-    // so they can be used to generate API documentation.
-    annotationProcessor "com.github.therapi:therapi-runtime-javadoc-scribe:0.7.0"
+    // Bakes Javadoc comments into the code so they can be used
+    // to generate API documentation.
+    annotationProcessor "com.github.therapi:therapi-runtime-javadoc-scribe:0.12.0"
 
     implementation 'org.slf4j:slf4j-simple:1.7.25'
     implementation 'commons-io:commons-io:2.4'
     implementation 'org.apache.commons:commons-lang3:3.7'
-
 
     testImplementation 'junit:junit:4.11'
 }

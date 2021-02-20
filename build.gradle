@@ -24,7 +24,7 @@ targetCompatibility = 1.8
 dependencies {
     def slf4jVersion = '1.7.25'
     def jacksonVersion = '2.9.4'
-    def springVersion = '5.0.4.RELEASE'
+    def springVersion = '5.3.4.RELEASE'
 
     compileOnly 'javax.servlet:javax.servlet-api:3.1.0'
 
@@ -46,7 +46,7 @@ dependencies {
     api "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
     api "com.fasterxml.jackson.module:jackson-module-jsonSchema:${jacksonVersion}"
 
-    implementation "com.github.therapi:therapi-runtime-javadoc:0.7.0"
+    implementation "com.github.therapi:therapi-runtime-javadoc:0.12.0"
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'net.javacrumbs.json-unit:json-unit:1.28.2'
