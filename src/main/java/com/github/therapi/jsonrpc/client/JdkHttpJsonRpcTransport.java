@@ -19,8 +19,12 @@ public class JdkHttpJsonRpcTransport implements JsonRpcTransport {
     private int connectionTimeoutMillis;
     private int readTimeoutMillis;
 
-    public JdkHttpJsonRpcTransport(String endpoint) throws MalformedURLException {
-        this.endpoint = new URL(endpoint);
+    public JdkHttpJsonRpcTransport(String endpoint) {
+        try {
+            this.endpoint = new URL(endpoint);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Failed to parse endpoint url", e);
+        }
         setConnectionTimeout(30, SECONDS);
         setReadTimeout(30, SECONDS);
     }
@@ -33,7 +37,8 @@ public class JdkHttpJsonRpcTransport implements JsonRpcTransport {
         this.readTimeoutMillis = (int) unit.toMillis(duration);
     }
 
-    @Override public JsonNode execute(ObjectMapper objectMapper, Object jsonRpcRequest) throws IOException {
+    @Override
+    public JsonNode execute(ObjectMapper objectMapper, Object jsonRpcRequest) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
         try {
             connection.setConnectTimeout(connectionTimeoutMillis);
