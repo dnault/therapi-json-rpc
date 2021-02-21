@@ -7,4 +7,6 @@ import java.util.Collection;
  */
 public interface MethodIntrospector {
     Collection<MethodDefinition> findMethods(Object o);
+
+    String getNamespace(Class<?> serviceClass);
 }

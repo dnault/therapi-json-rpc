@@ -48,10 +48,11 @@ public class StandardMethodIntrospector implements MethodIntrospector {
         return springAopIsPresent ? new SpringAopProxyIntrospector() : Object::getClass;
     }
 
-    protected String getNamespace(Object o, Class<?> targetClass) {
-        final Remotable remotable = targetClass.getAnnotation(Remotable.class);
+    @Override
+    public String getNamespace(Class<?> serviceClass) {
+        final Remotable remotable = serviceClass.getAnnotation(Remotable.class);
         return remotable == null || remotable.value().equals(Remotable.DEFAULT_NAME)
-                ? getDefaultNamespace(targetClass) : remotable.value();
+                ? getDefaultNamespace(serviceClass) : remotable.value();
     }
 
     protected String getDefaultNamespace(Class<?> serviceClass) {
@@ -67,7 +68,7 @@ public class StandardMethodIntrospector implements MethodIntrospector {
     public Collection<MethodDefinition> findMethods(Object o) {
         final List<MethodDefinition> methodsFromInterfaces = ClassUtils.getAllInterfaces(o.getClass()).stream()
                 .filter(iface -> iface.isAnnotationPresent(Remotable.class))
-                .flatMap(iface -> findMethodsOnInterface(o, iface, getNamespace(o, iface)))
+                .flatMap(iface -> findMethodsOnInterface(o, iface, getNamespace(iface)))
                 .collect(toList());
 
         final List<MethodDefinition> result = new ArrayList<>(methodsFromInterfaces);
@@ -78,7 +79,7 @@ public class StandardMethodIntrospector implements MethodIntrospector {
         // For annotated classes, take the service name from the subbiest of subclasses.
         final Remotable remotableClass = targetClass.getAnnotation(Remotable.class);
         if (remotableClass != null) {
-            final String namespace = getNamespace(o, targetClass);
+            final String namespace = getNamespace(targetClass);
 
             final List<Class<?>> classHierarchy = new ArrayList<>();
             classHierarchy.add(targetClass);
