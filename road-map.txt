@@ -5,6 +5,7 @@
 [COMPLETE] lowercase enum module
 [COMPLETE] spring integration
 [COMPLETE] method interception?
+[COMPLETE] automatic client (ServiceFactory)
 
 automatic documentation [IN PROGRESS]
 \- schemas
@@ -14,8 +15,6 @@ json views
 binary responses
 
 upload requests
-
-automatic client
 
 metrics
 
