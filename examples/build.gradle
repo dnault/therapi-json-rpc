@@ -9,6 +9,7 @@ plugins {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 
     // for gretty... until this is resolved:
@@ -19,7 +20,7 @@ repositories {
 dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
 
-    implementation "com.github.therapi:therapi-json-rpc:0.4.0"
+    implementation "com.github.therapi:therapi-json-rpc:0.5.0"
 
     // Bakes Javadoc comments into the code so they can be used
     // to generate API documentation.
