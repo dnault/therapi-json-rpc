@@ -23,7 +23,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     testImplementation 'junit:junit:4.11'
-    testImplementation 'org.slf4j:slf4j-simple:1.7.25'
+    testImplementation 'org.slf4j:slf4j-simple:1.7.30'
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 }
 

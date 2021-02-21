@@ -25,7 +25,7 @@ dependencies {
     // to generate API documentation.
     annotationProcessor "com.github.therapi:therapi-runtime-javadoc-scribe:0.12.0"
 
-    implementation 'org.slf4j:slf4j-simple:1.7.25'
+    implementation 'org.slf4j:slf4j-simple:1.7.30'
     implementation 'commons-io:commons-io:2.4'
     implementation 'org.apache.commons:commons-lang3:3.7'
 
