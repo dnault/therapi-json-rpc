@@ -37,7 +37,8 @@ dependencies {
 
     implementation 'com.google.code.findbugs:jsr305:3.0.0'
     implementation 'com.google.guava:guava:21.0'
-    implementation 'org.apache.commons:commons-lang3:3.7'
+    implementation 'org.apache.commons:commons-lang3:3.11'
+    implementation 'org.apache.commons:commons-text:1.9'
     implementation 'aopalliance:aopalliance:1.0'
 
     api "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
@@ -51,7 +52,6 @@ dependencies {
     testImplementation 'net.javacrumbs.json-unit:json-unit:1.28.2'
     testImplementation "org.slf4j:slf4j-simple:${slf4jVersion}"
     testImplementation "org.springframework:spring-aop:${springVersion}"
-    testImplementation 'org.apache.commons:commons-text:1.2'
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {

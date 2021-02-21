@@ -8,7 +8,6 @@ import static java.util.Collections.unmodifiableCollection;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -38,6 +37,7 @@ import com.google.common.collect.TreeMultimap;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -189,7 +189,7 @@ public class MethodRegistry {
     public List<String> suggestMethods(String methodName) {
         TreeMultimap<Integer, String> suggestionsByDistance = TreeMultimap.create();
         for (String name : methodsByName.keySet()) {
-            int distance = getLevenshteinDistance(name, methodName, 25);
+            int distance = new LevenshteinDistance(25).apply(name, methodName);
             if (distance != -1) {
                 suggestionsByDistance.put(distance, name);
             }
